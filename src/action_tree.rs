@@ -2,8 +2,15 @@ use crate::bet_size::*;
 use crate::card::*;
 use crate::mutex_like::*;
 
+// #[cfg(feature = "bincode")]
+// use bincode::{Decode, Encode};
+
 #[cfg(feature = "bincode")]
-use bincode::{Decode, Encode};
+use bincode::{
+    de::Decoder,
+    error::DecodeError,
+    Decode, Encode
+};
 
 pub(crate) const PLAYER_OOP: u8 = 0;
 pub(crate) const PLAYER_IP: u8 = 1;
@@ -147,13 +154,32 @@ pub struct ActionTree {
 }
 
 #[derive(Default)]
-#[cfg_attr(feature = "bincode", derive(Decode, Encode))]
+#[cfg_attr(feature = "bincode", derive(Encode))]
 pub(crate) struct ActionTreeNode {
     pub(crate) player: u8,
     pub(crate) board_state: BoardState,
     pub(crate) amount: i32,
     pub(crate) actions: Vec<Action>,
     pub(crate) children: Vec<MutexLike<ActionTreeNode>>,
+}
+
+#[cfg(feature = "bincode")]
+impl Decode<()> for ActionTreeNode {
+    fn decode<D: Decoder<Context = ()>>(decoder: &mut D) -> Result<Self, DecodeError> {
+        let player = u8::decode(decoder)?;
+        let board_state = BoardState::decode(decoder)?;
+        let amount = i32::decode(decoder)?;
+        let actions = Vec::<Action>::decode(decoder)?;
+        let children = Vec::<MutexLike<ActionTreeNode>>::decode(decoder)?;
+        
+        Ok(Self {
+            player,
+            board_state,
+            amount,
+            actions,
+            children,
+        })
+    }
 }
 
 struct BuildTreeInfo {

@@ -73,4 +73,41 @@ fn main() {
 
     // delete the file
     std::fs::remove_file("filename.bin").unwrap();
+
+    // Write results to a text file
+    use std::fs::File;
+    use std::io::Write;
+    
+    let mut file = File::create("solver_results.txt").unwrap();
+    
+    writeln!(file, "\nGame Configuration:").unwrap();
+    
+    // For the flop, extract the individual cards from the flop
+    let flop_str = format!("{}{}{}", 
+        card_to_string((card_config.flop >> 16) as u8).unwrap_or_default(),
+        card_to_string((card_config.flop >> 8) as u8).unwrap_or_default(),
+        card_to_string(card_config.flop as u8).unwrap_or_default()
+    );
+    writeln!(file, "Board: {}", flop_str).unwrap();
+    
+    if card_config.turn != NOT_DEALT {
+        writeln!(file, "Turn: {}", card_to_string(card_config.turn).unwrap_or_default()).unwrap();
+    }
+    if card_config.river != NOT_DEALT {
+        writeln!(file, "River: {}", card_to_string(card_config.river).unwrap_or_default()).unwrap();
+    }
+    writeln!(file, "Starting pot: {}", tree_config.starting_pot).unwrap();
+    writeln!(file, "Effective stack: {}", tree_config.effective_stack).unwrap();
+    
+    // Write equity information
+    game.back_to_root();
+    game.cache_normalized_weights();
+    let oop_equity = compute_average(&game.equity(0), game.normalized_weights(0)) * 100.0;
+    let ip_equity = compute_average(&game.equity(1), game.normalized_weights(1)) * 100.0;
+    
+    writeln!(file, "\nEquity:").unwrap();
+    writeln!(file, "OOP equity: {:.2}%", oop_equity).unwrap();
+    writeln!(file, "IP equity: {:.2}%", ip_equity).unwrap();
+    
+    println!("Results written to solver_results.txt");
 }

@@ -1,0 +1,214 @@
+Complete Game Tree Analysis
+==========================
+Board: Td9d6hQc
+Starting pot: 200
+Effective stack: 900
+Exploitability: 0.91
+
+
+● Root node
+  Player: OOP
+  Equity: OOP 53.06% / IP 46.94%
+  EV: OOP 91.89 / IP 108.11
+  Available actions: [Check, Bet(120), Bet(216), AllIn(900)]
+  Action EVs for OOP:
+    - Check: 89.44
+      Hand 5c4c: 65.0%
+      Hand Ac4c: 54.2%
+      Hand 5d4d: 55.3%
+      Hand Ad4d: 98.6%
+      Hand 5h4h: 64.6%
+      ... and 162 more hands
+      Average frequency: 67.6%
+  ● After Check
+    Player: IP
+    Equity: OOP 52.75% / IP 47.25%
+    EV: OOP 89.44 / IP 110.56
+    Available actions: [Check, Bet(120), Bet(216), AllIn(900)]
+    Action EVs for IP:
+      - Check: Leads to chance node
+      (End of branch)
+      - Bet(120): 263.62
+        Hand 2d2c: 100.0%
+        Hand 2h2c: 98.7%
+        Hand 2s2c: 99.5%
+        Hand Ac2c: 21.1%
+        Hand 2h2d: 9.6%
+        ... and 245 more hands
+        Average frequency: 65.8%
+    ● After Check → Bet(120)
+      Player: OOP
+      Equity: OOP 45.79% / IP 54.21%
+      EV: OOP 56.38 / IP 263.62
+      Available actions: [Fold, Call, Raise(300)]
+      Action EVs for OOP:
+        - Fold: Leads to terminal node
+        (End of branch)
+        - Call: Leads to chance node
+        (End of branch)
+        - Raise(300): 475.60
+          Hand 5c4c: 0.0%
+          Hand Ac4c: 20.6%
+          Hand 5d4d: 0.0%
+          Hand Ad4d: 0.0%
+          Hand 5h4h: 0.0%
+          ... and 162 more hands
+          Average frequency: 4.1%
+      ● After Check → Bet(120) → Raise(300)
+        Player: IP
+        Equity: OOP 63.24% / IP 36.76%
+        EV: OOP 475.60 / IP 144.40
+        Available actions: [Fold, Call, AllIn(900)]
+        Action EVs for IP:
+          - Fold: Leads to terminal node
+          (Further exploration omitted for brevity)
+          - Call: Leads to chance node
+          (Further exploration omitted for brevity)
+          - AllIn(900): 1258.86
+            Warning: Strategy index calculation issue detected
+      - Bet(216): 374.68
+        Hand 2d2c: 0.0%
+        Hand 2h2c: 0.0%
+        Hand 2s2c: 0.0%
+        Hand Ac2c: 0.0%
+        Hand 2h2d: 0.0%
+        ... and 245 more hands
+        Average frequency: 0.0%
+    ● After Check → Bet(216)
+      Player: OOP
+      Equity: OOP 46.50% / IP 53.50%
+      EV: OOP 41.32 / IP 374.68
+      Available actions: [Fold, Call, Raise(540), AllIn(900)]
+      Action EVs for OOP:
+        - Fold: Leads to terminal node
+        (End of branch)
+        - Call: Leads to chance node
+        (End of branch)
+        - Raise(540): 672.08
+          Hand 5c4c: 6.1%
+          Hand Ac4c: 0.0%
+          Hand 5d4d: 0.0%
+          Hand Ad4d: 0.0%
+          Hand 5h4h: 0.0%
+          ... and 162 more hands
+          Average frequency: 1.2%
+      ● After Check → Bet(216) → Raise(540)
+        Player: IP
+        Equity: OOP 58.52% / IP 41.48%
+        EV: OOP 672.08 / IP 283.92
+        Available actions: [Fold, Call, AllIn(900)]
+        Action EVs for IP:
+          - Fold: Leads to terminal node
+          (Further exploration omitted for brevity)
+          - Call: Leads to chance node
+          (Further exploration omitted for brevity)
+          - AllIn(900): 1355.32
+            Warning: Strategy index calculation issue detected
+        - AllIn(900): 1019.66
+          Warning: Strategy index calculation issue detected
+      - AllIn(900): NaN
+        Warning: Strategy index calculation issue detected
+    - Bet(120): 246.73
+      Hand 5c4c: 100.0%
+      Hand Ac4c: 62.6%
+      Hand 5d4d: 55.9%
+      Hand Ad4d: 0.0%
+      Hand 5h4h: 0.0%
+      ... and 162 more hands
+      Average frequency: 43.7%
+  ● After Bet(120)
+    Player: IP
+    Equity: OOP 57.91% / IP 42.09%
+    EV: OOP 246.73 / IP 73.27
+    Available actions: [Fold, Call, Raise(300)]
+    Action EVs for IP:
+      - Fold: Leads to terminal node
+      (End of branch)
+      - Call: Leads to chance node
+      (End of branch)
+      - Raise(300): 495.46
+        Hand 2d2c: 0.0%
+        ... and 245 more hands
+        Average frequency: 0.0%
+    ● After Bet(120) → Raise(300)
+      Player: OOP
+      Equity: OOP 42.06% / IP 57.94%
+      EV: OOP 124.54 / IP 495.46
+      Available actions: [Fold, Call, AllIn(900)]
+      Action EVs for OOP:
+        - Fold: Leads to terminal node
+        (End of branch)
+        - Call: Leads to chance node
+        (End of branch)
+        - AllIn(900): 1106.31
+          Hand 5c4c: 0.0%
+          Hand Ac4c: 0.0%
+          Hand 5d4d: 0.0%
+          Hand Ad4d: 0.0%
+          Hand 5h4h: 0.0%
+          ... and 162 more hands
+          Average frequency: 0.0%
+      ● After Bet(120) → Raise(300) → AllIn(900)
+        Player: IP
+        Equity: OOP 57.98% / IP 42.02%
+        EV: OOP 1106.31 / IP 293.69
+        Available actions: [Fold, Call]
+        Action EVs for IP:
+          - Fold: Leads to terminal node
+          (Further exploration omitted for brevity)
+          - Call: Leads to terminal node
+          (Further exploration omitted for brevity)
+    - Bet(216): 360.61
+      Hand 5c4c: 22.2%
+      Hand Ac4c: 0.2%
+      Hand 5d4d: 0.0%
+      Hand Ad4d: 4.1%
+      Hand 5h4h: 3.8%
+      ... and 162 more hands
+      Average frequency: 6.1%
+  ● After Bet(216)
+    Player: IP
+    Equity: OOP 55.88% / IP 44.12%
+    EV: OOP 360.61 / IP 55.39
+    Available actions: [Fold, Call, Raise(540), AllIn(900)]
+    Action EVs for IP:
+      - Fold: Leads to terminal node
+      (End of branch)
+      - Call: Leads to chance node
+      (End of branch)
+      - Raise(540): 738.44
+        Hand 2d2c: 0.0%
+        ... and 245 more hands
+        Average frequency: 0.0%
+    ● After Bet(216) → Raise(540)
+      Player: OOP
+      Equity: OOP 39.34% / IP 60.66%
+      EV: OOP 217.56 / IP 738.44
+      Available actions: [Fold, Call, AllIn(900)]
+      Action EVs for OOP:
+        - Fold: Leads to terminal node
+        (End of branch)
+        - Call: Leads to chance node
+        (End of branch)
+        - AllIn(900): 1202.08
+          Hand 5c4c: 0.0%
+          Hand Ac4c: 0.0%
+          Hand 5d4d: 0.0%
+          Hand Ad4d: 1.0%
+          Hand 5h4h: 0.9%
+          ... and 162 more hands
+          Average frequency: 0.4%
+      ● After Bet(216) → Raise(540) → AllIn(900)
+        Player: IP
+        Equity: OOP 61.19% / IP 38.81%
+        EV: OOP 1202.08 / IP 437.92
+        Available actions: [Fold, Call]
+        Action EVs for IP:
+          - Fold: Leads to terminal node
+          (Further exploration omitted for brevity)
+          - Call: Leads to terminal node
+          (Further exploration omitted for brevity)
+      - AllIn(900): 1062.27
+        Warning: Strategy index calculation issue detected
+    - AllIn(900): NaN
+      Warning: Strategy index calculation issue detected
