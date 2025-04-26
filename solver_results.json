@@ -1,366 +1,8 @@
 {
   "actions": [
-    "CHECK","BET 120","BET 216","ALLIN 900"
+    "CHECK","BET 120","ALLIN 900"
   ],
   "childrens": {
-    "BET 216": {
-      "actions": [
-        "FOLD","CALL","RAISE 540","ALLIN 900"
-      ],
-      "childrens": {
-        "ALLIN 900": {
-          "actions": [
-            "FOLD","CALL"
-          ],
-          "childrens": {
-            "CALL": {
-              "deal_number": 0,
-              "node_type": "terminal_node"
-            },
-            "FOLD": {
-              "deal_number": 0,
-              "node_type": "terminal_node"
-            }
-          },
-          "node_type": "action_node",
-          "player": "OOP",
-          "strategy": {
-            "actions": [
-              "FOLD","CALL"
-            ],
-            "strategy": {}
-          },
-          "path": [
-            "BET 216","ALLIN 900"
-          ]
-        },
-        "FOLD": {
-          "deal_number": 0,
-          "node_type": "terminal_node"
-        },
-        "CALL": {
-          "deal_number": 0,
-          "node_type": "chance_node"
-        },
-        "RAISE 540": {
-          "actions": [
-            "FOLD","CALL","ALLIN 900"
-          ],
-          "childrens": {
-            "CALL": {
-              "deal_number": 0,
-              "node_type": "chance_node"
-            },
-            "ALLIN 900": {
-              "actions": [
-                "FOLD","CALL"
-              ],
-              "childrens": {
-                "FOLD": {
-                  "deal_number": 0,
-                  "node_type": "terminal_node"
-                },
-                "CALL": {
-                  "deal_number": 0,
-                  "node_type": "terminal_node"
-                }
-              },
-              "node_type": "action_node",
-              "player": "IP",
-              "strategy": {
-                "actions": [
-                  "FOLD","CALL"
-                ],
-                "strategy": {
-                  "As2s": [
-                    1.0,0.0
-                  ]
-                }
-              },
-              "path": [
-                "BET 216","RAISE 540","ALLIN 900"
-              ]
-            },
-            "FOLD": {
-              "deal_number": 0,
-              "node_type": "terminal_node"
-            }
-          },
-          "node_type": "action_node",
-          "player": "OOP",
-          "strategy": {
-            "actions": [
-              "FOLD","CALL","ALLIN 900"
-            ],
-            "strategy": {}
-          },
-          "path": [
-            "BET 216","RAISE 540"
-          ]
-        }
-      },
-      "node_type": "action_node",
-      "player": "IP",
-      "strategy": {
-        "actions": [
-          "FOLD","CALL","RAISE 540","ALLIN 900"
-        ],
-        "strategy": {
-          "As2s": [
-            1.0,0.0,0.0,0.0
-          ]
-        }
-      },
-      "path": [
-        "BET 216"
-      ]
-    },
-    "CHECK": {
-      "actions": [
-        "CHECK","BET 120","BET 216","ALLIN 900"
-      ],
-      "childrens": {
-        "CHECK": {
-          "deal_number": 0,
-          "node_type": "chance_node"
-        },
-        "BET 120": {
-          "actions": [
-            "FOLD","CALL","RAISE 300"
-          ],
-          "childrens": {
-            "RAISE 300": {
-              "actions": [
-                "FOLD","CALL","ALLIN 900"
-              ],
-              "childrens": {
-                "ALLIN 900": {
-                  "actions": [
-                    "FOLD","CALL"
-                  ],
-                  "childrens": {
-                    "FOLD": {
-                      "deal_number": 0,
-                      "node_type": "terminal_node"
-                    },
-                    "CALL": {
-                      "deal_number": 0,
-                      "node_type": "terminal_node"
-                    }
-                  },
-                  "node_type": "action_node",
-                  "player": "OOP",
-                  "strategy": {
-                    "actions": [
-                      "FOLD","CALL"
-                    ],
-                    "strategy": {}
-                  },
-                  "path": [
-                    "CHECK","BET 120","RAISE 300","ALLIN 900"
-                  ]
-                },
-                "CALL": {
-                  "deal_number": 0,
-                  "node_type": "chance_node"
-                },
-                "FOLD": {
-                  "deal_number": 0,
-                  "node_type": "terminal_node"
-                }
-              },
-              "node_type": "action_node",
-              "player": "IP",
-              "strategy": {
-                "actions": [
-                  "FOLD","CALL","ALLIN 900"
-                ],
-                "strategy": {
-                  "As2s": [
-                    1.0,0.0,0.0
-                  ]
-                }
-              },
-              "path": [
-                "CHECK","BET 120","RAISE 300"
-              ]
-            },
-            "CALL": {
-              "deal_number": 0,
-              "node_type": "chance_node"
-            },
-            "FOLD": {
-              "deal_number": 0,
-              "node_type": "terminal_node"
-            }
-          },
-          "node_type": "action_node",
-          "player": "OOP",
-          "strategy": {
-            "actions": [
-              "FOLD","CALL","RAISE 300"
-            ],
-            "strategy": {}
-          },
-          "path": [
-            "CHECK","BET 120"
-          ]
-        },
-        "BET 216": {
-          "actions": [
-            "FOLD","CALL","RAISE 540","ALLIN 900"
-          ],
-          "childrens": {
-            "FOLD": {
-              "deal_number": 0,
-              "node_type": "terminal_node"
-            },
-            "ALLIN 900": {
-              "actions": [
-                "FOLD","CALL"
-              ],
-              "childrens": {
-                "CALL": {
-                  "deal_number": 0,
-                  "node_type": "terminal_node"
-                },
-                "FOLD": {
-                  "deal_number": 0,
-                  "node_type": "terminal_node"
-                }
-              },
-              "node_type": "action_node",
-              "player": "IP",
-              "strategy": {
-                "actions": [
-                  "FOLD","CALL"
-                ],
-                "strategy": {
-                  "As2s": [
-                    1.0,0.0
-                  ]
-                }
-              },
-              "path": [
-                "CHECK","BET 216","ALLIN 900"
-              ]
-            },
-            "CALL": {
-              "deal_number": 0,
-              "node_type": "chance_node"
-            },
-            "RAISE 540": {
-              "actions": [
-                "FOLD","CALL","ALLIN 900"
-              ],
-              "childrens": {
-                "FOLD": {
-                  "deal_number": 0,
-                  "node_type": "terminal_node"
-                },
-                "CALL": {
-                  "deal_number": 0,
-                  "node_type": "chance_node"
-                },
-                "ALLIN 900": {
-                  "actions": [
-                    "FOLD","CALL"
-                  ],
-                  "childrens": {
-                    "FOLD": {
-                      "deal_number": 0,
-                      "node_type": "terminal_node"
-                    },
-                    "CALL": {
-                      "deal_number": 0,
-                      "node_type": "terminal_node"
-                    }
-                  },
-                  "node_type": "action_node",
-                  "player": "OOP",
-                  "strategy": {
-                    "actions": [
-                      "FOLD","CALL"
-                    ],
-                    "strategy": {}
-                  },
-                  "path": [
-                    "CHECK","BET 216","RAISE 540","ALLIN 900"
-                  ]
-                }
-              },
-              "node_type": "action_node",
-              "player": "IP",
-              "strategy": {
-                "actions": [
-                  "FOLD","CALL","ALLIN 900"
-                ],
-                "strategy": {
-                  "As2s": [
-                    1.0,0.0,0.0
-                  ]
-                }
-              },
-              "path": [
-                "CHECK","BET 216","RAISE 540"
-              ]
-            }
-          },
-          "node_type": "action_node",
-          "player": "OOP",
-          "strategy": {
-            "actions": [
-              "FOLD","CALL","RAISE 540","ALLIN 900"
-            ],
-            "strategy": {}
-          },
-          "path": [
-            "CHECK","BET 216"
-          ]
-        },
-        "ALLIN 900": {
-          "actions": [
-            "FOLD","CALL"
-          ],
-          "childrens": {
-            "CALL": {
-              "deal_number": 0,
-              "node_type": "terminal_node"
-            },
-            "FOLD": {
-              "deal_number": 0,
-              "node_type": "terminal_node"
-            }
-          },
-          "node_type": "action_node",
-          "player": "OOP",
-          "strategy": {
-            "actions": [
-              "FOLD","CALL"
-            ],
-            "strategy": {}
-          },
-          "path": [
-            "CHECK","ALLIN 900"
-          ]
-        }
-      },
-      "node_type": "action_node",
-      "player": "IP",
-      "strategy": {
-        "actions": [
-          "CHECK","BET 120","BET 216","ALLIN 900"
-        ],
-        "strategy": {
-          "As2s": [
-            0.98,0.02,0.0,0.0
-          ]
-        }
-      },
-      "path": [
-        "CHECK"
-      ]
-    },
     "ALLIN 900": {
       "actions": [
         "FOLD","CALL"
@@ -413,10 +55,6 @@
               "deal_number": 0,
               "node_type": "chance_node"
             },
-            "FOLD": {
-              "deal_number": 0,
-              "node_type": "terminal_node"
-            },
             "ALLIN 900": {
               "actions": [
                 "FOLD","CALL"
@@ -446,6 +84,10 @@
               "path": [
                 "BET 120","RAISE 300","ALLIN 900"
               ]
+            },
+            "FOLD": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
             }
           },
           "node_type": "action_node",
@@ -476,13 +118,147 @@
       "path": [
         "BET 120"
       ]
+    },
+    "CHECK": {
+      "actions": [
+        "CHECK","BET 120","ALLIN 900"
+      ],
+      "childrens": {
+        "BET 120": {
+          "actions": [
+            "FOLD","CALL","RAISE 300"
+          ],
+          "childrens": {
+            "RAISE 300": {
+              "actions": [
+                "FOLD","CALL","ALLIN 900"
+              ],
+              "childrens": {
+                "CALL": {
+                  "deal_number": 0,
+                  "node_type": "chance_node"
+                },
+                "ALLIN 900": {
+                  "actions": [
+                    "FOLD","CALL"
+                  ],
+                  "childrens": {
+                    "CALL": {
+                      "deal_number": 0,
+                      "node_type": "terminal_node"
+                    },
+                    "FOLD": {
+                      "deal_number": 0,
+                      "node_type": "terminal_node"
+                    }
+                  },
+                  "node_type": "action_node",
+                  "player": "OOP",
+                  "strategy": {
+                    "actions": [
+                      "FOLD","CALL"
+                    ],
+                    "strategy": {}
+                  },
+                  "path": [
+                    "CHECK","BET 120","RAISE 300","ALLIN 900"
+                  ]
+                },
+                "FOLD": {
+                  "deal_number": 0,
+                  "node_type": "terminal_node"
+                }
+              },
+              "node_type": "action_node",
+              "player": "IP",
+              "strategy": {
+                "actions": [
+                  "FOLD","CALL","ALLIN 900"
+                ],
+                "strategy": {
+                  "As2s": [
+                    1.0,0.0,0.0
+                  ]
+                }
+              },
+              "path": [
+                "CHECK","BET 120","RAISE 300"
+              ]
+            },
+            "FOLD": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            },
+            "CALL": {
+              "deal_number": 0,
+              "node_type": "chance_node"
+            }
+          },
+          "node_type": "action_node",
+          "player": "OOP",
+          "strategy": {
+            "actions": [
+              "FOLD","CALL","RAISE 300"
+            ],
+            "strategy": {}
+          },
+          "path": [
+            "CHECK","BET 120"
+          ]
+        },
+        "CHECK": {
+          "deal_number": 0,
+          "node_type": "chance_node"
+        },
+        "ALLIN 900": {
+          "actions": [
+            "FOLD","CALL"
+          ],
+          "childrens": {
+            "FOLD": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            },
+            "CALL": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            }
+          },
+          "node_type": "action_node",
+          "player": "OOP",
+          "strategy": {
+            "actions": [
+              "FOLD","CALL"
+            ],
+            "strategy": {}
+          },
+          "path": [
+            "CHECK","ALLIN 900"
+          ]
+        }
+      },
+      "node_type": "action_node",
+      "player": "IP",
+      "strategy": {
+        "actions": [
+          "CHECK","BET 120","ALLIN 900"
+        ],
+        "strategy": {
+          "As2s": [
+            0.3,0.7,0.0
+          ]
+        }
+      },
+      "path": [
+        "CHECK"
+      ]
     }
   },
   "node_type": "action_node",
   "player": "OOP",
   "strategy": {
     "actions": [
-      "CHECK","BET 120","BET 216","ALLIN 900"
+      "CHECK","BET 120","ALLIN 900"
     ],
     "strategy": {}
   },

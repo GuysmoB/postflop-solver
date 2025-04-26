@@ -75,14 +75,14 @@ fn main() {
     let card_config = CardConfig {
         range: [oop_range.parse().unwrap(), ip_range.parse().unwrap()],
         flop: flop_from_str("Td9d6h").unwrap(),
-        turn: card_from_str("Qc").unwrap(),
+        turn: NOT_DEALT, //card_from_str("Qc").unwrap(),
         river: NOT_DEALT,
     };
 
     let bet_sizes = BetSizeOptions::try_from(("60%, e, a", "2.5x")).unwrap();
 
     let tree_config = TreeConfig {
-        initial_state: BoardState::Turn,
+        initial_state: BoardState::Flop,
         starting_pot: 200,
         effective_stack: 900,
         rake_rate: 0.0,
@@ -97,7 +97,7 @@ fn main() {
         merging_threshold: 0.1,
     };
 
-    let action_tree = ActionTree::new(tree_config.clone()).unwrap();
+    let action_tree: ActionTree = ActionTree::new(tree_config.clone()).unwrap();
     let mut game = PostFlopGame::with_config(card_config.clone(), action_tree).unwrap();
 
     println!("Solving game...");
@@ -173,17 +173,68 @@ fn generate_strategy(game: &mut PostFlopGame, path: Vec<String>) -> StrategyOutp
     }
 
     if game.is_chance_node() {
-        let mut dealcards = HashMap::new();
+        eprintln!("TROUVÉ UN NŒUD DE CHANCE!");
+        eprintln!("Cartes possibles: {:064b}", game.possible_cards());
+        eprintln!("Nombre d'actions: {}", game.available_actions().len());
 
-        // Si c'est un nœud de chance, nous devons fournir des informations pour chaque carte possible
-        // Ici, on crée simplement une référence
-        dealcards.insert(
-            "card_placeholder".to_string(),
-            NodeData::Reference {
-                deal_number: 0,
-                node_type: "chance_node".to_string(),
-            },
-        );
+        // Traiter le nœud de chance (rivière)
+        let mut dealcards = HashMap::new();
+        // Supprimer: let node = game.node(); - Ce membre est privé
+
+        // Déterminer quelles cartes sont disponibles
+        let possible_cards_mask = game.possible_cards();
+
+        // Limitons à 3 cartes de rivière pour cette démo
+        let mut count = 0;
+        let max_rivers_to_process = 3;
+
+        for card_idx in 0..52 {
+            // Vérifie si cette carte peut être distribuée
+            if ((1u64 << card_idx) & possible_cards_mask) != 0 {
+                count += 1;
+
+                // Conversion de l'index en chaîne (format "Xc" où X est la valeur et c la couleur)
+                // Utiliser une fonction qui ne renvoie pas Result
+                let card_str = card_to_string_simple(card_idx as Card);
+
+                // Jouer cette action de chance
+                for action_idx in 0..game.available_actions().len() {
+                    if let Action::Chance(c) = game.available_actions()[action_idx] {
+                        if c == card_idx as Card {
+                            // Jouer cette carte
+                            eprintln!("Jouer la carte: {}", card_str);
+                            game.play(action_idx);
+
+                            // Créer un nouveau chemin avec la carte distribuée
+                            let mut new_path = path.clone();
+                            new_path.push(format!("DEAL {}", card_str));
+
+                            // Générer la stratégie pour ce nœud
+                            let strategy = generate_strategy(game, new_path);
+
+                            // Stocker le résultat
+                            dealcards.insert(card_str, NodeData::FullNode(strategy));
+
+                            // Revenir à l'état précédent
+                            game.back_to_root();
+
+                            // Utiliser history() au lieu de action_history privé
+                            let current_history = game.history().to_vec();
+                            for &action_idx in current_history.iter() {
+                                game.play(action_idx);
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+                // Limiter le nombre de rivières traitées
+                if count >= max_rivers_to_process {
+                    break;
+                }
+            }
+        }
 
         return StrategyOutput {
             actions: vec![],
@@ -191,7 +242,7 @@ fn generate_strategy(game: &mut PostFlopGame, path: Vec<String>) -> StrategyOutp
             node_type: Some("chance_node".to_string()),
             player: None,
             strategy: None,
-            deal_number: Some(52), // Nombre total de cartes dans le deck
+            deal_number: Some(count),
             dealcards: Some(dealcards),
             path: Some(path),
         };
@@ -444,5 +495,21 @@ fn find_paths(node: &Value, current_path: Vec<String>, paths: &mut Vec<(Vec<Stri
             new_path.push(action.clone());
             find_paths(child, new_path, paths);
         }
+    }
+}
+
+fn card_to_string_simple(card: Card) -> String {
+    let rank_chars = [
+        '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A',
+    ];
+    let suit_chars = ['c', 'd', 'h', 's'];
+
+    let rank = (card >> 2) as usize;
+    let suit = (card & 3) as usize;
+
+    if rank < rank_chars.len() && suit < suit_chars.len() {
+        format!("{}{}", rank_chars[rank], suit_chars[suit])
+    } else {
+        "??".to_string()
     }
 }
