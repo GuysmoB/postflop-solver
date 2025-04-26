@@ -1,269 +1,490 @@
 {
-  "actions": ["Check","Bet(120)","Bet(216)","AllIn(900)"],
-  "children": [
-    {
-      "action": "Check",
-      "data": {
-        "actions": ["Check","Bet(120)","Bet(216)","AllIn(900)"],
-        "children": [
-          {
-            "action": "Bet(120)",
-            "data": {
-              "actions": ["Fold","Call","Raise(300)"],
-              "children": [
-                {
-                  "action": "Raise(300)",
-                  "data": {
-                    "actions": ["Fold","Call","AllIn(900)"],
-                    "equity": [0.6299999952316284,0.3700000047683716],
-                    "ev": [475.6000061035156,144.39999389648438],
-                    "hands": {
-                      "Ad2d": {
-                        "ev": [0.0,0.0,806.8300170898438],
-                        "strategy": [0.0,1.0,0.0]
-                      }
-                    },
-                    "path": ["Check","Bet(120)","Raise(300)"],
-                    "position": "IP"
-                  }
-                }
-              ],
-              "equity": [0.46000000834465027,0.5400000214576721],
-              "ev": [56.380001068115234,263.6199951171875],
-              "hands": {
-                "Ad2d": {
-                  "ev": [0.0,0.0,0.0],
-                  "strategy": [0.0,0.0,0.0]
-                }
-              },
-              "path": ["Check","Bet(120)"],
-              "position": "OOP"
-            }
-          },
-          {
-            "action": "Bet(216)",
-            "data": {
-              "actions": ["Fold","Call","Raise(540)","AllIn(900)"],
-              "children": [
-                {
-                  "action": "Raise(540)",
-                  "data": {
-                    "actions": ["Fold","Call","AllIn(900)"],
-                    "equity": [0.5899999737739563,0.4099999964237213],
-                    "ev": [672.0800170898438,283.9200134277344],
-                    "hands": {
-                      "Ad2d": {
-                        "ev": [0.0,0.0,705.4299926757812],
-                        "strategy": [0.5799999833106995,0.1899999976158142,0.23999999463558197]
-                      }
-                    },
-                    "path": ["Check","Bet(216)","Raise(540)"],
-                    "position": "IP"
-                  }
-                },
-                {
-                  "action": "AllIn(900)",
-                  "data": {
-                    "actions": ["Fold","Call"],
-                    "equity": [0.5600000023841858,0.4399999976158142],
-                    "ev": [1019.6599731445312,296.3399963378906],
-                    "hands": {
-                      "Ad2d": {
-                        "ev": [0.0,0.0],
-                        "strategy": [1.0,0.0]
-                      }
-                    },
-                    "path": ["Check","Bet(216)","AllIn(900)"],
-                    "position": "IP"
-                  }
-                }
-              ],
-              "equity": [0.46000000834465027,0.5400000214576721],
-              "ev": [41.31999969482422,374.67999267578125],
-              "hands": {
-                "Ad2d": {
-                  "ev": [0.0,0.0,0.0,0.0],
-                  "strategy": [0.0,0.0,0.0,0.0]
-                }
-              },
-              "path": ["Check","Bet(216)"],
-              "position": "OOP"
-            }
-          },
-          {
-            "action": "AllIn(900)",
-            "data": {
-              "actions": ["Fold","Call"],
-              "equity": [null,null],
-              "ev": [null,null],
-              "hands": {
-                "Ad2d": {
-                  "ev": [0.0,0.0],
-                  "strategy": [0.0,0.0]
-                }
-              },
-              "path": ["Check","AllIn(900)"],
-              "position": "OOP"
-            }
-          }
-        ],
-        "equity": [0.5299999713897705,0.4699999988079071],
-        "ev": [89.44000244140625,110.55999755859375],
-        "hands": {
-          "Ad2d": {
-            "ev": [0.0,205.72999572753906,301.8299865722656,0.0],
-            "strategy": [0.5600000023841858,0.20999999344348907,0.23000000417232513,0.0]
-          }
-        },
-        "path": ["Check"],
-        "position": "IP"
-      }
-    },
-    {
-      "action": "Bet(120)",
-      "data": {
-        "actions": ["Fold","Call","Raise(300)"],
-        "children": [
-          {
-            "action": "Raise(300)",
-            "data": {
-              "actions": ["Fold","Call","AllIn(900)"],
-              "children": [
-                {
-                  "action": "AllIn(900)",
-                  "data": {
-                    "actions": ["Fold","Call"],
-                    "equity": [0.5799999833106995,0.41999998688697815],
-                    "ev": [1106.31005859375,293.69000244140625],
-                    "hands": {
-                      "Ad2d": {
-                        "ev": [0.0,0.0],
-                        "strategy": [1.0,0.0]
-                      }
-                    },
-                    "path": ["Bet(120)","Raise(300)","AllIn(900)"],
-                    "position": "IP"
-                  }
-                }
-              ],
-              "equity": [0.41999998688697815,0.5799999833106995],
-              "ev": [124.54000091552734,495.4599914550781],
-              "hands": {
-                "Ad2d": {
-                  "ev": [0.0,0.0,0.0],
-                  "strategy": [0.0,0.0,0.0]
-                }
-              },
-              "path": ["Bet(120)","Raise(300)"],
-              "position": "OOP"
-            }
-          }
-        ],
-        "equity": [0.5799999833106995,0.41999998688697815],
-        "ev": [246.72999572753906,73.2699966430664],
-        "hands": {
-          "Ad2d": {
-            "ev": [0.0,0.0,328.1600036621094],
-            "strategy": [0.0,1.0,0.0]
-          }
-        },
-        "path": ["Bet(120)"],
-        "position": "IP"
-      }
-    },
-    {
-      "action": "Bet(216)",
-      "data": {
-        "actions": ["Fold","Call","Raise(540)","AllIn(900)"],
-        "children": [
-          {
-            "action": "Raise(540)",
-            "data": {
-              "actions": ["Fold","Call","AllIn(900)"],
-              "children": [
-                {
-                  "action": "AllIn(900)",
-                  "data": {
-                    "actions": ["Fold","Call"],
-                    "equity": [0.6100000143051147,0.38999998569488525],
-                    "ev": [1202.0799560546875,437.9200134277344],
-                    "hands": {
-                      "Ad2d": {
-                        "ev": [0.0,0.0],
-                        "strategy": [0.5,0.5]
-                      }
-                    },
-                    "path": ["Bet(216)","Raise(540)","AllIn(900)"],
-                    "position": "IP"
-                  }
-                }
-              ],
-              "equity": [0.38999998569488525,0.6100000143051147],
-              "ev": [217.55999755859375,738.4400024414062],
-              "hands": {
-                "Ad2d": {
-                  "ev": [0.0,0.0,0.0],
-                  "strategy": [0.0,0.0,0.0]
-                }
-              },
-              "path": ["Bet(216)","Raise(540)"],
-              "position": "OOP"
-            }
-          },
-          {
-            "action": "AllIn(900)",
-            "data": {
-              "actions": ["Fold","Call"],
-              "equity": [0.4399999976158142,0.5600000023841858],
-              "ev": [253.72999572753906,1062.27001953125],
-              "hands": {
-                "Ad2d": {
-                  "ev": [0.0,0.0],
-                  "strategy": [0.0,0.0]
-                }
-              },
-              "path": ["Bet(216)","AllIn(900)"],
-              "position": "OOP"
-            }
-          }
-        ],
-        "equity": [0.5600000023841858,0.4399999976158142],
-        "ev": [360.6099853515625,55.38999938964844],
-        "hands": {
-          "Ad2d": {
-            "ev": [0.0,0.0,0.0,0.0],
-            "strategy": [0.38999998569488525,0.6100000143051147,0.0,0.0]
-          }
-        },
-        "path": ["Bet(216)"],
-        "position": "IP"
-      }
-    },
-    {
-      "action": "AllIn(900)",
-      "data": {
-        "actions": ["Fold","Call"],
-        "equity": [null,null],
-        "ev": [null,null],
-        "hands": {
-          "Ad2d": {
-            "ev": [0.0,0.0],
-            "strategy": [0.949999988079071,0.05000000074505806]
-          }
-        },
-        "path": ["AllIn(900)"],
-        "position": "IP"
-      }
-    }
+  "actions": [
+    "CHECK","BET 120","BET 216","ALLIN 900"
   ],
-  "equity": [0.5299999713897705,0.4699999988079071],
-  "ev": [91.88999938964844,108.11000061035156],
-  "hands": {
-    "Ad2d": {
-      "ev": [0.0,0.0,0.0,0.0],
-      "strategy": [0.0,0.0,0.0,0.0]
+  "childrens": {
+    "BET 216": {
+      "actions": [
+        "FOLD","CALL","RAISE 540","ALLIN 900"
+      ],
+      "childrens": {
+        "ALLIN 900": {
+          "actions": [
+            "FOLD","CALL"
+          ],
+          "childrens": {
+            "CALL": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            },
+            "FOLD": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            }
+          },
+          "node_type": "action_node",
+          "player": "OOP",
+          "strategy": {
+            "actions": [
+              "FOLD","CALL"
+            ],
+            "strategy": {}
+          },
+          "path": [
+            "BET 216","ALLIN 900"
+          ]
+        },
+        "FOLD": {
+          "deal_number": 0,
+          "node_type": "terminal_node"
+        },
+        "CALL": {
+          "deal_number": 0,
+          "node_type": "chance_node"
+        },
+        "RAISE 540": {
+          "actions": [
+            "FOLD","CALL","ALLIN 900"
+          ],
+          "childrens": {
+            "CALL": {
+              "deal_number": 0,
+              "node_type": "chance_node"
+            },
+            "ALLIN 900": {
+              "actions": [
+                "FOLD","CALL"
+              ],
+              "childrens": {
+                "FOLD": {
+                  "deal_number": 0,
+                  "node_type": "terminal_node"
+                },
+                "CALL": {
+                  "deal_number": 0,
+                  "node_type": "terminal_node"
+                }
+              },
+              "node_type": "action_node",
+              "player": "IP",
+              "strategy": {
+                "actions": [
+                  "FOLD","CALL"
+                ],
+                "strategy": {
+                  "As2s": [
+                    1.0,0.0
+                  ]
+                }
+              },
+              "path": [
+                "BET 216","RAISE 540","ALLIN 900"
+              ]
+            },
+            "FOLD": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            }
+          },
+          "node_type": "action_node",
+          "player": "OOP",
+          "strategy": {
+            "actions": [
+              "FOLD","CALL","ALLIN 900"
+            ],
+            "strategy": {}
+          },
+          "path": [
+            "BET 216","RAISE 540"
+          ]
+        }
+      },
+      "node_type": "action_node",
+      "player": "IP",
+      "strategy": {
+        "actions": [
+          "FOLD","CALL","RAISE 540","ALLIN 900"
+        ],
+        "strategy": {
+          "As2s": [
+            1.0,0.0,0.0,0.0
+          ]
+        }
+      },
+      "path": [
+        "BET 216"
+      ]
+    },
+    "CHECK": {
+      "actions": [
+        "CHECK","BET 120","BET 216","ALLIN 900"
+      ],
+      "childrens": {
+        "CHECK": {
+          "deal_number": 0,
+          "node_type": "chance_node"
+        },
+        "BET 120": {
+          "actions": [
+            "FOLD","CALL","RAISE 300"
+          ],
+          "childrens": {
+            "RAISE 300": {
+              "actions": [
+                "FOLD","CALL","ALLIN 900"
+              ],
+              "childrens": {
+                "ALLIN 900": {
+                  "actions": [
+                    "FOLD","CALL"
+                  ],
+                  "childrens": {
+                    "FOLD": {
+                      "deal_number": 0,
+                      "node_type": "terminal_node"
+                    },
+                    "CALL": {
+                      "deal_number": 0,
+                      "node_type": "terminal_node"
+                    }
+                  },
+                  "node_type": "action_node",
+                  "player": "OOP",
+                  "strategy": {
+                    "actions": [
+                      "FOLD","CALL"
+                    ],
+                    "strategy": {}
+                  },
+                  "path": [
+                    "CHECK","BET 120","RAISE 300","ALLIN 900"
+                  ]
+                },
+                "CALL": {
+                  "deal_number": 0,
+                  "node_type": "chance_node"
+                },
+                "FOLD": {
+                  "deal_number": 0,
+                  "node_type": "terminal_node"
+                }
+              },
+              "node_type": "action_node",
+              "player": "IP",
+              "strategy": {
+                "actions": [
+                  "FOLD","CALL","ALLIN 900"
+                ],
+                "strategy": {
+                  "As2s": [
+                    1.0,0.0,0.0
+                  ]
+                }
+              },
+              "path": [
+                "CHECK","BET 120","RAISE 300"
+              ]
+            },
+            "CALL": {
+              "deal_number": 0,
+              "node_type": "chance_node"
+            },
+            "FOLD": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            }
+          },
+          "node_type": "action_node",
+          "player": "OOP",
+          "strategy": {
+            "actions": [
+              "FOLD","CALL","RAISE 300"
+            ],
+            "strategy": {}
+          },
+          "path": [
+            "CHECK","BET 120"
+          ]
+        },
+        "BET 216": {
+          "actions": [
+            "FOLD","CALL","RAISE 540","ALLIN 900"
+          ],
+          "childrens": {
+            "FOLD": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            },
+            "ALLIN 900": {
+              "actions": [
+                "FOLD","CALL"
+              ],
+              "childrens": {
+                "CALL": {
+                  "deal_number": 0,
+                  "node_type": "terminal_node"
+                },
+                "FOLD": {
+                  "deal_number": 0,
+                  "node_type": "terminal_node"
+                }
+              },
+              "node_type": "action_node",
+              "player": "IP",
+              "strategy": {
+                "actions": [
+                  "FOLD","CALL"
+                ],
+                "strategy": {
+                  "As2s": [
+                    1.0,0.0
+                  ]
+                }
+              },
+              "path": [
+                "CHECK","BET 216","ALLIN 900"
+              ]
+            },
+            "CALL": {
+              "deal_number": 0,
+              "node_type": "chance_node"
+            },
+            "RAISE 540": {
+              "actions": [
+                "FOLD","CALL","ALLIN 900"
+              ],
+              "childrens": {
+                "FOLD": {
+                  "deal_number": 0,
+                  "node_type": "terminal_node"
+                },
+                "CALL": {
+                  "deal_number": 0,
+                  "node_type": "chance_node"
+                },
+                "ALLIN 900": {
+                  "actions": [
+                    "FOLD","CALL"
+                  ],
+                  "childrens": {
+                    "FOLD": {
+                      "deal_number": 0,
+                      "node_type": "terminal_node"
+                    },
+                    "CALL": {
+                      "deal_number": 0,
+                      "node_type": "terminal_node"
+                    }
+                  },
+                  "node_type": "action_node",
+                  "player": "OOP",
+                  "strategy": {
+                    "actions": [
+                      "FOLD","CALL"
+                    ],
+                    "strategy": {}
+                  },
+                  "path": [
+                    "CHECK","BET 216","RAISE 540","ALLIN 900"
+                  ]
+                }
+              },
+              "node_type": "action_node",
+              "player": "IP",
+              "strategy": {
+                "actions": [
+                  "FOLD","CALL","ALLIN 900"
+                ],
+                "strategy": {
+                  "As2s": [
+                    1.0,0.0,0.0
+                  ]
+                }
+              },
+              "path": [
+                "CHECK","BET 216","RAISE 540"
+              ]
+            }
+          },
+          "node_type": "action_node",
+          "player": "OOP",
+          "strategy": {
+            "actions": [
+              "FOLD","CALL","RAISE 540","ALLIN 900"
+            ],
+            "strategy": {}
+          },
+          "path": [
+            "CHECK","BET 216"
+          ]
+        },
+        "ALLIN 900": {
+          "actions": [
+            "FOLD","CALL"
+          ],
+          "childrens": {
+            "CALL": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            },
+            "FOLD": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            }
+          },
+          "node_type": "action_node",
+          "player": "OOP",
+          "strategy": {
+            "actions": [
+              "FOLD","CALL"
+            ],
+            "strategy": {}
+          },
+          "path": [
+            "CHECK","ALLIN 900"
+          ]
+        }
+      },
+      "node_type": "action_node",
+      "player": "IP",
+      "strategy": {
+        "actions": [
+          "CHECK","BET 120","BET 216","ALLIN 900"
+        ],
+        "strategy": {
+          "As2s": [
+            0.98,0.02,0.0,0.0
+          ]
+        }
+      },
+      "path": [
+        "CHECK"
+      ]
+    },
+    "ALLIN 900": {
+      "actions": [
+        "FOLD","CALL"
+      ],
+      "childrens": {
+        "CALL": {
+          "deal_number": 0,
+          "node_type": "terminal_node"
+        },
+        "FOLD": {
+          "deal_number": 0,
+          "node_type": "terminal_node"
+        }
+      },
+      "node_type": "action_node",
+      "player": "IP",
+      "strategy": {
+        "actions": [
+          "FOLD","CALL"
+        ],
+        "strategy": {
+          "As2s": [
+            1.0,0.0
+          ]
+        }
+      },
+      "path": [
+        "ALLIN 900"
+      ]
+    },
+    "BET 120": {
+      "actions": [
+        "FOLD","CALL","RAISE 300"
+      ],
+      "childrens": {
+        "FOLD": {
+          "deal_number": 0,
+          "node_type": "terminal_node"
+        },
+        "CALL": {
+          "deal_number": 0,
+          "node_type": "chance_node"
+        },
+        "RAISE 300": {
+          "actions": [
+            "FOLD","CALL","ALLIN 900"
+          ],
+          "childrens": {
+            "CALL": {
+              "deal_number": 0,
+              "node_type": "chance_node"
+            },
+            "FOLD": {
+              "deal_number": 0,
+              "node_type": "terminal_node"
+            },
+            "ALLIN 900": {
+              "actions": [
+                "FOLD","CALL"
+              ],
+              "childrens": {
+                "FOLD": {
+                  "deal_number": 0,
+                  "node_type": "terminal_node"
+                },
+                "CALL": {
+                  "deal_number": 0,
+                  "node_type": "terminal_node"
+                }
+              },
+              "node_type": "action_node",
+              "player": "IP",
+              "strategy": {
+                "actions": [
+                  "FOLD","CALL"
+                ],
+                "strategy": {
+                  "As2s": [
+                    1.0,0.0
+                  ]
+                }
+              },
+              "path": [
+                "BET 120","RAISE 300","ALLIN 900"
+              ]
+            }
+          },
+          "node_type": "action_node",
+          "player": "OOP",
+          "strategy": {
+            "actions": [
+              "FOLD","CALL","ALLIN 900"
+            ],
+            "strategy": {}
+          },
+          "path": [
+            "BET 120","RAISE 300"
+          ]
+        }
+      },
+      "node_type": "action_node",
+      "player": "IP",
+      "strategy": {
+        "actions": [
+          "FOLD","CALL","RAISE 300"
+        ],
+        "strategy": {
+          "As2s": [
+            1.0,0.0,0.0
+          ]
+        }
+      },
+      "path": [
+        "BET 120"
+      ]
     }
   },
-  "path": [],
-  "position": "OOP"
+  "node_type": "action_node",
+  "player": "OOP",
+  "strategy": {
+    "actions": [
+      "CHECK","BET 120","BET 216","ALLIN 900"
+    ],
+    "strategy": {}
+  },
+  "path": []
 }
