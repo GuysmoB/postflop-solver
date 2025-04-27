@@ -73,6 +73,7 @@ mod range;
 mod sliceop;
 mod solver;
 mod utility;
+mod utils;
 
 #[cfg(feature = "bincode")]
 pub use file::*;
@@ -87,3 +88,4 @@ pub use mutex_like::*;
 pub use range::*;
 pub use solver::*;
 pub use utility::*;
+pub use utils::*;
