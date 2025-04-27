@@ -5,6 +5,20 @@ use crate::PostFlopGame;
 use serde_json::json;
 use std::collections::HashMap;
 
+struct ResultData {
+    current_player: String,
+    num_actions: usize,
+    is_empty: bool,
+    eqr_base: [f64; 2],
+    weights: Vec<Vec<f64>>,
+    normalizer: Vec<Vec<f64>>,
+    equity: Vec<Vec<f64>>,
+    ev: Vec<Vec<f64>>,
+    eqr: Vec<Vec<f64>>,
+    strategy: Vec<f64>,
+    action_ev: Vec<f64>,
+}
+
 // Fonction utilitaire pour convertir une carte en chaîne simple
 pub fn card_to_string_simple(card: Card) -> String {
     let rank_chars = [
@@ -35,141 +49,6 @@ pub fn compute_average(values: &[f32], weights: &[f32]) -> f32 {
     } else {
         0.0
     }
-}
-
-pub fn get_node_statistics(game: &mut PostFlopGame) -> HashMap<String, serde_json::Value> {
-    let mut stats = HashMap::new();
-
-    // Récupérer les informations de mise et de pot
-    let total_bet_amount = game.total_bet_amount();
-    let pot_base = game.tree_config().starting_pot + total_bet_amount.iter().min().unwrap();
-
-    // Calculer les tailles de pot pour chaque joueur
-    let pot_oop = (pot_base + total_bet_amount[0]) as f32;
-    let pot_ip = (pot_base + total_bet_amount[1]) as f32;
-
-    stats.insert("pot_oop".to_string(), json!(pot_oop));
-    stats.insert("pot_ip".to_string(), json!(pot_ip));
-
-    // Obtenir et filtrer les poids des mains (ignorer les combos très rares)
-    let trunc = |&w: &f32| if w < 0.0005 { 0.0 } else { w };
-    let weights = [
-        game.weights(0).iter().map(trunc).collect::<Vec<_>>(),
-        game.weights(1).iter().map(trunc).collect::<Vec<_>>(),
-    ];
-
-    // Vérifier si les ranges sont vides
-    let is_empty = |player: usize| weights[player].iter().all(|&w| w == 0.0);
-    let oop_empty = is_empty(0);
-    let ip_empty = is_empty(1);
-
-    stats.insert("oop_range_empty".to_string(), json!(oop_empty));
-    stats.insert("ip_range_empty".to_string(), json!(ip_empty));
-
-    // Si au moins un joueur a une range non vide
-    if !oop_empty || !ip_empty {
-        // Mettre à jour les poids normalisés
-        game.cache_normalized_weights();
-
-        // Récupérer les informations de stratégie
-        let current_player = if game.is_terminal_node() || game.is_chance_node() {
-            None
-        } else {
-            Some(game.current_player())
-        };
-
-        // Ajouter l'information sur le joueur actuel
-        if let Some(player) = current_player {
-            let player_str = if player == 0 { "OOP" } else { "IP" };
-            stats.insert("current_player".to_string(), json!(player_str));
-        } else if game.is_terminal_node() {
-            stats.insert("current_player".to_string(), json!("terminal"));
-        } else if game.is_chance_node() {
-            stats.insert("current_player".to_string(), json!("chance"));
-        }
-
-        // Si c'est un nœud d'action, calculer et ajouter la stratégie
-        if !game.is_terminal_node() && !game.is_chance_node() {
-            let player = game.current_player();
-            let range = game.private_cards(player);
-            let range_size = range.len();
-            let strategy_array = game.strategy();
-            let hand_strings = holes_to_strings(range).unwrap();
-
-            let mut strategy_map = HashMap::new();
-            let actions = game.available_actions();
-            let action_strings: Vec<String> = actions
-                .iter()
-                .map(|a| {
-                    format!("{:?}", a)
-                        .to_uppercase()
-                        .replace("(", " ")
-                        .replace(")", "")
-                })
-                .collect();
-
-            // Construire un mapping de stratégie par main
-            for (h_idx, hand) in hand_strings.iter().enumerate().take(20) {
-                let mut hand_strategy = Vec::new();
-
-                for (a_idx, action) in action_strings.iter().enumerate() {
-                    let strat_index = h_idx + a_idx * range_size;
-                    let strat_value = if strat_index < strategy_array.len() {
-                        strategy_array[strat_index]
-                    } else {
-                        0.0
-                    };
-
-                    hand_strategy.push((action.clone(), strat_value));
-                }
-
-                strategy_map.insert(hand.clone(), hand_strategy);
-            }
-
-            stats.insert("strategy_by_hand".to_string(), json!(strategy_map));
-
-            // Calculer l'EV moyenne par action
-            let normalized_weights = game.normalized_weights(player);
-            let ev_details = game.expected_values_detail(player);
-            let actions_len = actions.len();
-            let mut action_evs = Vec::new();
-
-            for a_idx in 0..actions_len {
-                let ev_slice = &ev_details[a_idx * range_size..(a_idx + 1) * range_size];
-                let avg_ev = weighted_average(ev_slice, &normalized_weights);
-
-                action_evs.push((action_strings[a_idx].clone(), avg_ev));
-            }
-
-            stats.insert("action_evs".to_string(), json!(action_evs));
-        }
-
-        // Ajouter les équités moyennes et les EVs pour les deux joueurs
-        for player in 0..2 {
-            let player_str = if player == 0 { "oop" } else { "ip" };
-            let normalized_weights = game.normalized_weights(player);
-
-            if !is_empty(player) {
-                let equity = game.equity(player);
-                let ev = game.expected_values(player);
-
-                let avg_equity = compute_average(&equity, &normalized_weights);
-                let avg_ev = compute_average(&ev, &normalized_weights);
-
-                stats.insert(format!("{}_equity", player_str), json!(avg_equity));
-                stats.insert(format!("{}_ev", player_str), json!(avg_ev));
-
-                // Calculer le ratio EV/equity
-                let pot = if player == 0 { pot_oop } else { pot_ip };
-                if avg_equity > 0.0001 {
-                    let eqr = avg_ev / (pot * avg_equity);
-                    stats.insert(format!("{}_eqr", player_str), json!(eqr));
-                }
-            }
-        }
-    }
-
-    stats
 }
 
 #[inline]
@@ -291,7 +170,9 @@ pub fn print_hand_details(game: &mut PostFlopGame, max_hands: usize) {
     println!("\n=== DÉTAILS DU NŒUD ({}) ===", player_str);
 
     // Récupérer les données brutes selon la structure exacte
-    let result_buffer = get_results(game);
+    let player_type = if player == 0 { "oop" } else { "ip" };
+    let num_actions = game.available_actions().len();
+    let result_buffer = get_specific_result(game, player_type, num_actions);
 
     // Définir les tailles des ranges
     let oop_range_size = game.private_cards(0).len();
@@ -690,4 +571,823 @@ fn get_showdown_equity(game: &mut PostFlopGame) -> Result<[f32; 2], &'static str
     };
 
     Ok([oop_avg, ip_avg])
+}
+
+/// Fonction pour obtenir des résultats spécifiques basés sur le type de nœud et le nombre d'actions
+/// Similaire à la fonction getResults() du frontend
+/// Fonction pour obtenir des résultats spécifiques basés sur le type de joueur et le nombre d'actions
+/// Cette fonction reproduit exactement la structure de données utilisée par getSpecificResultsFront dans le frontend
+pub fn get_specific_result(
+    game: &mut PostFlopGame,
+    player_type: &str, // "oop", "ip", "chance", "terminal"
+    num_actions: usize,
+) -> Box<[f64]> {
+    // S'assurer que les poids normalisés sont disponibles
+    game.cache_normalized_weights();
+
+    // Obtenir les résultats bruts
+    let buffer = get_results(game);
+
+    // Créer un nouveau buffer qui sera retourné avec la structure exacte attendue par le frontend
+    let mut offset = 0;
+
+    // Récupérer les en-têtes (potOOP, potIP, isEmpty)
+    let pot_oop = buffer[offset];
+    offset += 1;
+
+    let pot_ip = buffer[offset];
+    offset += 1;
+
+    let is_empty_flag = buffer[offset] as usize;
+    offset += 1;
+
+    let is_empty = is_empty_flag != 0;
+    let eqr_base = [pot_oop, pot_ip];
+
+    // Récupérer tailles des ranges
+    let oop_range_size = game.private_cards(0).len();
+    let ip_range_size = game.private_cards(1).len();
+
+    // Poids bruts
+    let mut weights: Vec<Vec<f64>> = vec![Vec::new(), Vec::new()];
+
+    // OOP weights
+    for i in 0..oop_range_size {
+        weights[0].push(buffer[offset]);
+        offset += 1;
+    }
+
+    // IP weights
+    for i in 0..ip_range_size {
+        weights[1].push(buffer[offset]);
+        offset += 1;
+    }
+
+    // Poids normalisés
+    let mut normalizer: Vec<Vec<f64>> = vec![Vec::new(), Vec::new()];
+
+    // OOP normalized weights
+    for i in 0..oop_range_size {
+        normalizer[0].push(buffer[offset]);
+        offset += 1;
+    }
+
+    // IP normalized weights
+    for i in 0..ip_range_size {
+        normalizer[1].push(buffer[offset]);
+        offset += 1;
+    }
+
+    // Si non vide, récupérer équité, EV et EQR
+    let mut equity: Vec<Vec<f64>> = vec![Vec::new(), Vec::new()];
+    let mut ev: Vec<Vec<f64>> = vec![Vec::new(), Vec::new()];
+    let mut eqr: Vec<Vec<f64>> = vec![Vec::new(), Vec::new()];
+
+    if !is_empty {
+        // Équité OOP
+        for i in 0..oop_range_size {
+            equity[0].push(buffer[offset]);
+            offset += 1;
+        }
+
+        // Équité IP
+        for i in 0..ip_range_size {
+            equity[1].push(buffer[offset]);
+            offset += 1;
+        }
+
+        // EV OOP
+        for i in 0..oop_range_size {
+            ev[0].push(buffer[offset]);
+            offset += 1;
+        }
+
+        // EV IP
+        for i in 0..ip_range_size {
+            ev[1].push(buffer[offset]);
+            offset += 1;
+        }
+
+        // EQR OOP
+        for i in 0..oop_range_size {
+            eqr[0].push(buffer[offset]);
+            offset += 1;
+        }
+
+        // EQR IP
+        for i in 0..ip_range_size {
+            eqr[1].push(buffer[offset]);
+            offset += 1;
+        }
+    }
+
+    // Si c'est un nœud joueur (oop ou ip), récupérer la stratégie et les EV par action
+    let mut strategy: Vec<f64> = Vec::new();
+    let mut action_ev: Vec<f64> = Vec::new();
+
+    if player_type == "oop" || player_type == "ip" {
+        let current_range_size = if player_type == "oop" {
+            oop_range_size
+        } else {
+            ip_range_size
+        };
+
+        // Stratégie
+        for _ in 0..(num_actions * current_range_size) {
+            if offset < buffer.len() {
+                strategy.push(buffer[offset]);
+                offset += 1;
+            } else {
+                strategy.push(0.0);
+            }
+        }
+
+        // EV par action (seulement si !isEmpty)
+        if !is_empty {
+            for _ in 0..(num_actions * current_range_size) {
+                if offset < buffer.len() {
+                    action_ev.push(buffer[offset]);
+                    offset += 1;
+                } else {
+                    action_ev.push(0.0);
+                }
+            }
+        }
+    }
+
+    // Créer un dictionnaire pour débogage
+    let results = ResultData {
+        current_player: player_type.to_string(),
+        num_actions,
+        is_empty,
+        eqr_base,
+        weights,
+        normalizer,
+        equity,
+        ev,
+        eqr,
+        strategy,
+        action_ev,
+    };
+
+    // Afficher les résultats pour débogage
+    println!("Type de joueur: {}", player_type);
+    println!("Nombre d'actions: {}", num_actions);
+    println!("Est vide: {}", is_empty);
+    println!("Taille OOP range: {}", oop_range_size);
+    println!("Taille IP range: {}", ip_range_size);
+
+    // Retourner le buffer initial, car il contient déjà toutes les données nécessaires
+    // exactement dans le format attendu par le frontend
+    buffer
+}
+
+// Structure pour organiser les résultats (pour débogage)
+
+/// Fonction pour naviguer vers un nœud spécifique dans l'arbre de jeu
+/// Similaire à la fonction selectSpotFront() du frontend
+pub fn select_spot_old(
+    game: &mut PostFlopGame,
+    spot_index: usize,
+    history: &[String],
+    print_details: bool,
+) -> Result<(), String> {
+    // Revenir à la racine de l'arbre
+    game.back_to_root();
+
+    // Si spot_index est 0, on est déjà à la racine
+    if spot_index == 0 {
+        println!("Revenu à la racine de l'arbre");
+        return Ok(());
+    }
+
+    // Pour chaque action jusqu'à l'index souhaité
+    for (i, action_str) in history.iter().take(spot_index).enumerate() {
+        // Vérifier si nous sommes dans un nœud de chance (pour les cartes)
+        if game.is_chance_node() {
+            // Traitement des nœuds de chance
+            if action_str.starts_with("DEAL ") {
+                let card_str = &action_str[5..]; // Extraire le nom de la carte
+
+                let actions = game.available_actions();
+                let mut found = false;
+
+                // Trouver l'index de l'action correspondant à cette carte
+                for (idx, action) in actions.iter().enumerate() {
+                    if let Action::Chance(card) = action {
+                        let card_name = card_to_string_simple(*card);
+                        if card_name == card_str {
+                            game.play(idx);
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if !found {
+                    return Err(format!("Carte {} non disponible", card_str));
+                }
+            } else {
+                return Err(format!(
+                    "Action inattendue {} dans un nœud de chance",
+                    action_str
+                ));
+            }
+        } else {
+            // Traitement des nœuds d'action (joueur)
+            let actions = game.available_actions();
+            let mut found = false;
+
+            // Recherche de l'action correspondante
+            for (idx, action) in actions.iter().enumerate() {
+                let action_name = format!("{:?}", action)
+                    .to_uppercase()
+                    .replace("(", " ")
+                    .replace(")", "");
+
+                if action_name == *action_str {
+                    game.play(idx);
+                    found = true;
+                    break;
+                }
+            }
+
+            if !found {
+                return Err(format!("Action {} non disponible", action_str));
+            }
+        }
+
+        // Afficher les détails du nœud si demandé
+        if print_details && i == spot_index - 1 {
+            println!("\n===== NŒUD #{} =====", i + 1);
+
+            // Déterminer le type de joueur et le nombre d'actions
+            let current_player = if game.is_terminal_node() {
+                "terminal"
+            } else if game.is_chance_node() {
+                "chance"
+            } else if game.current_player() == 0 {
+                "oop"
+            } else {
+                "ip"
+            };
+
+            let num_actions = if game.is_terminal_node() || game.is_chance_node() {
+                0
+            } else {
+                game.available_actions().len()
+            };
+
+            // Utiliser get_specific_result pour obtenir les résultats détaillés
+            game.cache_normalized_weights(); // S'assurer que les poids sont mis en cache
+            let results = get_specific_result(game, current_player, num_actions);
+
+            // Afficher l'état du jeu en fonction du type de nœud
+            if game.is_terminal_node() {
+                println!("Nœud terminal");
+
+                // Calculer le pot final
+                let total_bet = game.total_bet_amount();
+                let pot_base = game.tree_config().starting_pot as f32;
+                let common_bet = total_bet[0].min(total_bet[1]) as f32;
+                let extra_bet = (total_bet[0].max(total_bet[1]) - common_bet as i32) as f32;
+                let pot_size = pot_base + 2.0 * common_bet + extra_bet;
+                println!("Pot final: {:.2} bb", pot_size);
+
+                // Afficher l'équité au showdown si applicable
+                if let Ok(equity) = get_showdown_equity(game) {
+                    println!("Équité au showdown:");
+                    println!("  OOP: {:.2}%", equity[0] * 100.0);
+                    println!("  IP: {:.2}%", equity[1] * 100.0);
+                } else {
+                    // Si un joueur a fold
+                    if total_bet[0] > total_bet[1] {
+                        println!("IP a abandonné (fold)");
+                    } else if total_bet[1] > total_bet[0] {
+                        println!("OOP a abandonné (fold)");
+                    }
+                }
+            } else if game.is_chance_node() {
+                println!("Nœud de chance");
+
+                // Afficher le board actuel
+                let board = game.current_board();
+                let board_str = board
+                    .iter()
+                    .map(|&card| card_to_string_simple(card))
+                    .collect::<Vec<_>>()
+                    .join(" ");
+                println!("Board actuel: {}", board_str);
+
+                // Afficher les cartes disponibles
+                println!("Cartes disponibles:");
+                for (i, action) in game.available_actions().iter().enumerate() {
+                    if let Action::Chance(card) = action {
+                        println!("  {}: {}", i, card_to_string_simple(*card));
+                    }
+                }
+            } else {
+                // Nœud d'action (joueur)
+                let player = game.current_player();
+                let player_str = if player == 0 { "OOP" } else { "IP" };
+                println!("Joueur actuel: {} ({})", player_str, player);
+
+                // Extraire les données principales des résultats
+                let is_empty = results[2] != 0.0;
+                let header_offset = 3;
+                let oop_range_size = game.private_cards(0).len();
+                let ip_range_size = game.private_cards(1).len();
+
+                // Calculer les offsets pour accéder aux différentes sections des résultats
+                let weight_offset = header_offset;
+                let normalizer_offset = weight_offset + oop_range_size + ip_range_size;
+                let equity_offset = normalizer_offset + oop_range_size + ip_range_size;
+
+                // Afficher les taux de stratégie globaux (similaire au frontend)
+                if !is_empty {
+                    println!("\n=== STRATÉGIE GLOBALE ===");
+                    let actions = game.available_actions();
+                    let strategy = game.strategy();
+                    let weights = game.normalized_weights(player);
+                    let mut total_weight = 0.0;
+                    let mut action_totals = vec![0.0; actions.len()];
+
+                    // Calculer les fréquences moyennes pondérées
+                    for hand_idx in 0..weights.len() {
+                        let weight = weights[hand_idx];
+                        total_weight += weight;
+
+                        for (i, _) in actions.iter().enumerate() {
+                            let strat_idx = hand_idx + i * weights.len();
+                            if strat_idx < strategy.len() {
+                                action_totals[i] += strategy[strat_idx] * weight;
+                            }
+                        }
+                    }
+
+                    // Afficher les fréquences par action
+                    for (i, action) in actions.iter().enumerate() {
+                        let action_str = format!("{:?}", action)
+                            .to_uppercase()
+                            .replace("(", " ")
+                            .replace(")", "");
+
+                        let avg_freq = if total_weight > 0.0 {
+                            (action_totals[i] / total_weight) * 100.0
+                        } else {
+                            0.0
+                        };
+
+                        println!("  {} : {:.2}%", action_str, avg_freq);
+                    }
+
+                    // Afficher les détails par main
+                    print_hand_details(game, 5);
+                } else {
+                    println!("\nAucune main valide dans la range actuelle.");
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Fonction pour naviguer vers un nœud spécifique dans l'arbre de jeu
+/// Basée sur selectSpotFront du frontend
+pub fn select_spot(
+    game: &mut PostFlopGame,
+    spot_index: usize,
+    need_splice: bool,
+    from_deal: bool,
+) -> Result<(), String> {
+    // Revenir à la racine de l'arbre
+    game.back_to_root();
+
+    // Si spot_index est 0, sélectionner l'index 1 à la place
+    if spot_index == 0 {
+        return select_spot(game, 1, need_splice, from_deal);
+    }
+
+    // Définir les variables de suivi
+    let mut selected_spot_index = spot_index;
+    let mut selected_chance_index = -1;
+    let mut history = Vec::new();
+
+    // Construire l'historique des actions à partir des spots précédents
+    // Dans le cas réel, cela serait basé sur le tableau spots du frontend
+    for i in 1..spot_index {
+        // Ici on simulerait la récupération de l'action sélectionnée
+        // pour chaque spot précédent
+        let action_str = format!("ACTION_{}", i); // Simulé pour l'exemple
+        history.push(action_str);
+    }
+
+    // Convertir l'historique en actions jouables
+    let mut action_history = Vec::new();
+    for action_str in history.iter() {
+        let action = if action_str.starts_with("DEAL ") {
+            // Traiter les cartes
+            let card_str = &action_str[5..];
+            // Simuler la conversion d'une chaîne de carte en Card
+            let card = 0; // Valeur fictive pour l'exemple
+            Action::Chance(card)
+        } else {
+            // Traiter les actions de joueur
+            match action_str.as_str() {
+                "FOLD" => Action::Fold,
+                "CHECK" => Action::Check,
+                "CALL" => Action::Call,
+                s if s.starts_with("BET ") => {
+                    let amount: i32 = 10; // Valeur fictive pour l'exemple
+                    Action::Bet(amount)
+                }
+                _ => return Err(format!("Action non reconnue: {}", action_str)),
+            }
+        };
+        action_history.push(action);
+    }
+
+    // Appliquer l'historique des actions
+    // game.apply_history(&action_history)?;
+
+    // Déterminer le joueur actuel et le nombre d'actions
+    let current_player = if game.is_terminal_node() {
+        "terminal"
+    } else if game.is_chance_node() {
+        "chance"
+    } else if game.current_player() == 0 {
+        "oop"
+    } else {
+        "ip"
+    };
+
+    let num_actions = if game.is_terminal_node() || game.is_chance_node() {
+        0
+    } else {
+        game.available_actions().len()
+    };
+
+    // Obtenir les résultats spécifiques
+    game.cache_normalized_weights();
+    let results = get_specific_result(game, current_player, num_actions);
+
+    // Si need_splice est true, on simulerait ici la mise à jour du tableau spots
+    if need_splice {
+        println!("Mise à jour de la structure des nœuds (need_splice=true)");
+
+        if game.is_terminal_node() {
+            println!("Terminal node: mise à jour pour refléter un nœud terminal");
+        } else if game.is_chance_node() {
+            println!("Chance node: mise à jour pour refléter un nœud de chance");
+        } else {
+            println!("Player node: mise à jour pour refléter un nœud de joueur");
+        }
+    }
+
+    // Afficher les informations sur le nœud actuel
+    println!("\n===== NŒUD #{} =====", spot_index);
+    println!("Type de joueur: {}", current_player);
+
+    // Afficher les détails spécifiques selon le type de nœud
+    if game.is_terminal_node() {
+        println!("Nœud terminal");
+
+        // Calculer le pot final
+        let total_bet = game.total_bet_amount();
+        let pot_base = game.tree_config().starting_pot as f64;
+        let common_bet = total_bet[0].min(total_bet[1]) as f64;
+        let extra_bet = (total_bet[0].max(total_bet[1]) - common_bet as i32) as f64;
+        let pot_size = pot_base + 2.0 * common_bet + extra_bet;
+        println!("Pot final: {:.2} bb", pot_size);
+
+        // Afficher l'équité au showdown si applicable
+        if let Ok(equity) = get_showdown_equity(game) {
+            println!("Équité au showdown:");
+            println!("  OOP: {:.2}%", equity[0] * 100.0);
+            println!("  IP: {:.2}%", equity[1] * 100.0);
+        } else {
+            // Si un joueur a fold
+            if total_bet[0] > total_bet[1] {
+                println!("IP a abandonné (fold)");
+            } else if total_bet[1] > total_bet[0] {
+                println!("OOP a abandonné (fold)");
+            }
+        }
+    } else if game.is_chance_node() {
+        println!("Nœud de chance");
+
+        // Afficher le board actuel
+        let board = game.current_board();
+        let board_str = board
+            .iter()
+            .map(|&card| card_to_string_simple(card))
+            .collect::<Vec<_>>()
+            .join(" ");
+
+        // Déterminer le street actuel
+        let street_name = if board.len() == 3 {
+            "FLOP → TURN"
+        } else if board.len() == 4 {
+            "TURN → RIVER"
+        } else {
+            "???"
+        };
+
+        println!("Board actuel: {} ({})", board_str, street_name);
+
+        // Afficher les cartes disponibles
+        println!("Cartes disponibles:");
+        let actions = game.available_actions();
+        for (i, action) in actions.iter().enumerate() {
+            if let Action::Chance(card) = action {
+                println!("  {}: DEAL {}", i, card_to_string_simple(*card));
+            }
+        }
+    } else {
+        // Nœud d'action (joueur)
+        let player = game.current_player();
+        let player_str = if player == 0 { "OOP" } else { "IP" };
+        println!("Joueur actuel: {} ({})", player_str, player);
+
+        // Afficher les actions disponibles
+        let actions = game.available_actions();
+        println!("Actions disponibles:");
+        for (i, action) in actions.iter().enumerate() {
+            let action_str = format!("{:?}", action)
+                .to_uppercase()
+                .replace("(", " ")
+                .replace(")", "");
+            println!("  {}: {}", i, action_str);
+        }
+
+        // Afficher la stratégie globale
+        let is_empty = results[2] != 0.0;
+        if !is_empty {
+            println!("\n=== STRATÉGIE GLOBALE ===");
+            let strategy = game.strategy();
+            let weights = game.normalized_weights(player);
+            let mut total_weight = 0.0;
+            let mut action_totals = vec![0.0; actions.len()];
+
+            // Calculer les fréquences moyennes pondérées
+            for hand_idx in 0..weights.len() {
+                let weight = weights[hand_idx];
+                total_weight += weight as f64;
+
+                for (i, _) in actions.iter().enumerate() {
+                    let strat_idx = hand_idx + i * weights.len();
+                    if strat_idx < strategy.len() {
+                        action_totals[i] += (strategy[strat_idx] as f64) * (weight as f64);
+                    }
+                }
+            }
+
+            // Afficher les fréquences par action
+            for (i, action) in actions.iter().enumerate() {
+                let action_str = format!("{:?}", action)
+                    .to_uppercase()
+                    .replace("(", " ")
+                    .replace(")", "");
+
+                let avg_freq = if total_weight > 0.0 {
+                    (action_totals[i] / total_weight) * 100.0
+                } else {
+                    0.0
+                };
+
+                println!("  {} : {:.2}%", action_str, avg_freq);
+            }
+
+            // Si demandé, afficher les détails par main
+            print_hand_details(game, 5);
+        } else {
+            println!("\nAucune main valide dans la range actuelle.");
+        }
+    }
+
+    Ok(())
+}
+
+/// Fonction pour explorer l'arbre de jeu de manière interactive
+/// Fonction pour explorer l'arbre de jeu de manière interactive
+pub fn explore_tree(game: &mut PostFlopGame) {
+    use std::io::{self, Write};
+
+    println!("\n===== EXPLORATION INTERACTIVE DE L'ARBRE =====");
+
+    // S'assurer que nous commençons à la racine
+    game.back_to_root();
+
+    // Historique des actions pour la navigation
+    let mut history = Vec::new();
+    let mut spot_index = 0;
+
+    // Variable pour stocker la carte sélectionnée dans un nœud de chance
+    let mut selected_card_idx: Option<usize> = None;
+
+    loop {
+        println!("\n----- NŒUD ACTUEL (#{}) -----", spot_index);
+
+        // Afficher l'état actuel du jeu
+        if game.is_terminal_node() {
+            println!("Nœud terminal");
+
+            // Calculer le pot final
+            let total_bet = game.total_bet_amount();
+            let pot_base = game.tree_config().starting_pot as f32;
+            let common_bet = total_bet[0].min(total_bet[1]) as f32;
+            let extra_bet = (total_bet[0].max(total_bet[1]) - common_bet as i32) as f32;
+            let pot_size = pot_base + 2.0 * common_bet + extra_bet;
+            println!("Pot final: {:.2} bb", pot_size);
+
+            // Afficher l'équité au showdown si applicable
+            if let Ok(equity) = get_showdown_equity(game) {
+                println!("Équité au showdown:");
+                println!("  OOP: {:.2}%", equity[0] * 100.0);
+                println!("  IP: {:.2}%", equity[1] * 100.0);
+            } else {
+                // Si un joueur a fold
+                if total_bet[0] > total_bet[1] {
+                    println!("IP a abandonné (fold)");
+                } else if total_bet[1] > total_bet[0] {
+                    println!("OOP a abandonné (fold)");
+                }
+            }
+        } else if game.is_chance_node() {
+            println!("Nœud de chance");
+
+            // Afficher le board actuel
+            let board = game.current_board();
+            let board_str = board
+                .iter()
+                .map(|&card| card_to_string_simple(card))
+                .collect::<Vec<_>>()
+                .join(" ");
+            println!("Board actuel: {}", board_str);
+
+            // Déterminer l'étape actuelle
+            let current_street = if board.len() == 3 {
+                "FLOP → TURN"
+            } else if board.len() == 4 {
+                "TURN → RIVER"
+            } else {
+                "?"
+            };
+            println!("Distribution de: {}", current_street);
+
+            // Afficher les actions disponibles
+            let actions = game.available_actions();
+            println!("Cartes disponibles:");
+            for (i, action) in actions.iter().enumerate() {
+                if let Action::Chance(card) = action {
+                    // Marquer la carte sélectionnée avec un indicateur
+                    let selection_marker = if Some(i) == selected_card_idx {
+                        "✓ "
+                    } else {
+                        "  "
+                    };
+                    println!(
+                        "  {}: {}DEAL {}",
+                        i,
+                        selection_marker,
+                        card_to_string_simple(*card)
+                    );
+                }
+            }
+
+            // Afficher les options supplémentaires pour les nœuds de chance
+            if let Some(idx) = selected_card_idx {
+                if let Action::Chance(card) = actions[idx] {
+                    println!("\nCarte sélectionnée: DEAL {}", card_to_string_simple(card));
+                    println!("Options spéciales:");
+                    println!("  c = Confirmer la sélection");
+                    println!("  x = Annuler la sélection");
+                }
+            }
+        } else {
+            // Nœud d'action (joueur)
+            let player = game.current_player();
+            let player_str = if player == 0 { "OOP" } else { "IP" };
+            println!("Joueur actuel: {} ({})", player_str, player);
+
+            // Afficher les actions disponibles
+            let actions = game.available_actions();
+            println!("Actions disponibles:");
+            for (i, action) in actions.iter().enumerate() {
+                let action_str = format!("{:?}", action)
+                    .to_uppercase()
+                    .replace("(", " ")
+                    .replace(")", "");
+                println!("  {}: {}", i, action_str);
+            }
+
+            // Afficher les détails du nœud
+            print_hand_details(game, 3);
+        }
+
+        // Afficher le chemin parcouru
+        if !history.is_empty() {
+            println!("\nChemin parcouru: {}", history.join(" → "));
+        }
+
+        // Menu d'options
+        println!("\nOptions:");
+        println!(
+            "  [0-9] = {} une action",
+            if game.is_chance_node() {
+                "Sélectionner"
+            } else {
+                "Jouer"
+            }
+        );
+        println!("  b = Retour en arrière");
+        println!("  r = Revenir à la racine");
+        println!("  d = Détails complets");
+        println!("  q = Quitter");
+
+        // Lire l'entrée utilisateur
+        print!("> ");
+        io::stdout().flush().unwrap();
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
+        let input = input.trim();
+
+        if input == "q" {
+            break;
+        } else if input == "r" {
+            // Revenir à la racine
+            game.back_to_root();
+            history.clear();
+            spot_index = 0;
+            selected_card_idx = None;
+        } else if input == "b" {
+            // Retour en arrière d'un niveau
+            if spot_index > 0 {
+                spot_index -= 1;
+                history.pop();
+                selected_card_idx = None;
+                select_spot_old(game, spot_index, &history, false).unwrap();
+            } else {
+                println!("Déjà à la racine!");
+            }
+        } else if input == "d" {
+            // Afficher les détails complets
+            if !game.is_terminal_node() && !game.is_chance_node() {
+                print_hand_details(game, 10);
+            } else {
+                println!("Pas de détails supplémentaires disponibles pour ce nœud");
+            }
+        } else if input == "c" && game.is_chance_node() && selected_card_idx.is_some() {
+            // Confirmer la sélection d'une carte
+            let idx = selected_card_idx.unwrap();
+            let actions = game.available_actions();
+            if idx < actions.len() {
+                if let Action::Chance(card) = actions[idx] {
+                    // Ajouter la carte à l'historique
+                    let action_str = format!("DEAL {}", card_to_string_simple(card));
+
+                    // Jouer l'action
+                    game.play(idx);
+
+                    // Mettre à jour l'historique
+                    history.push(action_str);
+                    spot_index += 1;
+                    selected_card_idx = None;
+                }
+            }
+        } else if input == "x" && game.is_chance_node() && selected_card_idx.is_some() {
+            // Annuler la sélection
+            selected_card_idx = None;
+        } else if let Ok(index) = input.parse::<usize>() {
+            // Sélectionner ou jouer l'action selon le type de nœud
+            let actions = game.available_actions();
+            if index < actions.len() {
+                if game.is_chance_node() {
+                    // Dans un nœud de chance, sélectionner la carte sans la jouer immédiatement
+                    selected_card_idx = Some(index);
+                    println!("Carte sélectionnée! Tapez 'c' pour confirmer ou 'x' pour annuler.");
+                } else {
+                    // Dans un nœud de joueur, jouer l'action directement
+                    let action = &actions[index];
+                    let action_str = format!("{:?}", action)
+                        .to_uppercase()
+                        .replace("(", " ")
+                        .replace(")", "");
+
+                    // Jouer l'action
+                    game.play(index);
+
+                    // Mettre à jour l'historique
+                    history.push(action_str);
+                    spot_index += 1;
+                    selected_card_idx = None;
+                }
+            } else {
+                println!("Action invalide!");
+            }
+        } else {
+            println!("Commande non reconnue");
+        }
+    }
 }
