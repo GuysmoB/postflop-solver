@@ -166,8 +166,13 @@ fn main() {
     // S'assurer que nous sommes à la racine
     game.back_to_root();
 
-    println!("\n=== DÉTAILS DES MAINS ===");
-    explore_tree(&mut game);
+    // println!("\n=== DÉTAILS DES MAINS ===");
+    // explore_tree(&mut game);
+
+    match run_bet_call_turn_scenario(&mut game) {
+        Ok(_) => println!("Scénario exécuté avec succès!"),
+        Err(e) => println!("Erreur: {}", e),
+    }
 
     // println!("\nExploration de tous les chemins d'actions possibles:");
     // println!("\n=== STATISTIQUES DU NŒUD ACTUEL ===");

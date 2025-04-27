@@ -1,7 +1,10 @@
 use crate::holes_to_strings;
 use crate::Action;
 use crate::Card;
+use crate::GameState;
 use crate::PostFlopGame;
+use crate::Spot;
+use crate::SpotType;
 use serde_json::json;
 use std::collections::HashMap;
 
@@ -1390,4 +1393,92 @@ pub fn explore_tree(game: &mut PostFlopGame) {
             println!("Commande non reconnue");
         }
     }
+}
+
+/// Exécuter le scénario: OOP bet, IP call, puis turn
+pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String> {
+    // Créer l'état du jeu
+    let mut state = GameState::new();
+
+    // Initialiser avec la racine (flop)
+    let starting_pot = game.tree_config().starting_pot as f64;
+    let effective_stack = game.tree_config().effective_stack as f64;
+    let board = game.current_board();
+    let board_cards: Vec<usize> = board.iter().map(|&card| card as usize).collect();
+
+    // Spot racine
+    let root_spot = Spot {
+        spot_type: SpotType::Root,
+        index: 0,
+        player: "flop".to_string(),
+        selected_index: -1,
+        actions: Vec::new(),
+        cards: Vec::new(),
+        pot: starting_pot,
+        stack: effective_stack,
+        equity_oop: 0.0,
+    };
+
+    state.spots.push(root_spot);
+
+    // Sélectionner le premier spot (initialise le jeu et affiche les actions disponibles)
+    select_spot(game, &mut state, 1, true, false)?;
+
+    // À ce stade, state.spots[1] contient un nœud joueur OOP avec des actions
+
+    println!("\n=== ÉTAPE 1: OOP BET ===");
+
+    // Trouver l'index de l'action "Bet" pour OOP
+    let bet_idx = state.spots[1].actions.iter().position(|a| a.name == "Bet");
+    if let Some(bet_idx) = bet_idx {
+        // Sélectionner cette action
+        state.spots[1].selected_index = bet_idx as i32;
+        state.spots[1].actions[bet_idx].is_selected = true;
+
+        // Avancer au nœud suivant (IP)
+        select_spot(game, &mut state, 2, true, false)?;
+
+        println!("\n=== ÉTAPE 2: IP CALL ===");
+
+        // Trouver l'index de l'action "Call" pour IP
+        let call_idx = state.spots[2].actions.iter().position(|a| a.name == "Call");
+        if let Some(call_idx) = call_idx {
+            // Sélectionner cette action
+            state.spots[2].selected_index = call_idx as i32;
+            state.spots[2].actions[call_idx].is_selected = true;
+
+            // Avancer au nœud suivant (nœud de chance pour la turn)
+            select_spot(game, &mut state, 3, true, false)?;
+
+            println!("\n=== ÉTAPE 3: TURN (NŒUD DE CHANCE) ===");
+
+            // À ce stade, state.spots[3] est un nœud de chance (turn)
+            // et state.spots[4] sera un nœud joueur OOP après la turn
+
+            // Pour simuler la sélection d'une carte turn, choisissons la première carte disponible
+            if let Some(card_idx) = state.spots[3].cards.iter().position(|c| !c.is_dead) {
+                // Sélectionner cette carte
+                state.spots[3].selected_index = card_idx as i32;
+                state.spots[3].cards[card_idx].is_selected = true;
+
+                // CORRECTION: Avancer avec from_deal=true pour obtenir les bons résultats à la turn
+                select_spot(game, &mut state, 4, false, true)?;
+
+                println!("\n=== RÉSULTATS APRÈS LA TURN ===");
+                // À ce stade, state.spots[4] est un nœud joueur OOP après la turn
+                // avec les stratégies et EVs correctement calculés
+
+                // Afficher les informations détaillées
+                print_hand_details(game, 5);
+            } else {
+                return Err("Aucune carte disponible pour la turn!".to_string());
+            }
+        } else {
+            return Err("Action Call non trouvée pour IP!".to_string());
+        }
+    } else {
+        return Err("Action Bet non trouvée pour OOP!".to_string());
+    }
+
+    Ok(())
 }
