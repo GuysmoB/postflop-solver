@@ -422,11 +422,11 @@ export default defineComponent({
       };
       spots.value = [spot];
 
-      await selectSpotFront(1, true);
+      await selectSpotResult(1, true);
       context.emit("update:is-handler-updated", false);
     });
 
-    const selectSpotFront = async (
+    const selectSpotResult = async (
       spotIndex: number,
       needSplice: boolean,
       fromDeal = false
@@ -446,7 +446,7 @@ export default defineComponent({
       }
 
       if (spotIndex === 0) {
-        await selectSpotFront(1, true);
+        await selectSpotResult(1, true);
         return;
       }
 
@@ -943,7 +943,7 @@ export default defineComponent({
       spot.actions[actionIndex].isSelected = true;
       spot.selectedIndex = actionIndex;
 
-      await selectSpotFront(spotIndex + 1, true);
+      await selectSpotResult(spotIndex + 1, true);
     };
 
     const deal = async (card: number) => {
@@ -958,7 +958,7 @@ export default defineComponent({
       spot.cards[card].isSelected = true;
       spot.selectedIndex = card;
 
-      await selectSpotFront(selectedSpotIndex.value, false, true);
+      await selectSpotResult(selectedSpotIndex.value, false, true);
     };
 
     const dealArrow = async (
@@ -986,7 +986,7 @@ export default defineComponent({
       const selectedChanceIndexBak = selectedChanceIndex.value;
       selectedChanceIndex.value = spot.index;
 
-      await selectSpotFront(selectedSpotIndex.value, false, true);
+      await selectSpotResult(selectedSpotIndex.value, false, true);
 
       if (
         selectedChanceIndex.value === -1 &&
@@ -1092,7 +1092,7 @@ export default defineComponent({
       isDealing,
       canChanceReports,
       isSelectedChanceSkipped,
-      selectSpot: selectSpotFront,
+      selectSpot: selectSpotResult,
       play,
       deal,
       dealArrow,
@@ -1102,3 +1102,5 @@ export default defineComponent({
   },
 });
 </script>
+
+

@@ -314,6 +314,7 @@ export default defineComponent({
       board: config.board,
       pot: config.startingPot,
       stack: config.effectiveStack,
+      prevPlayer: null,
     };
     const spots = ref<Spot[]>([rootSpot]);
     const selectedSpotIndex = ref(-1);

@@ -11,6 +11,15 @@ fn decode_signed_slice(slice: &[i16], scale: f32) -> Vec<f32> {
 }
 
 impl PostFlopGame {
+    #[inline]
+    pub fn cloned_history(&self) -> Vec<usize> {
+        if self.state <= State::Uninitialized {
+            panic!("Game is not successfully initialized");
+        }
+
+        self.action_history.clone()
+    }
+
     /// Moves the current node back to the root node.
     #[inline]
     pub fn back_to_root(&mut self) {
