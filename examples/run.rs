@@ -104,12 +104,14 @@ fn main() {
     let action_tree = ActionTree::new(tree_config.clone()).unwrap();
     let mut game = PostFlopGame::with_config(card_config, action_tree).unwrap();
 
+    log_game_state(&game);
+
     // Allocation de mémoire
     game.allocate_memory(false);
 
     // Paramètres de résolution
-    let max_iterations = 1000;
-    let target_exploitability = 1.0;
+    let max_iterations = 99;
+    let target_exploitability = 0.03;
     let print_progress = true;
 
     println!("Démarrage de la résolution avec solve_step et finalize...");
@@ -179,4 +181,87 @@ fn main() {
     // let stats = get_node_statistics(&mut game);
     // let json_string = serde_json::to_string_pretty(&stats).unwrap();
     // println!("{}", json_string);
+}
+
+fn log_game_state(game: &PostFlopGame) {
+    println!("\n===== POSTFLOP GAME INITIAL STATE =====");
+
+    // Card configuration
+    let card_config = game.card_config();
+    println!("\n--- Card Configuration ---");
+
+    // Board state
+    let flop_str = card_config
+        .flop
+        .iter()
+        .map(|&c| card_to_string_simple(c))
+        .collect::<Vec<_>>()
+        .join(" ");
+    println!("Flop: {}", flop_str);
+
+    // Turn if exists
+    if card_config.turn != NOT_DEALT {
+        println!("Turn: {}", card_to_string_simple(card_config.turn));
+    } else {
+        println!("Turn: Not dealt");
+    }
+
+    // River if exists
+    if card_config.river != NOT_DEALT {
+        println!("River: {}", card_to_string_simple(card_config.river));
+    } else {
+        println!("River: Not dealt");
+    }
+
+    // Tree configuration
+    let tree_config = game.tree_config();
+    println!("\n--- Tree Configuration ---");
+    println!("Initial state: {:?}", tree_config.initial_state);
+    println!("Starting pot: {}", tree_config.starting_pot);
+    println!("Effective stack: {}", tree_config.effective_stack);
+    println!("Rake rate: {}", tree_config.rake_rate);
+    println!("Rake cap: {}", tree_config.rake_cap);
+    println!("Add allin threshold: {}", tree_config.add_allin_threshold);
+    println!(
+        "Force allin threshold: {}",
+        tree_config.force_allin_threshold
+    );
+    println!("Merging threshold: {}", tree_config.merging_threshold);
+
+    // Bet size information
+    println!("\n--- Bet Size Configuration ---");
+    println!("FLOP:");
+    println!("  OOP bet: {:?}", tree_config.flop_bet_sizes[0].bet);
+    println!("  OOP raise: {:?}", tree_config.flop_bet_sizes[0].raise);
+    println!("  IP bet: {:?}", tree_config.flop_bet_sizes[1].bet);
+    println!("  IP raise: {:?}", tree_config.flop_bet_sizes[1].raise);
+
+    println!("TURN:");
+    println!("  OOP bet: {:?}", tree_config.turn_bet_sizes[0].bet);
+    println!("  OOP raise: {:?}", tree_config.turn_bet_sizes[0].raise);
+    println!("  IP bet: {:?}", tree_config.turn_bet_sizes[1].bet);
+    println!("  IP raise: {:?}", tree_config.turn_bet_sizes[1].raise);
+    if let Some(donk) = &tree_config.turn_donk_sizes {
+        println!("  OOP donk: {:?}", donk.donk);
+    } else {
+        println!("  OOP donk: None");
+    }
+
+    println!("RIVER:");
+    println!("  OOP bet: {:?}", tree_config.river_bet_sizes[0].bet);
+    println!("  OOP raise: {:?}", tree_config.river_bet_sizes[0].raise);
+    println!("  IP bet: {:?}", tree_config.river_bet_sizes[1].bet);
+    println!("  IP raise: {:?}", tree_config.river_bet_sizes[1].raise);
+    if let Some(donk) = &tree_config.river_donk_sizes {
+        println!("  OOP donk: {:?}", donk.donk);
+    } else {
+        println!("  OOP donk: None");
+    }
+
+    // Range information
+    println!("\n--- Range Information ---");
+    println!("OOP hands: {} combos", game.private_cards(0).len());
+    println!("IP hands: {} combos", game.private_cards(1).len());
+
+    println!("\n====================================");
 }

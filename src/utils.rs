@@ -180,6 +180,8 @@ pub fn print_hand_details(game: &mut PostFlopGame, max_hands: usize, results: &[
         return;
     }
 
+    game.cache_normalized_weights();
+
     // Récupérer le joueur actuel
     let player = game.current_player();
     let player_str = if player == 0 { "OOP" } else { "IP" };
@@ -914,68 +916,68 @@ pub fn get_current_actions_string(game: &PostFlopGame) -> String {
     }
 }
 
-/// Fonction pour afficher un log complet de l'état du jeu
-pub fn log_game_state(game: &PostFlopGame, current_player: &str, num_actions: usize) {
-    println!("\n==== ÉTAT COMPLET DU JEU ====");
-    println!(
-        "État du nœud: terminal={}, chance={}",
-        game.is_terminal_node(),
-        game.is_chance_node()
-    );
-    println!("Joueur actuel: {}", current_player);
-    println!("Nombre d'actions: {}", num_actions);
-    println!("Cartes du board: {:?}", game.current_board());
-    println!("Pot de départ: {}", game.tree_config().starting_pot);
-    println!("Stack effectif: {}", game.tree_config().effective_stack);
-    println!(
-        "Montants misés: OOP={}, IP={}",
-        game.total_bet_amount()[0],
-        game.total_bet_amount()[1]
-    );
+// Fonction pour afficher un log complet de l'état du jeu
+// pub fn log_game_state(game: &PostFlopGame, current_player: &str, num_actions: usize) {
+//     println!("\n==== ÉTAT COMPLET DU JEU ====");
+//     println!(
+//         "État du nœud: terminal={}, chance={}",
+//         game.is_terminal_node(),
+//         game.is_chance_node()
+//     );
+//     println!("Joueur actuel: {}", current_player);
+//     println!("Nombre d'actions: {}", num_actions);
+//     println!("Cartes du board: {:?}", game.current_board());
+//     println!("Pot de départ: {}", game.tree_config().starting_pot);
+//     println!("Stack effectif: {}", game.tree_config().effective_stack);
+//     println!(
+//         "Montants misés: OOP={}, IP={}",
+//         game.total_bet_amount()[0],
+//         game.total_bet_amount()[1]
+//     );
 
-    // Log des actions disponibles
-    if !game.is_terminal_node() && !game.is_chance_node() {
-        println!("Actions disponibles:");
-        for (i, action) in game.available_actions().iter().enumerate() {
-            println!("  {}: {:?}", i, action);
-        }
-    }
+//     // Log des actions disponibles
+//     if !game.is_terminal_node() && !game.is_chance_node() {
+//         println!("Actions disponibles:");
+//         for (i, action) in game.available_actions().iter().enumerate() {
+//             println!("  {}: {:?}", i, action);
+//         }
+//     }
 
-    // Log des poids et de l'équité
-    println!("Poids OOP:");
-    let oop_weights = game.weights(0);
-    for i in 0..std::cmp::min(5, oop_weights.len()) {
-        print!("{:.4} ", oop_weights[i]);
-    }
-    println!("... ({} au total)", oop_weights.len());
+//     // Log des poids et de l'équité
+//     println!("Poids OOP:");
+//     let oop_weights = game.weights(0);
+//     for i in 0..std::cmp::min(5, oop_weights.len()) {
+//         print!("{:.4} ", oop_weights[i]);
+//     }
+//     println!("... ({} au total)", oop_weights.len());
 
-    println!("Poids IP:");
-    let ip_weights = game.weights(1);
-    for i in 0..std::cmp::min(5, ip_weights.len()) {
-        print!("{:.4} ", ip_weights[i]);
-    }
-    println!("... ({} au total)", ip_weights.len());
+//     println!("Poids IP:");
+//     let ip_weights = game.weights(1);
+//     for i in 0..std::cmp::min(5, ip_weights.len()) {
+//         print!("{:.4} ", ip_weights[i]);
+//     }
+//     println!("... ({} au total)", ip_weights.len());
 
-    // Équité si disponible
-    if !game.is_terminal_node() && !game.is_chance_node() {
-        // Utiliser des appels sécurisés pour éviter les problèmes avec cache_normalized_weights
+//     // Équité si disponible
+//     if !game.is_terminal_node() && !game.is_chance_node() {
+//         // Utiliser des appels sécurisés pour éviter les problèmes avec cache_normalized_weights
 
-        // Stratégie si nœud joueur
-        if current_player == "oop" || current_player == "ip" {
-            println!("Stratégie (5 premières valeurs):");
-            let strategy = game.strategy();
-            for i in 0..std::cmp::min(5, strategy.len()) {
-                print!("{:.4} ", strategy[i]);
-            }
-            println!("... ({} au total)", strategy.len());
+//         // Stratégie si nœud joueur
+//         if current_player == "oop" || current_player == "ip" {
+//             println!("Stratégie (5 premières valeurs):");
+//             let strategy = game.strategy();
+//             for i in 0..std::cmp::min(5, strategy.len()) {
+//                 print!("{:.4} ", strategy[i]);
+//             }
+//             println!("... ({} au total)", strategy.len());
 
-            println!("Action EVs (5 premières valeurs):");
-            let action_evs = game.expected_values_detail(game.current_player());
-            for i in 0..std::cmp::min(5, action_evs.len()) {
-                print!("{:.4} ", action_evs[i]);
-            }
-            println!("... ({} au total)", action_evs.len());
-        }
-    }
-    println!("==== FIN DU LOG DU JEU ====\n");
-}
+//             println!("Action EVs (5 premières valeurs):");
+//             let action_evs = game.expected_values_detail(game.current_player());
+//             for i in 0..std::cmp::min(5, action_evs.len()) {
+//                 print!("{:.4} ", action_evs[i]);
+//             }
+//             println!("... ({} au total)", action_evs.len());
+//         }
+//     }
+//     println!("==== FIN DU LOG DU JEU ====\n");
+// }

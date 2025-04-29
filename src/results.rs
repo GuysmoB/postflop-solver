@@ -1,4 +1,4 @@
-use crate::log_game_state;
+// use crate::log_game_state;
 use crate::utils::actions_after;
 use crate::utils::get_current_actions_string;
 use crate::utils::get_specific_result;
@@ -174,7 +174,7 @@ pub fn select_spot(
         game.available_actions().len()
     };
 
-    log_game_state(game, current_player, num_actions);
+    // log_game_state(game, current_player, num_actions);
     // Obtenir les résultats au format identique à getSpecificResultsFront
     let results = get_specific_result(game, current_player, num_actions)?;
 
