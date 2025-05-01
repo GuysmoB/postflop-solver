@@ -1,5 +1,8 @@
-use crate::action_tree::Action as GameAction; // L'enum du jeu (Fold, Check, etc.)
+use crate::action_tree::Action as GameAction;
+use crate::deal;
+// L'enum du jeu (Fold, Check, etc.)
 use crate::holes_to_strings;
+use crate::play;
 use crate::results::select_spot;
 use crate::Card;
 use crate::GameState;
@@ -145,7 +148,10 @@ pub fn get_results(game: &mut PostFlopGame) -> Box<[f64]> {
     }
 
     if !game.is_terminal_node() && !game.is_chance_node() {
+        // println!("get_result() - before strategy()");
         buf.extend(round_iter(game.strategy().iter()));
+        // println!("get_result() - after strategy()");
+
         if is_empty_flag == 0 {
             buf.extend(round_iter(
                 game.expected_values_detail(game.current_player()).iter(),
@@ -625,9 +631,6 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
     println!("\n=== STATISTIQUES INITIALES (FLOP) ===");
     display_simple_stats(game);
 
-    println!("\n=== DETAILS ===");
-    // print_hand_details(game, 1, &*results);
-
     // Afficher les actions disponibles
     // println!("\nActions disponibles pour OOP:");
     // for (i, action) in state.spots[1].actions.iter().enumerate() {
@@ -643,165 +646,135 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
     //     );
     // }
 
-    // // À ce stade, state.spots[1] contient un nœud joueur OOP avec des actions
-    // println!("\n=== ÉTAPE 1: OOP BET ===");
+    // À ce stade, state.spots[1] contient un nœud joueur OOP avec des actions
+    println!("\n=== ÉTAPE 1: OOP BET ===");
 
-    // // Trouver l'index de l'action "Bet" pour OOP
-    // let bet_idx = state.spots[1].actions.iter().position(|a| a.name == "Bet");
-    // if let Some(bet_idx) = bet_idx {
-    //     // Afficher l'action sélectionnée
-    //     let bet_action = &state.spots[1].actions[bet_idx];
-    //     println!(
-    //         "Action sélectionnée: {} {}",
-    //         bet_action.name,
-    //         if bet_action.amount != "0" {
-    //             &bet_action.amount
-    //         } else {
-    //             ""
-    //         }
-    //     );
+    // Trouver l'index de l'action "Bet" pour OOP
+    let bet_idx = state.spots[1].actions.iter().position(|a| a.name == "Bet");
+    if let Some(bet_idx) = bet_idx {
+        // Afficher l'action sélectionnée
+        let bet_action = &state.spots[1].actions[bet_idx];
+        println!(
+            "Action sélectionnée: {} {}",
+            bet_action.name,
+            if bet_action.amount != "0" {
+                &bet_action.amount
+            } else {
+                ""
+            }
+        );
 
-    //     // Sélectionner cette action
-    //     state.spots[1].selected_index = bet_idx as i32;
-    //     state.spots[1].actions[bet_idx].is_selected = true;
+        // Utiliser play() au lieu de manipuler manuellement les index et appeler select_spot
+        play(game, &mut state, bet_idx)?;
 
-    //     // Avancer au nœud suivant (IP)
-    //     select_spot(game, &mut state, 2, true, false)?;
+        // Afficher les statistiques après le bet OOP
+        println!("\n=== STATISTIQUES APRÈS BET OOP ===");
+        display_simple_stats(game);
 
-    //     // Afficher les statistiques après le bet OOP
-    //     println!("\n=== STATISTIQUES APRÈS BET OOP ===");
-    //     display_simple_stats(game);
+        // Afficher les actions disponibles pour IP
+        // println!("\nActions disponibles pour IP:");
+        // for (i, action) in state.spots[2].actions.iter().enumerate() {
+        //     println!(
+        //         "  {}: {} {}",
+        //         i,
+        //         action.name,
+        //         if action.amount != "0" {
+        //             &action.amount
+        //         } else {
+        //             ""
+        //         }
+        //     );
+        // }
 
-    //     // Afficher les actions disponibles pour IP
-    //     println!("\nActions disponibles pour IP:");
-    //     for (i, action) in state.spots[2].actions.iter().enumerate() {
-    //         println!(
-    //             "  {}: {} {}",
-    //             i,
-    //             action.name,
-    //             if action.amount != "0" {
-    //                 &action.amount
-    //             } else {
-    //                 ""
-    //             }
-    //         );
-    //     }
+        println!("\n=== ÉTAPE 2: IP CALL ===");
+        // Trouver l'index de l'action "Call" pour IP
+        let call_idx = state.spots[2].actions.iter().position(|a| a.name == "Call");
+        if let Some(call_idx) = call_idx {
+            // Afficher l'action sélectionnée
+            let call_action = &state.spots[2].actions[call_idx];
+            println!(
+                "Action sélectionnée: {} {}",
+                call_action.name,
+                if call_action.amount != "0" {
+                    &call_action.amount
+                } else {
+                    ""
+                }
+            );
 
-    //     println!("\n=== ÉTAPE 2: IP CALL ===");
+            // Utiliser play() pour sélectionner l'action call
+            play(game, &mut state, call_idx)?;
 
-    //     // Trouver l'index de l'action "Call" pour IP
-    //     let call_idx = state.spots[2].actions.iter().position(|a| a.name == "Call");
-    //     if let Some(call_idx) = call_idx {
-    //         // Afficher l'action sélectionnée
-    //         let call_action = &state.spots[2].actions[call_idx];
-    //         println!(
-    //             "Action sélectionnée: {} {}",
-    //             call_action.name,
-    //             if call_action.amount != "0" {
-    //                 &call_action.amount
-    //             } else {
-    //                 ""
-    //             }
-    //         );
+            println!("\n=== ÉTAPE 3: TURN (NŒUD DE CHANCE) ===");
 
-    //         // Sélectionner cette action
-    //         state.spots[2].selected_index = call_idx as i32;
-    //         state.spots[2].actions[call_idx].is_selected = true;
+            // Afficher les statistiques avant la distribution de la turn
+            println!("\n=== STATISTIQUES AVANT DISTRIBUTION DE LA TURN ===");
+            // À ce stade, state.spots[3] est un nœud de chance (turn)
+            let chance_spot_idx = 3; // L'index du nœud de chance (turn)
+            println!("Pot actuel: {:.2} bb", state.spots[chance_spot_idx].pot);
+            println!(
+                "Stack restant: {:.2} bb",
+                state.spots[chance_spot_idx].stack
+            );
 
-    //         // Avancer au nœud suivant (nœud de chance pour la turn)
-    //         select_spot(game, &mut state, 3, true, false)?;
+            // Pour simuler la sélection d'une carte turn, choisissons la première carte disponible
+            if let Some(card_idx) = state.spots[chance_spot_idx]
+                .cards
+                .iter()
+                .position(|c| !c.is_dead)
+            {
+                // Afficher la carte sélectionnée
+                let selected_card = state.spots[chance_spot_idx].cards[card_idx].card as Card;
+                println!(
+                    "\nCarte turn sélectionnée: {}",
+                    card_to_string_simple(selected_card)
+                );
 
-    //         println!("\n=== ÉTAPE 3: TURN (NŒUD DE CHANCE) ===");
+                // Utiliser deal() pour sélectionner la carte
+                deal(game, &mut state, card_idx)?;
 
-    //         // Afficher les statistiques avant la distribution de la turn
-    //         println!("\n=== STATISTIQUES AVANT DISTRIBUTION DE LA TURN ===");
-    //         println!("Pot actuel: {:.2} bb", state.spots[2].pot);
-    //         println!("Stack restant: {:.2} bb", state.spots[2].stack);
+                println!("\n=== RÉSULTATS APRÈS LA TURN ===");
 
-    //         // Afficher quelques cartes turn disponibles
-    //         println!("\nExemples de cartes turn disponibles:");
-    //         let mut cards_shown = 0;
-    //         for (i, card) in state.spots[3].cards.iter().enumerate() {
-    //             if !card.is_dead && cards_shown < 5 {
-    //                 println!("  {}: {}", i, card_to_string_simple(card.card as Card));
-    //                 cards_shown += 1;
-    //             }
-    //         }
+                // Afficher le board actuel
+                let current_board = game.current_board();
+                println!(
+                    "Board actuel: {}",
+                    current_board
+                        .iter()
+                        .map(|&c| card_to_string_simple(c))
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                );
 
-    //         // Compter le nombre total de cartes disponibles
-    //         let available_cards_count = state.spots[3].cards.iter().filter(|c| !c.is_dead).count();
-    //         if available_cards_count > 5 {
-    //             println!(
-    //                 "  ... et {} cartes supplémentaires",
-    //                 available_cards_count - 5
-    //             );
-    //         }
+                // Afficher les statistiques après la distribution de la turn
+                println!("\n=== STATISTIQUES APRÈS DISTRIBUTION DE LA TURN ===");
+                display_simple_stats(game);
 
-    //         // À ce stade, state.spots[3] est un nœud de chance (turn)
-    //         // et state.spots[4] sera un nœud joueur OOP après la turn
-
-    //         // Pour simuler la sélection d'une carte turn, choisissons la première carte disponible
-    //         if let Some(card_idx) = state.spots[3].cards.iter().position(|c| !c.is_dead) {
-    //             // Afficher la carte sélectionnée
-    //             let selected_card = state.spots[3].cards[card_idx].card as Card;
-    //             println!(
-    //                 "\nCarte turn sélectionnée: {}",
-    //                 card_to_string_simple(selected_card)
-    //             );
-
-    //             // Sélectionner cette carte
-    //             state.spots[3].selected_index = card_idx as i32;
-    //             state.spots[3].cards[card_idx].is_selected = true;
-
-    //             // CORRECTION: Avancer avec from_deal=true pour obtenir les bons résultats à la turn
-    //             select_spot(game, &mut state, 4, false, true)?;
-
-    //             println!("\n=== RÉSULTATS APRÈS LA TURN ===");
-
-    //             // Afficher le board actuel
-    //             let current_board = game.current_board();
-    //             println!(
-    //                 "Board actuel: {}",
-    //                 current_board
-    //                     .iter()
-    //                     .map(|&c| card_to_string_simple(c))
-    //                     .collect::<Vec<_>>()
-    //                     .join(" ")
-    //             );
-
-    //             // Afficher les statistiques après la distribution de la turn
-    //             println!("\n=== STATISTIQUES APRÈS DISTRIBUTION DE LA TURN ===");
-    //             display_simple_stats(game);
-
-    //             // À ce stade, state.spots[4] est un nœud joueur OOP après la turn
-    //             // avec les stratégies et EVs correctement calculés
-    //             if state.spots.len() > 4 {
-    //                 println!("\nActions disponibles pour OOP après la turn:");
-    //                 for (i, action) in state.spots[4].actions.iter().enumerate() {
-    //                     println!(
-    //                         "  {}: {} {}",
-    //                         i,
-    //                         action.name,
-    //                         if action.amount != "0" {
-    //                             &action.amount
-    //                         } else {
-    //                             ""
-    //                         }
-    //                     );
-    //                 }
-    //             }
-
-    //             // Afficher les informations détaillées
-    //             // print_hand_details(game, 1);
-    //         } else {
-    //             return Err("Aucune carte disponible pour la turn!".to_string());
-    //         }
-    //     } else {
-    //         return Err("Action Call non trouvée pour IP!".to_string());
-    //     }
-    // } else {
-    //     return Err("Action Bet non trouvée pour OOP!".to_string());
-    // }
+                // À ce stade, state.spots[4] est un nœud joueur OOP après la turn
+                if state.spots.len() > 4 {
+                    // println!("\nActions disponibles pour OOP après la turn:");
+                    // for (i, action) in state.spots[4].actions.iter().enumerate() {
+                    //     println!(
+                    //         "  {}: {} {}",
+                    //         i,
+                    //         action.name,
+                    //         if action.amount != "0" {
+                    //             &action.amount
+                    //         } else {
+                    //             ""
+                    //         }
+                    //     );
+                    // }
+                }
+            } else {
+                return Err("Aucune carte disponible pour la turn!".to_string());
+            }
+        } else {
+            return Err("Action Call non trouvée pour IP!".to_string());
+        }
+    } else {
+        return Err("Action Bet non trouvée pour OOP!".to_string());
+    }
 
     Ok(())
 }
@@ -869,7 +842,7 @@ fn calculate_average_equity(game: &PostFlopGame, player: usize) -> f64 {
     }
 }
 
-pub fn actions_after(game: &mut PostFlopGame, append: &[i32]) -> String {
+pub fn actions_after(game: &mut PostFlopGame, append: &[usize]) -> String {
     if append.is_empty() {
         return get_current_actions_string(game);
     }
@@ -877,11 +850,9 @@ pub fn actions_after(game: &mut PostFlopGame, append: &[i32]) -> String {
     // Utiliser cloned_history pour éviter l'emprunt
     let history = game.cloned_history();
 
-    // Jouer chaque action valide (ignorer les valeurs négatives)
+    // Jouer chaque action (plus besoin de vérifier si négatif avec usize)
     for &action in append {
-        if action >= 0 {
-            game.play(action as usize);
-        }
+        game.play(action);
     }
 
     // Capturer le résultat

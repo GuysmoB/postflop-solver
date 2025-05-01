@@ -390,7 +390,9 @@ impl PostFlopGame {
 
             // update the weights
             if node.num_actions() > 1 {
+                // println!("play() - before strategy()");
                 let strategy = self.strategy();
+                // println!("play() - after strategy()");
                 let weights = row(&strategy, action, num_hands);
                 mul_slice(&mut self.weights[player], weights);
             }
@@ -684,7 +686,9 @@ impl PostFlopGame {
 
         let num_actions = self.node().num_actions();
         let num_hands = self.num_private_hands(player);
+        // println!("expected_values() - before strategy()");
         let strategy = self.strategy();
+        // println!("expected_values() - after strategy()");
 
         let mut ret = Vec::with_capacity(num_hands);
         for i in 0..num_hands {
@@ -831,6 +835,7 @@ impl PostFlopGame {
         }
 
         if self.is_chance_node() {
+            println!("strategy() - Chance node is not allowed");
             panic!("Chance node is not allowed");
         }
 
@@ -890,6 +895,7 @@ impl PostFlopGame {
         }
 
         if self.is_chance_node() {
+            println!("lock_current_strategy() - Chance node is not allowed");
             panic!("Chance node is not allowed");
         }
 
@@ -953,6 +959,7 @@ impl PostFlopGame {
         }
 
         if self.is_chance_node() {
+            println!("unlock_current_strategy() - Chance node is not allowed");
             panic!("Chance node is not allowed");
         }
 
@@ -986,6 +993,7 @@ impl PostFlopGame {
         }
 
         if self.is_chance_node() {
+            println!("current_locking_strategy() - Chance node is not allowed");
             panic!("Chance node is not allowed");
         }
 

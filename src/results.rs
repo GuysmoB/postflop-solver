@@ -2,6 +2,7 @@
 use crate::utils::actions_after;
 use crate::utils::get_current_actions_string;
 use crate::utils::get_specific_result;
+use crate::weighted_average;
 use crate::Card;
 use crate::PostFlopGame;
 use crate::SpecificResultData;
@@ -81,6 +82,115 @@ impl GameState {
             last_results: None,
         }
     }
+
+    pub fn log_spot(&self, index: usize) {
+        if let Some(spot) = self.spots.get(index) {
+            println!(
+                "Spot #{} - Type: {:?}, Player: {}, Index: {}",
+                index, spot.spot_type, spot.player, spot.index
+            );
+            println!("  Selected index: {}", spot.selected_index);
+
+            if !spot.actions.is_empty() {
+                println!("  Actions:");
+                for (j, action) in spot.actions.iter().enumerate() {
+                    println!(
+                        "    {}: {} {} (selected: {}, rate: {:.2})",
+                        j, action.name, action.amount, action.is_selected, action.rate
+                    );
+                }
+            }
+
+            if spot.spot_type == SpotType::Chance {
+                let selected_cards: Vec<_> = spot
+                    .cards
+                    .iter()
+                    .filter(|c| c.is_selected)
+                    .map(|c| c.card)
+                    .collect();
+                let dead_cards_count = spot.cards.iter().filter(|c| c.is_dead).count();
+                println!(
+                    "  Cards: {} cards, {} dead, Selected: {:?}",
+                    spot.cards.len(),
+                    dead_cards_count,
+                    selected_cards
+                );
+            }
+
+            println!(
+                "  Pot: {:.2}, Stack: {:.2}, Equity OOP: {:.2}",
+                spot.pot, spot.stack, spot.equity_oop
+            );
+            println!("  Previous player: {:?}", spot.prev_player);
+        } else {
+            println!("Spot à l'index {} non trouvé", index);
+        }
+    }
+
+    pub fn log_spots(&self, prefix: &str) {
+        println!("\n=== {} - SPOTS STATE ===", prefix);
+        println!("Total spots: {}", self.spots.len());
+        println!("Selected spot index: {}", self.selected_spot_index);
+        println!("Selected chance index: {}", self.selected_chance_index);
+
+        for (i, spot) in self.spots.iter().enumerate() {
+            println!(
+                "Spot #{} - Type: {:?}, Player: {}, Index: {}",
+                i, spot.spot_type, spot.player, spot.index
+            );
+            println!("  Selected index: {}", spot.selected_index);
+
+            if !spot.actions.is_empty() {
+                println!("  Actions:");
+                for (j, action) in spot.actions.iter().enumerate() {
+                    println!(
+                        "    {}: {} {} (selected: {}, rate: {:.2})",
+                        j, action.name, action.amount, action.is_selected, action.rate
+                    );
+                }
+            }
+
+            if spot.spot_type == SpotType::Chance {
+                let selected_cards: Vec<_> = spot
+                    .cards
+                    .iter()
+                    .filter(|c| c.is_selected)
+                    .map(|c| c.card)
+                    .collect();
+                let dead_cards_count = spot.cards.iter().filter(|c| c.is_dead).count();
+                println!(
+                    "  Cards: {} cards, {} dead, Selected: {:?}",
+                    spot.cards.len(),
+                    dead_cards_count,
+                    selected_cards
+                );
+            }
+
+            println!(
+                "  Pot: {:.2}, Stack: {:.2}, Equity OOP: {:.2}",
+                spot.pot, spot.stack, spot.equity_oop
+            );
+            println!("  Previous player: {:?}", spot.prev_player);
+        }
+
+        println!("===============================\n");
+    }
+
+    pub fn log_state(&self, prefix: &str) {
+        println!("\n=== {} - GAME STATE ===", prefix);
+        println!("Selected spot index: {}", self.selected_spot_index);
+        println!("Selected chance index: {}", self.selected_chance_index);
+        println!("Is dealing: {}", self.is_dealing);
+        println!("Results empty: {}", self.results_empty);
+        println!("Equity OOP: {:.4}", self.equity_oop);
+        println!(
+            "Total bet amount: OOP={}, IP={}",
+            self.total_bet_amount_appended[0], self.total_bet_amount_appended[1]
+        );
+        println!("Can chance reports: {}", self.can_chance_reports);
+        println!("Has last results: {}", self.last_results.is_some());
+        // self.log_spots(prefix);
+    }
 }
 
 /// Function to navigate to a specific node in the game tree
@@ -92,6 +202,11 @@ pub fn select_spot(
     need_splice: bool,
     from_deal: bool,
 ) -> Result<SpecificResultData, String> {
+    println!(
+        "select_spot() - spot_index: {}, need_splice: {}, from_deal: {}",
+        spot_index, need_splice, from_deal
+    );
+
     // Skip if already at the selected spot and not from a deal action
     if !need_splice
         && (spot_index == state.selected_spot_index as usize && !from_deal
@@ -112,6 +227,10 @@ pub fn select_spot(
     // Store temporary values for indices to avoid unnecessary ref updates
     let mut selected_spot_index_tmp = state.selected_spot_index;
     let mut selected_chance_index_tmp = state.selected_chance_index;
+
+    if from_deal {
+        selected_chance_index_tmp = process_from_deal(game, state)?;
+    }
 
     // Update selected indices based on spot type
     if !need_splice && state.spots[spot_index].spot_type == SpotType::Chance {
@@ -143,10 +262,7 @@ pub fn select_spot(
         selected_chance_index_tmp as usize
     };
 
-    // Back to root and apply history
-    game.back_to_root();
-
-    // Build history array from spots (comme dans le code Vue)
+    // Build history array from spots
     let mut history: Vec<usize> = Vec::new();
     for i in 1..end_index {
         if state.spots[i].selected_index != -1 {
@@ -154,7 +270,6 @@ pub fn select_spot(
         }
     }
 
-    // Apply history to game
     game.apply_history(&history);
 
     // Get current player type and number of actions
@@ -174,32 +289,11 @@ pub fn select_spot(
         game.available_actions().len()
     };
 
-    // log_game_state(game, current_player, num_actions);
-    // Obtenir les résultats au format identique à getSpecificResultsFront
     let results = get_specific_result(game, current_player, num_actions)?;
-
-    // print results for debugging
-    println!(
-        "Results: current_player={}, num_actions={}, is_empty={}",
-        results.current_player, results.num_actions, results.is_empty
-    );
-
-    if !results.action_ev.is_empty() {
-        let display_count = std::cmp::min(5, results.action_ev.len());
-        println!(
-            "Action EV (5 premières valeurs): [{}]",
-            results.action_ev[..display_count]
-                .iter()
-                .map(|&v| format!("{:.4}", v))
-                .collect::<Vec<String>>()
-                .join(", ")
-        );
-    }
 
     // Check if results are empty
     state.results_empty = results.is_empty;
 
-    // Construire l'append array comme dans le frontend
     let mut append_array: Vec<i32> = Vec::new();
 
     if selected_chance_index_tmp != -1 {
@@ -215,7 +309,7 @@ pub fn select_spot(
         .collect();
 
     // Obtenir les actions après le skip des chances
-    let next_actions_str = actions_after(game, &append_array);
+    let next_actions_str = actions_after(game, &append);
 
     // Vérifier si on peut avoir des chance reports
     let can_chance_reports = selected_chance_index_tmp != -1
@@ -246,10 +340,10 @@ pub fn select_spot(
             // Create a terminal spot
             splice_spots_terminal(game, state, spot_index)?;
         } else if game.is_chance_node() || next_actions_str == "chance" {
-            // Create a chance spot
             splice_spots_chance(game, state, spot_index)?;
-            // Increment selected spot index after creating a chance node
             selected_spot_index_tmp += 1;
+
+            //logger state
         } else {
             // Create a player spot
             splice_spots_player(state, spot_index, next_actions_str)?;
@@ -262,7 +356,7 @@ pub fn select_spot(
             let player_index = if spot.player == "oop" { 0 } else { 1 };
 
             if !state.results_empty {
-                update_action_rates(spot, game, player_index);
+                // update_action_rates(spot, game, player_index);
             }
         }
     }
@@ -272,18 +366,22 @@ pub fn select_spot(
     state.selected_chance_index = selected_chance_index_tmp;
     state.is_dealing = false;
 
-    // Handle special from_deal processing
-    if from_deal {
-        process_from_deal(game, state)?;
-    }
-
-    // Construire un objet SpotSelectionResult avec toutes les informations nécessaires
     Ok(results)
 }
 
 /// Helper function to update action rates for a player spot
 fn update_action_rates(spot: &mut Spot, game: &PostFlopGame, player_index: usize) {
+    println!("update_action_rates() - spot_type: {:?}", spot.spot_type);
+
+    // if game.is_chance_node() || game.is_terminal_node() {
+    if spot.spot_type != SpotType::Player {
+        println!("Skipping update_action_rates for non-player node");
+        return;
+    }
+
+    // println!("Updating action rates for player index");
     let strategy = game.strategy();
+    // println!("update_action_rates() - after strategy()");
     let weights = game.normalized_weights(player_index);
     let num_hands = weights.len();
 
@@ -311,127 +409,103 @@ fn update_action_rates(spot: &mut Spot, game: &PostFlopGame, player_index: usize
     }
 }
 
-/// Process special handling for actions coming from deal()
-fn process_from_deal(game: &mut PostFlopGame, state: &mut GameState) -> Result<(), String> {
-    // This is where we would update river dead cards and terminal equity
-    // when we've just performed a deal action on turn
+/// Fonction process_from_deal qui gère les mises à jour spéciales après un deal
+/// Basée directement sur le code Vue dans le bloc if (fromDeal) de selectSpotResult
+fn process_from_deal(game: &mut PostFlopGame, state: &mut GameState) -> Result<i32, String> {
+    // Chercher l'index du nœud "river" (prochain nœud de chance après le nœud actuel)
+    let selected_chance_idx = state.selected_chance_index as usize;
+    let find_river_index = state
+        .spots
+        .iter()
+        .skip(selected_chance_idx + 3) // Skip 3 spots après le nœud de chance actuel
+        .position(|spot| spot.spot_type == SpotType::Chance);
 
-    // Find river spot after selected chance index (if any)
-    if state.selected_chance_index > 0 {
-        let start_idx = (state.selected_chance_index as usize) + 3;
-        let mut river_idx = -1;
+    let river_index = if let Some(idx) = find_river_index {
+        idx + selected_chance_idx + 3
+    } else {
+        usize::MAX // Équivalent à -1 dans le code Vue
+    };
 
-        for i in start_idx..state.spots.len() {
-            if state.spots[i].spot_type == SpotType::Chance {
-                river_idx = i as i32;
-                break;
+    // Obtenir le nœud river si présent
+    let river_spot_exists = river_index != usize::MAX && river_index < state.spots.len();
+
+    // IMPORTANT: Réinitialiser le selected_chance_index à -1 comme dans le frontend
+    // C'est la clé de la correction du bug
+    let new_selected_chance_index = -1;
+
+    // Si un nœud river existe, mettre à jour les cartes mortes
+    if river_spot_exists {
+        // Construire l'historique jusqu'au nœud river
+        game.back_to_root();
+        let mut history = Vec::new();
+        for i in 1..river_index {
+            if state.spots[i].selected_index != -1 {
+                history.push(state.spots[i].selected_index as usize);
             }
         }
+        game.apply_history(&history);
 
-        // Update river spot's dead cards
-        if river_idx >= 0 {
-            // First, collect history up to river spot
-            let mut history = Vec::new();
+        // Obtenir les cartes possibles
+        let possible_cards = game.possible_cards();
 
-            // Collect all selected indices first to avoid mutable borrow issues
-            let selected_indices: Vec<(usize, SpotType, i32)> = (1..river_idx as usize)
-                .filter_map(|i| {
-                    let spot = &state.spots[i];
-                    if spot.selected_index >= 0 {
-                        Some((i, spot.spot_type.clone(), spot.selected_index))
-                    } else {
-                        None
-                    }
-                })
-                .collect();
+        // Mettre à jour les cartes mortes dans le nœud river
+        let river_spot = &mut state.spots[river_index];
+        for (i, card) in river_spot.cards.iter_mut().enumerate() {
+            let is_dead = (possible_cards & (1u64 << i)) == 0;
+            card.is_dead = is_dead;
 
-            // Now process the collected indices
-            for (_, spot_type, selected_index) in selected_indices {
-                match spot_type {
-                    SpotType::Chance => {
-                        // For chance spots, just add the selected index
-                        history.push(selected_index as usize);
-                    }
-                    SpotType::Player => {
-                        // For player spots, add the selected action index
-                        history.push(selected_index as usize);
-                    }
-                    _ => {}
-                }
-            }
-
-            // Back to root and apply history
-            game.back_to_root();
-            game.apply_history(&history);
-
-            // Get possible cards and update river spot
-            let possible_cards = game.possible_cards();
-            let river_spot = &mut state.spots[river_idx as usize];
-
-            for i in 0..52 {
-                let is_dead = (possible_cards & (1u64 << i)) == 0;
-                river_spot.cards[i].is_dead = is_dead;
-
-                // If the selected card is now dead, deselect it
-                if river_spot.selected_index as usize == i && is_dead {
-                    river_spot.cards[i].is_selected = false;
-                    river_spot.selected_index = -1;
-                }
-            }
-        }
-
-        // Check if the last spot is a terminal spot with non-fold equity
-        // First collect the required information without holding any borrows
-        let spots_len = state.spots.len();
-        let last_spot_is_terminal = if let Some(last) = state.spots.last() {
-            last.spot_type == SpotType::Terminal && last.equity_oop != 0.0 && last.equity_oop != 1.0
-        } else {
-            false
-        };
-
-        // If we need to update the terminal equity
-        if last_spot_is_terminal {
-            // Collect all selected indices first without borrowing state.spots mutably
-            let selected_indices: Vec<i32> = (1..spots_len - 1)
-                .filter_map(|i| {
-                    let spot = &state.spots[i];
-                    if spot.selected_index >= 0 {
-                        Some(spot.selected_index)
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-
-            // Now build the history from collected indices
-            let history: Vec<usize> = selected_indices
-                .into_iter()
-                .map(|idx| idx as usize)
-                .collect();
-
-            // Back to root and apply history
-            game.back_to_root();
-            game.apply_history(&history);
-
-            // Get results and calculate equity
-            game.cache_normalized_weights();
-
-            // Now we can safely mutably borrow the last spot
-            if let Some(last_spot) = state.spots.last_mut() {
-                if !state.results_empty {
-                    let equity = calculate_average_equity(game, 0);
-                    last_spot.equity_oop = equity;
-                } else {
-                    last_spot.equity_oop = -1.0;
-                }
+            // Si la carte sélectionnée est maintenant morte, la désélectionner
+            if river_spot.selected_index == i as i32 && is_dead {
+                card.is_selected = false;
+                river_spot.selected_index = -1;
             }
         }
     }
 
-    // Reset selected chance index
-    state.selected_chance_index = -1;
+    // Vérifier si le dernier spot est terminal et mettre à jour son équité
+    let river_skipped = river_spot_exists && state.spots[river_index].selected_index == -1;
+    let last_spot_idx = state.spots.len() - 1;
 
-    Ok(())
+    if !river_skipped
+        && last_spot_idx < state.spots.len()
+        && state.spots[last_spot_idx].spot_type == SpotType::Terminal
+        && state.spots[last_spot_idx].equity_oop != 0.0
+        && state.spots[last_spot_idx].equity_oop != 1.0
+    {
+        // Construire l'historique jusqu'au dernier nœud
+        game.back_to_root();
+        let mut history = Vec::new();
+        for i in 1..last_spot_idx {
+            if state.spots[i].selected_index != -1 {
+                history.push(state.spots[i].selected_index as usize);
+            }
+        }
+        game.apply_history(&history);
+
+        // Obtenir les résultats
+        if let Ok(results) = get_specific_result(game, "terminal", 0) {
+            if !results.is_empty {
+                // Mettre à jour l'équité OOP du spot terminal
+                let equity_oop = weighted_average(
+                    &results.equity[0]
+                        .iter()
+                        .map(|&x| x as f32)
+                        .collect::<Vec<_>>(),
+                    &results.normalizer[0]
+                        .iter()
+                        .map(|&x| x as f32)
+                        .collect::<Vec<_>>(),
+                ) as f64;
+
+                state.spots[last_spot_idx].equity_oop = equity_oop;
+            } else {
+                state.spots[last_spot_idx].equity_oop = -1.0;
+            }
+        }
+    }
+
+    // Retourner le nouveau selected_chance_index pour que select_spot le mette à jour
+    Ok(new_selected_chance_index)
 }
 
 /// Calculate average equity for a player
@@ -517,17 +591,14 @@ fn splice_spots_chance(
     state: &mut GameState,
     spot_index: usize,
 ) -> Result<(), String> {
-    // Récupérer le spot précédent (comme prevSpot dans le frontend)
     let prev_spot = &state.spots[spot_index - 1];
 
-    // Chercher un spot de turn existant (comme turnSpot dans le frontend)
     let turn_spot = state
         .spots
         .iter()
         .take(spot_index)
         .find(|spot| spot.player == "turn");
 
-    // Préparer le tableau pour append (comme appendArray dans le frontend)
     let mut append_array = Vec::new();
     if state.selected_chance_index != -1 {
         // Ajouter les indices sélectionnés entre le nœud de chance sélectionné et l'index actuel
@@ -638,6 +709,8 @@ fn splice_spots_chance(
         state.selected_chance_index = spot_index as i32;
     }
 
+    // state.log_spots("");
+
     Ok(())
 }
 
@@ -709,11 +782,15 @@ fn splice_spots_player(
 pub fn play(
     game: &mut PostFlopGame,
     state: &mut GameState,
-    spot_index: usize,
     action_index: usize,
 ) -> Result<(), String> {
+    let spot_index = state.selected_spot_index as usize;
+
+    state.log_state("play()");
+    println!("play() - action_index: {}", action_index);
     // Récupérer le spot actuel
-    let spot = match state.spots.get_mut(spot_index) {
+
+    let spot: &mut Spot = match state.spots.get_mut(spot_index) {
         Some(s) => s,
         None => return Err(format!("Spot à l'index {} non trouvé", spot_index)),
     };
@@ -745,4 +822,63 @@ pub fn play(
 
     // Naviguer au spot suivant avec needSplice=true
     select_spot(game, state, spot_index + 1, true, false).map(|_| ())
+}
+
+/// Function to deal a card at the currently selected chance node
+/// Based on deal() from ResultNav.vue
+pub fn deal(
+    game: &mut PostFlopGame,
+    state: &mut GameState,
+    card: usize,
+) -> Result<SpecificResultData, String> {
+    // Check if there's a selected chance node
+    if state.selected_chance_index == -1 {
+        return Err("Aucun nœud de chance sélectionné".to_string());
+    }
+
+    // Get a mutable reference to the chance spot
+    let spot_index = state.selected_chance_index as usize;
+    let spot = match state.spots.get_mut(spot_index) {
+        Some(s) => {
+            // Ensure it's a chance node
+            if s.spot_type != SpotType::Chance {
+                return Err("Le spot sélectionné n'est pas un nœud de chance".to_string());
+            }
+            s
+        }
+        None => return Err(format!("Spot à l'index {} non trouvé", spot_index)),
+    };
+
+    // Mark that we're in a dealing state
+    state.is_dealing = true;
+
+    // Deselect the previously selected card if any
+    if spot.selected_index != -1 {
+        if let Some(prev_card) = spot.cards.get_mut(spot.selected_index as usize) {
+            prev_card.is_selected = false;
+        }
+    }
+
+    // Select the new card
+    if let Some(new_card) = spot.cards.get_mut(card) {
+        // Check if the card is dead (unavailable)
+        if new_card.is_dead {
+            return Err(format!(
+                "La carte à l'index {} est morte (indisponible)",
+                card
+            ));
+        }
+        new_card.is_selected = true;
+    } else {
+        return Err(format!("Carte à l'index {} non trouvée", card));
+    }
+
+    // Update the selected index
+    spot.selected_index = card as i32;
+
+    // Log the spot state after update
+    state.log_spots("After card selection in deal()");
+
+    // Call select_spot to update the game state with from_deal=true
+    select_spot(game, state, state.selected_spot_index as usize, false, true)
 }

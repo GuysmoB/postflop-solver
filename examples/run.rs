@@ -104,13 +104,13 @@ fn main() {
     let action_tree = ActionTree::new(tree_config.clone()).unwrap();
     let mut game = PostFlopGame::with_config(card_config, action_tree).unwrap();
 
-    log_game_state(&game);
+    // log_game_state(&game);
 
     // Allocation de mémoire
     game.allocate_memory(false);
 
     // Paramètres de résolution
-    let max_iterations = 99;
+    let max_iterations = 10;
     let target_exploitability = 0.03;
     let print_progress = true;
 
