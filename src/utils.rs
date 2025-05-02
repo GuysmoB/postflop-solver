@@ -10,20 +10,7 @@ use crate::PostFlopGame;
 use crate::Spot;
 use crate::SpotType;
 
-struct ResultData {
-    current_player: String,
-    num_actions: usize,
-    is_empty: bool,
-    eqr_base: [f64; 2],
-    weights: Vec<Vec<f64>>,
-    normalizer: Vec<Vec<f64>>,
-    equity: Vec<Vec<f64>>,
-    ev: Vec<Vec<f64>>,
-    eqr: Vec<Vec<f64>>,
-    strategy: Vec<f64>,
-    action_ev: Vec<f64>,
-}
-
+#[derive(Clone)]
 pub struct SpecificResultData {
     pub current_player: String,
     pub num_actions: usize,
@@ -36,6 +23,51 @@ pub struct SpecificResultData {
     pub eqr: Vec<Vec<f64>>,
     pub strategy: Vec<f64>,
     pub action_ev: Vec<f64>,
+}
+
+impl Default for SpecificResultData {
+    fn default() -> Self {
+        Self {
+            current_player: String::new(),
+            num_actions: 0,
+            is_empty: true,
+            eqr_base: [0, 0],
+            weights: vec![Vec::new(), Vec::new()],
+            normalizer: vec![Vec::new(), Vec::new()],
+            equity: vec![Vec::new(), Vec::new()],
+            ev: vec![Vec::new(), Vec::new()],
+            eqr: vec![Vec::new(), Vec::new()],
+            strategy: Vec::new(),
+            action_ev: Vec::new(),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct SpecificChanceReportData {
+    pub current_player: String,
+    pub num_actions: usize,
+    pub status: Vec<f64>,
+    pub combos: Vec<Vec<f64>>,
+    pub equity: Vec<Vec<f64>>,
+    pub ev: Vec<Vec<f64>>,
+    pub eqr: Vec<Vec<f64>>,
+    pub strategy: Vec<f64>,
+}
+
+impl Default for SpecificChanceReportData {
+    fn default() -> Self {
+        Self {
+            current_player: String::new(),
+            num_actions: 0,
+            status: vec![0.0; 52],
+            combos: vec![vec![0.0; 52], vec![0.0; 52]],
+            equity: vec![vec![0.0; 52], vec![0.0; 52]],
+            ev: vec![vec![0.0; 52], vec![0.0; 52]],
+            eqr: vec![vec![0.0; 52], vec![0.0; 52]],
+            strategy: Vec::new(),
+        }
+    }
 }
 
 // Fonction utilitaire pour convertir une carte en chaîne simple
@@ -71,7 +103,7 @@ pub fn compute_average(values: &[f32], weights: &[f32]) -> f32 {
 }
 
 #[inline]
-fn round(value: f64) -> f64 {
+pub fn round(value: f64) -> f64 {
     if value < 1.0 {
         (value * 1000000.0).round() / 1000000.0
     } else if value < 10.0 {
@@ -162,21 +194,14 @@ pub fn get_results(game: &mut PostFlopGame) -> Box<[f64]> {
     buf.into_boxed_slice()
 }
 
-// Fonction utilitaire pour calculer la moyenne pondérée
-pub fn weighted_average(values: &[f32], weights: &[f32]) -> f32 {
+pub fn weighted_average(slice: &[f32], weights: &[f32]) -> f64 {
     let mut sum = 0.0;
     let mut weight_sum = 0.0;
-
-    for (&value, &weight) in values.iter().zip(weights.iter()) {
-        sum += value * weight;
-        weight_sum += weight;
+    for (&value, &weight) in slice.iter().zip(weights.iter()) {
+        sum += value as f64 * weight as f64;
+        weight_sum += weight as f64;
     }
-
-    if weight_sum > 0.0 {
-        sum / weight_sum
-    } else {
-        0.0
-    }
+    sum / weight_sum
 }
 
 pub fn print_hand_details(game: &mut PostFlopGame, max_hands: usize, results: &[f64]) {
@@ -439,27 +464,6 @@ pub fn get_specific_result(
     // 1. Récupérer les résultats bruts via get_results (comme dans le frontend)
     let buffer = get_results(game);
 
-    use std::fs::File;
-    use std::io::Write;
-
-    let mut file = match File::create("buffer_debug.json") {
-        Ok(file) => file,
-        Err(e) => return Err(format!("Erreur lors de la création du fichier: {}", e)),
-    };
-
-    // Écrire l'en-tête JSON
-    writeln!(file, "{{").unwrap();
-
-    // Écrire le contenu du buffer
-    for (i, value) in buffer.iter().enumerate() {
-        // Ajouter une virgule sauf pour la dernière ligne
-        let separator = if i < buffer.len() - 1 { "," } else { "" };
-        writeln!(file, "    \"{}\": {}{}", i, value, separator).unwrap();
-    }
-
-    // Fermer l'objet JSON
-    writeln!(file, "}}").unwrap();
-
     // 2. Déterminer les tailles des ranges
     let oop_range_size = game.private_cards(0).len();
     let ip_range_size = game.private_cards(1).len();
@@ -705,11 +709,7 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
             // Utiliser play() pour sélectionner l'action call
             play(game, &mut state, call_idx)?;
 
-            println!("\n=== ÉTAPE 3: TURN (NŒUD DE CHANCE) ===");
-
-            // Afficher les statistiques avant la distribution de la turn
             println!("\n=== STATISTIQUES AVANT DISTRIBUTION DE LA TURN ===");
-            // À ce stade, state.spots[3] est un nœud de chance (turn)
             let chance_spot_idx = 3; // L'index du nœud de chance (turn)
             println!("Pot actuel: {:.2} bb", state.spots[chance_spot_idx].pot);
             println!(
@@ -717,58 +717,32 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
                 state.spots[chance_spot_idx].stack
             );
 
-            // Pour simuler la sélection d'une carte turn, choisissons la première carte disponible
-            if let Some(card_idx) = state.spots[chance_spot_idx]
+            let card_idx = state.spots[chance_spot_idx]
                 .cards
                 .iter()
                 .position(|c| !c.is_dead)
-            {
-                // Afficher la carte sélectionnée
-                let selected_card = state.spots[chance_spot_idx].cards[card_idx].card as Card;
-                println!(
-                    "\nCarte turn sélectionnée: {}",
-                    card_to_string_simple(selected_card)
-                );
+                .ok_or_else(|| "Aucune carte disponible pour la turn!".to_string())?;
 
-                // Utiliser deal() pour sélectionner la carte
-                deal(game, &mut state, card_idx)?;
+            // Afficher la carte sélectionnée
+            let selected_card = state.spots[chance_spot_idx].cards[card_idx].card as Card;
+            println!(
+                "\nCarte turn sélectionnée: {}",
+                card_to_string_simple(selected_card)
+            );
 
-                println!("\n=== RÉSULTATS APRÈS LA TURN ===");
+            // Afficher le board actuel
+            let current_board = game.current_board();
+            println!(
+                "Board actuel: {}",
+                current_board
+                    .iter()
+                    .map(|&c| card_to_string_simple(c))
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            );
 
-                // Afficher le board actuel
-                let current_board = game.current_board();
-                println!(
-                    "Board actuel: {}",
-                    current_board
-                        .iter()
-                        .map(|&c| card_to_string_simple(c))
-                        .collect::<Vec<_>>()
-                        .join(" ")
-                );
-
-                // Afficher les statistiques après la distribution de la turn
-                println!("\n=== STATISTIQUES APRÈS DISTRIBUTION DE LA TURN ===");
-                display_simple_stats(game);
-
-                // À ce stade, state.spots[4] est un nœud joueur OOP après la turn
-                if state.spots.len() > 4 {
-                    // println!("\nActions disponibles pour OOP après la turn:");
-                    // for (i, action) in state.spots[4].actions.iter().enumerate() {
-                    //     println!(
-                    //         "  {}: {} {}",
-                    //         i,
-                    //         action.name,
-                    //         if action.amount != "0" {
-                    //             &action.amount
-                    //         } else {
-                    //             ""
-                    //         }
-                    //     );
-                    // }
-                }
-            } else {
-                return Err("Aucune carte disponible pour la turn!".to_string());
-            }
+            // Utiliser deal() pour sélectionner la carte
+            deal(game, &mut state, card_idx)?;
         } else {
             return Err("Action Call non trouvée pour IP!".to_string());
         }
@@ -885,6 +859,33 @@ pub fn get_current_actions_string(game: &PostFlopGame) -> String {
             .collect::<Vec<_>>()
             .join("/")
     }
+}
+
+pub fn current_player_str(game: &PostFlopGame) -> &'static str {
+    if game.is_terminal_node() {
+        "terminal"
+    } else if game.is_chance_node() {
+        "chance"
+    } else if game.current_player() == 0 {
+        "oop"
+    } else {
+        "ip"
+    }
+}
+
+pub fn total_bet_amount(game: &mut PostFlopGame, append: &[usize]) -> Vec<u32> {
+    if append.is_empty() {
+        let total_bet_amount = game.total_bet_amount();
+        return total_bet_amount.iter().map(|&x| x as u32).collect();
+    }
+    let history = game.history().to_vec();
+    for &action in append {
+        game.play(action);
+    }
+    let total_bet_amount = game.total_bet_amount();
+    let ret = total_bet_amount.iter().map(|&x| x as u32).collect();
+    game.apply_history(&history);
+    ret
 }
 
 // Fonction pour afficher un log complet de l'état du jeu

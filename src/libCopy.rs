@@ -18,6 +18,8 @@ mod rayon_adapter;
 #[cfg(feature = "rayon")]
 use rayon_adapter::THREAD_POOL;
 
+use crate::Action;
+
 #[wasm_bindgen]
 pub struct GameManager {
     game: PostFlopGame,
@@ -321,8 +323,8 @@ impl GameManager {
         let mut buf = Vec::new();
 
         let total_bet_amount = game.total_bet_amount();
-        let pot_base = game.tree_config().starting_pot + total_bet_amount.iter()
-            .fold(0.0f64, |a, b| a.min(*b));
+        let pot_base = game.tree_config().starting_pot
+            + total_bet_amount.iter().fold(0.0f64, |a, b| a.min(*b));
 
         buf.push(pot_base + total_bet_amount[0]);
         buf.push(pot_base + total_bet_amount[1]);
@@ -446,8 +448,8 @@ impl GameManager {
             status[chance] = 2.0;
 
             let total_bet_amount = game.total_bet_amount();
-            let pot_base = game.tree_config().starting_pot + total_bet_amount.iter()
-                .fold(0.0f64, |a, b| a.min(*b));
+            let pot_base = game.tree_config().starting_pot
+                + total_bet_amount.iter().fold(0.0f64, |a, b| a.min(*b));
 
             for player in 0..2 {
                 let pot = (pot_base + total_bet_amount[player]) as f32;
