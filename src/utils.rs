@@ -8,7 +8,9 @@ use crate::Card;
 use crate::GameState;
 use crate::PostFlopGame;
 use crate::Spot;
+use crate::SpotCard;
 use crate::SpotType;
+use rand::Rng;
 
 #[derive(Clone)]
 pub struct SpecificResultData {
@@ -590,7 +592,7 @@ pub fn get_specific_result(
     })
 }
 
-/// Exécuter le scénario: OOP bet, IP call, puis turn
+/// Exécuter le scénario: OOP bet, IP call, puis turn, puis OOP bet, IP call pour arriver à la river
 pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String> {
     // Créer l'état du jeu
     let mut state = GameState::new();
@@ -628,129 +630,477 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
 
     state.spots.push(root_spot);
 
-    // Sélectionner le premier spot (initialise le jeu et affiche les actions disponibles)
-    let results = select_spot(game, &mut state, 1, true, false)?;
+    // Sélectionner le premier spot (initialise le jeu)
+    select_spot(game, &mut state, 1, true, false)?;
 
-    // Afficher les statistiques initiales (EV, équité)
-    println!("\n=== STATISTIQUES INITIALES (FLOP) ===");
-    display_simple_stats(game);
+    // ÉTAPE 1: OOP BET SUR LE FLOP
+    println!("\n=== ÉTAPE 1: OOP BET SUR LE FLOP ===");
+    let bet_idx = state.spots[1]
+        .actions
+        .iter()
+        .position(|a| a.name == "Bet")
+        .ok_or_else(|| "Action Bet non trouvée pour OOP".to_string())?;
 
-    // Afficher les actions disponibles
-    // println!("\nActions disponibles pour OOP:");
-    // for (i, action) in state.spots[1].actions.iter().enumerate() {
-    //     println!(
-    //         "  {}: {} {}",
-    //         i,
-    //         action.name,
-    //         if action.amount != "0" {
-    //             &action.amount
-    //         } else {
-    //             ""
-    //         }
-    //     );
-    // }
+    let bet_action = &state.spots[1].actions[bet_idx];
+    println!(
+        "Action sélectionnée: {} {}",
+        bet_action.name,
+        if bet_action.amount != "0" {
+            &bet_action.amount
+        } else {
+            ""
+        }
+    );
 
-    // À ce stade, state.spots[1] contient un nœud joueur OOP avec des actions
-    println!("\n=== ÉTAPE 1: OOP BET ===");
+    play(game, &mut state, bet_idx)?;
 
-    // Trouver l'index de l'action "Bet" pour OOP
-    let bet_idx = state.spots[1].actions.iter().position(|a| a.name == "Bet");
-    if let Some(bet_idx) = bet_idx {
-        // Afficher l'action sélectionnée
-        let bet_action = &state.spots[1].actions[bet_idx];
+    // ÉTAPE 2: IP CALL SUR LE FLOP
+    println!("\n=== ÉTAPE 2: IP CALL SUR LE FLOP ===");
+    let call_idx = state.spots[2]
+        .actions
+        .iter()
+        .position(|a| a.name == "Call")
+        .ok_or_else(|| "Action Call non trouvée pour IP".to_string())?;
+
+    let call_action = &state.spots[2].actions[call_idx];
+    println!(
+        "Action sélectionnée: {} {}",
+        call_action.name,
+        if call_action.amount != "0" {
+            &call_action.amount
+        } else {
+            ""
+        }
+    );
+
+    play(game, &mut state, call_idx)?;
+
+    // ÉTAPE 3: DISTRIBUTION DE LA TURN
+    println!("\n=== ÉTAPE 3: DISTRIBUTION DE LA TURN ===");
+    let chance_spot_idx = 3;
+    println!("Pot actuel: {:.2} bb", state.spots[chance_spot_idx].pot);
+    println!(
+        "Stack restant: {:.2} bb",
+        state.spots[chance_spot_idx].stack
+    );
+
+    let available_cards: Vec<usize> = state.spots[chance_spot_idx]
+        .cards
+        .iter()
+        .enumerate()
+        .filter(|(_, c)| !c.is_dead)
+        .map(|(idx, _)| idx)
+        .collect();
+
+    if available_cards.is_empty() {
+        return Err("Aucune carte disponible pour la turn!".to_string());
+    }
+
+    // Sélectionner une carte aléatoire parmi les disponibles
+    let mut rng = rand::thread_rng();
+    let random_idx = rng.gen_range(0..available_cards.len());
+    let card_idx = available_cards[random_idx];
+
+    let selected_card = state.spots[chance_spot_idx].cards[card_idx].card as Card;
+    println!(
+        "Carte turn sélectionnée: {}",
+        card_to_string_simple(selected_card)
+    );
+
+    deal(game, &mut state, card_idx)?;
+
+    println!(
+        "Board après la turn: {}",
+        game.current_board()
+            .iter()
+            .map(|&c| card_to_string_simple(c))
+            .collect::<Vec<_>>()
+            .join(" ")
+    );
+
+    // ÉTAPE 4: OOP BET SUR LA TURN
+    println!("\n=== ÉTAPE 4: OOP BET SUR LA TURN ===");
+    let turn_oop_spot_idx = 4;
+    let turn_bet_idx = state.spots[turn_oop_spot_idx]
+        .actions
+        .iter()
+        .position(|a| a.name == "Bet")
+        .ok_or_else(|| "Action Bet non trouvée pour OOP sur la turn".to_string())?;
+
+    let turn_bet_action = &state.spots[turn_oop_spot_idx].actions[turn_bet_idx];
+    println!(
+        "Action sélectionnée: {} {}",
+        turn_bet_action.name,
+        if turn_bet_action.amount != "0" {
+            &turn_bet_action.amount
+        } else {
+            ""
+        }
+    );
+
+    play(game, &mut state, turn_bet_idx)?;
+
+    // ÉTAPE 5: IP CALL SUR LA TURN
+    println!("\n=== ÉTAPE 5: IP CALL SUR LA TURN ===");
+    let turn_ip_spot_idx = 5;
+    let turn_call_idx = state.spots[turn_ip_spot_idx]
+        .actions
+        .iter()
+        .position(|a| a.name == "Call")
+        .ok_or_else(|| "Action Call non trouvée pour IP sur la turn".to_string())?;
+
+    let turn_call_action = &state.spots[turn_ip_spot_idx].actions[turn_call_idx];
+    println!(
+        "Action sélectionnée: {} {}",
+        turn_call_action.name,
+        if turn_call_action.amount != "0" {
+            &turn_call_action.amount
+        } else {
+            ""
+        }
+    );
+
+    play(game, &mut state, turn_call_idx)?;
+
+    // ÉTAPE 6: ARRIVÉE À LA RIVER
+    println!("\n=== ÉTAPE 3: DISTRIBUTION DE LA RIVER ===");
+    let chance_spot_idx = 6;
+    println!("Pot actuel: {:.2} bb", state.spots[chance_spot_idx].pot);
+    println!(
+        "Stack restant: {:.2} bb",
+        state.spots[chance_spot_idx].stack
+    );
+
+    let available_cards: Vec<usize> = state.spots[chance_spot_idx]
+        .cards
+        .iter()
+        .enumerate()
+        .filter(|(_, c)| !c.is_dead)
+        .map(|(idx, _)| idx)
+        .collect();
+
+    if available_cards.is_empty() {
+        return Err("Aucune carte disponible pour la river!".to_string());
+    }
+
+    // Sélectionner une carte aléatoire parmi les disponibles
+    let mut rng = rand::thread_rng();
+    let random_idx = rng.gen_range(0..available_cards.len());
+    let card_idx = available_cards[random_idx];
+
+    let selected_card = state.spots[chance_spot_idx].cards[card_idx].card as Card;
+    println!(
+        "Carte river sélectionnée: {}",
+        card_to_string_simple(selected_card)
+    );
+
+    deal(game, &mut state, card_idx)?;
+
+    println!(
+        "Board après la river: {}",
+        game.current_board()
+            .iter()
+            .map(|&c| card_to_string_simple(c))
+            .collect::<Vec<_>>()
+            .join(" ")
+    );
+
+    Ok(())
+}
+
+/// Explorer l'arbre des actions de manière interactive (version simplifiée)
+pub fn explore_game_tree(game: &mut PostFlopGame) -> Result<(), String> {
+    // Créer l'état du jeu
+    let mut state = GameState::new();
+    let mut history_stack: Vec<usize> = Vec::new(); // Indices de spots pour revenir en arrière
+
+    // Initialiser avec la racine (flop)
+    let starting_pot = game.tree_config().starting_pot as f64;
+    let effective_stack = game.tree_config().effective_stack as f64;
+    let board = game.current_board();
+
+    println!("=== EXPLORATEUR D'ARBRE INTERACTIF ===");
+    println!(
+        "Board: {}",
+        board
+            .iter()
+            .map(|&c| card_to_string_simple(c))
+            .collect::<Vec<_>>()
+            .join(" ")
+    );
+
+    // Spot racine
+    let root_spot = Spot {
+        spot_type: SpotType::Root,
+        index: 0,
+        player: "flop".to_string(),
+        selected_index: -1,
+        actions: Vec::new(),
+        cards: Vec::new(),
+        pot: starting_pot,
+        stack: effective_stack,
+        equity_oop: 0.0,
+        prev_player: None,
+    };
+
+    state.spots.push(root_spot);
+
+    // Sélectionner le premier spot
+    select_spot(game, &mut state, 1, true, false)?;
+
+    loop {
+        let current_spot_index = state.selected_spot_index as usize;
+
+        // Afficher le board actuel
         println!(
-            "Action sélectionnée: {} {}",
-            bet_action.name,
-            if bet_action.amount != "0" {
-                &bet_action.amount
-            } else {
-                ""
-            }
+            "\nBoard: {}",
+            game.current_board()
+                .iter()
+                .map(|&c| card_to_string_simple(c))
+                .collect::<Vec<_>>()
+                .join(" ")
         );
 
-        // Utiliser play() au lieu de manipuler manuellement les index et appeler select_spot
-        play(game, &mut state, bet_idx)?;
-
-        // Afficher les statistiques après le bet OOP
-        println!("\n=== STATISTIQUES APRÈS BET OOP ===");
-        display_simple_stats(game);
-
-        // Afficher les actions disponibles pour IP
-        // println!("\nActions disponibles pour IP:");
-        // for (i, action) in state.spots[2].actions.iter().enumerate() {
-        //     println!(
-        //         "  {}: {} {}",
-        //         i,
-        //         action.name,
-        //         if action.amount != "0" {
-        //             &action.amount
-        //         } else {
-        //             ""
-        //         }
-        //     );
-        // }
-
-        println!("\n=== ÉTAPE 2: IP CALL ===");
-        // Trouver l'index de l'action "Call" pour IP
-        let call_idx = state.spots[2].actions.iter().position(|a| a.name == "Call");
-        if let Some(call_idx) = call_idx {
-            // Afficher l'action sélectionnée
-            let call_action = &state.spots[2].actions[call_idx];
+        // Afficher les informations du spot actuel
+        if let Some(spot) = state.spots.get(current_spot_index) {
             println!(
-                "Action sélectionnée: {} {}",
-                call_action.name,
-                if call_action.amount != "0" {
-                    &call_action.amount
-                } else {
-                    ""
+                "Spot actuel: {}, Pot: {:.2} bb, Stack: {:.2} bb",
+                match spot.spot_type {
+                    SpotType::Root => "Racine",
+                    SpotType::Player => &spot.player,
+                    SpotType::Chance => &spot.player,
+                    SpotType::Terminal => "Terminal",
+                },
+                spot.pot,
+                spot.stack
+            );
+
+            match spot.spot_type {
+                SpotType::Player => {
+                    println!("Actions disponibles:");
+                    for (i, action) in spot.actions.iter().enumerate() {
+                        println!(
+                            "  {}: {} {}",
+                            i,
+                            action.name,
+                            if action.amount != "0" {
+                                &action.amount
+                            } else {
+                                ""
+                            }
+                        );
+                    }
                 }
-            );
+                SpotType::Chance => {
+                    println!("Cartes disponibles (les 5 premières):");
+                    let available_cards: Vec<(usize, &SpotCard)> = spot
+                        .cards
+                        .iter()
+                        .enumerate()
+                        .filter(|(_, c)| !c.is_dead)
+                        .take(5)
+                        .collect();
 
-            // Utiliser play() pour sélectionner l'action call
-            play(game, &mut state, call_idx)?;
+                    for (i, card) in &available_cards {
+                        println!("  {}: {}", i, card_to_string_simple(card.card as Card));
+                    }
 
-            println!("\n=== STATISTIQUES AVANT DISTRIBUTION DE LA TURN ===");
-            let chance_spot_idx = 3; // L'index du nœud de chance (turn)
-            println!("Pot actuel: {:.2} bb", state.spots[chance_spot_idx].pot);
-            println!(
-                "Stack restant: {:.2} bb",
-                state.spots[chance_spot_idx].stack
-            );
-
-            let card_idx = state.spots[chance_spot_idx]
-                .cards
-                .iter()
-                .position(|c| !c.is_dead)
-                .ok_or_else(|| "Aucune carte disponible pour la turn!".to_string())?;
-
-            // Afficher la carte sélectionnée
-            let selected_card = state.spots[chance_spot_idx].cards[card_idx].card as Card;
-            println!(
-                "\nCarte turn sélectionnée: {}",
-                card_to_string_simple(selected_card)
-            );
-
-            // Afficher le board actuel
-            let current_board = game.current_board();
-            println!(
-                "Board actuel: {}",
-                current_board
-                    .iter()
-                    .map(|&c| card_to_string_simple(c))
-                    .collect::<Vec<_>>()
-                    .join(" ")
-            );
-
-            // Utiliser deal() pour sélectionner la carte
-            deal(game, &mut state, card_idx)?;
-        } else {
-            return Err("Action Call non trouvée pour IP!".to_string());
+                    let remaining =
+                        spot.cards.iter().filter(|c| !c.is_dead).count() - available_cards.len();
+                    if remaining > 0 {
+                        println!("  ... et {} autres cartes", remaining);
+                    }
+                }
+                SpotType::Terminal => {
+                    println!(
+                        "Nœud terminal - Équité OOP: {:.2}%",
+                        spot.equity_oop * 100.0
+                    );
+                }
+                _ => {}
+            }
         }
-    } else {
-        return Err("Action Bet non trouvée pour OOP!".to_string());
+
+        // Options utilisateur
+        println!("\nEntrez un nombre pour choisir une action/carte");
+        println!("r: Retour arrière");
+        println!("q: Quitter");
+
+        // Lire l'entrée utilisateur
+        let mut input = String::new();
+        std::io::stdin()
+            .read_line(&mut input)
+            .expect("Échec de la lecture");
+        let input = input.trim();
+
+        if input == "q" {
+            println!("Au revoir!");
+            break;
+        } else if input == "r" {
+            // Revenir en arrière
+            if history_stack.is_empty() {
+                println!("Vous êtes déjà à la racine.");
+            } else {
+                let spot_index = history_stack.pop().unwrap();
+
+                // Recréer l'état à partir de la racine
+                state.spots.truncate(spot_index);
+                game.back_to_root();
+
+                // Rejouer l'historique
+                let mut history = Vec::new();
+                for i in 1..spot_index {
+                    if state.spots[i].selected_index != -1 {
+                        history.push(state.spots[i].selected_index as usize);
+                    }
+                }
+                game.apply_history(&history);
+
+                select_spot(game, &mut state, spot_index, true, false)?;
+                println!("Retour au spot précédent.");
+            }
+        } else if let Ok(index) = input.parse::<usize>() {
+            if let Some(spot) = state.spots.get(current_spot_index) {
+                if spot.spot_type == SpotType::Player {
+                    if index < spot.actions.len() {
+                        // Sauvegarder l'état actuel
+                        history_stack.push(current_spot_index);
+
+                        // Jouer l'action
+                        play(game, &mut state, index)?;
+                    } else {
+                        println!("Action invalide.");
+                    }
+                } else if spot.spot_type == SpotType::Chance {
+                    if index < spot.cards.len() && !spot.cards[index].is_dead {
+                        // Sauvegarder l'état actuel
+                        history_stack.push(current_spot_index);
+
+                        // Distribuer la carte
+                        deal(game, &mut state, index)?;
+                    } else {
+                        println!("Carte invalide ou morte.");
+                    }
+                } else {
+                    println!("Ce spot ne permet pas de choisir une action.");
+                }
+            }
+        } else {
+            println!("Commande non reconnue.");
+        }
     }
 
     Ok(())
+}
+
+/// Fonction auxiliaire pour afficher l'état actuel du jeu
+fn print_current_state(state: &GameState, game: &PostFlopGame) {
+    let current_spot_index = state.selected_spot_index as usize;
+
+    if let Some(spot) = state.spots.get(current_spot_index) {
+        println!("\n=== SPOT ACTUEL (Index: {}) ===", current_spot_index);
+        println!("Type: {:?}", spot.spot_type);
+
+        if spot.player != "flop" {
+            println!("Joueur: {}", spot.player);
+        }
+
+        println!("Pot: {:.2} bb", spot.pot);
+        println!("Stack restant: {:.2} bb", spot.stack);
+
+        match spot.spot_type {
+            SpotType::Player => {
+                println!("\nActions disponibles:");
+                for (i, action) in spot.actions.iter().enumerate() {
+                    println!(
+                        "  {}: {} {}",
+                        i,
+                        action.name,
+                        if action.amount != "0" {
+                            &action.amount
+                        } else {
+                            ""
+                        }
+                    );
+                }
+            }
+            SpotType::Chance => {
+                println!("\nCartes disponibles (non mortes):");
+                let mut shown_count = 0;
+                for (i, card) in spot.cards.iter().enumerate() {
+                    if !card.is_dead {
+                        println!("  {}: {}", i, card_to_string_simple(card.card as Card));
+
+                        // Limiter l'affichage à 10 cartes pour ne pas submerger l'utilisateur
+                        shown_count += 1;
+                        if shown_count >= 10 {
+                            let remaining = spot.cards.iter().filter(|c| !c.is_dead).count() - 10;
+                            if remaining > 0 {
+                                println!("  ... et {} autres cartes", remaining);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            SpotType::Terminal => {
+                println!("Équité OOP: {:.2}%", spot.equity_oop * 100.0);
+            }
+            _ => {}
+        }
+    }
+}
+
+/// Fonction auxiliaire pour afficher l'historique des actions
+fn print_action_history(state: &GameState) {
+    println!("Historique des actions:");
+
+    for (i, spot) in state.spots.iter().enumerate() {
+        if spot.spot_type == SpotType::Root {
+            println!("0: [RACINE] Flop");
+            continue;
+        }
+
+        if spot.selected_index == -1 {
+            continue; // Ignorer les spots sans action sélectionnée
+        }
+
+        match spot.spot_type {
+            SpotType::Player => {
+                let action = &spot.actions[spot.selected_index as usize];
+                println!(
+                    "{}: [{}] {} {}",
+                    i,
+                    spot.player.to_uppercase(),
+                    action.name,
+                    if action.amount != "0" {
+                        &action.amount
+                    } else {
+                        ""
+                    }
+                );
+            }
+            SpotType::Chance => {
+                if spot.selected_index >= 0 && (spot.selected_index as usize) < spot.cards.len() {
+                    let card = &spot.cards[spot.selected_index as usize];
+                    println!(
+                        "{}: [{}] Carte: {}",
+                        i,
+                        spot.player.to_uppercase(),
+                        card_to_string_simple(card.card as Card)
+                    );
+                }
+            }
+            SpotType::Terminal => {
+                println!(
+                    "{}: [TERMINAL] Équité OOP: {:.2}%",
+                    i,
+                    spot.equity_oop * 100.0
+                );
+            }
+            _ => {}
+        }
+    }
 }
 
 /// Afficher des statistiques simples pour le nœud actuel
@@ -771,11 +1121,6 @@ fn display_simple_stats(game: &mut PostFlopGame) {
         };
         println!("Type de nœud: Joueur ({})", player);
     }
-
-    // Afficher les montants de mises
-    let total_bet = game.total_bet_amount();
-    println!("Mise OOP: {:.2} bb", total_bet[0]);
-    println!("Mise IP: {:.2} bb", total_bet[1]);
 
     // Pour les nœuds non-chance et non-terminaux, afficher les actions disponibles
     if !game.is_chance_node() && !game.is_terminal_node() {
@@ -817,25 +1162,52 @@ fn calculate_average_equity(game: &PostFlopGame, player: usize) -> f64 {
 }
 
 pub fn actions_after(game: &mut PostFlopGame, append: &[usize]) -> String {
+    println!("actions_after() - test 1");
     if append.is_empty() {
         return get_current_actions_string(game);
     }
 
-    // Utiliser cloned_history pour éviter l'emprunt
     let history = game.cloned_history();
 
-    // Jouer chaque action (plus besoin de vérifier si négatif avec usize)
+    println!("actions_after() - test 2");
+    // for &action in append {
+    //     println!("actions_after() action : {}", action);
+    //     game.play(action);
+    // }
+
     for &action in append {
-        game.play(action);
+        println!("actions_after() action: {}", action);
+
+        if game.is_chance_node() {
+            // Trouver une carte valide à jouer
+            let possible_cards = game.possible_cards();
+
+            if possible_cards == 0 {
+                return "error: no cards available".to_string();
+            }
+
+            // Si action=0, prendre la première carte disponible
+            let card_to_play = if action == 0 {
+                possible_cards.trailing_zeros() as usize
+            } else if action < 52 && (possible_cards & (1u64 << action)) != 0 {
+                action
+            } else {
+                return format!("error: invalid card {}", action);
+            };
+
+            println!("Playing card {} instead of action {}", card_to_play, action);
+            game.play(card_to_play);
+        } else {
+            game.play(action);
+        }
     }
 
-    // Capturer le résultat
+    println!("actions_after() - test 3");
     let result = get_current_actions_string(game);
 
-    // Restaurer l'état d'origine
+    println!("actions_after() - test 4");
     game.apply_history(&history);
 
-    // Retourner le résultat
     result
 }
 

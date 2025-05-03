@@ -304,6 +304,8 @@ impl PostFlopGame {
                 action as Card
             };
 
+            println!("play() - actual_card: {}", actual_card);
+
             // swap the suit if swapping was performed in turn
             let action_card = if let Some((suit1, suit2)) = self.turn_swapped_suit {
                 if actual_card & 3 == suit1 {
@@ -320,13 +322,24 @@ impl PostFlopGame {
             let actions = self.available_actions();
             let mut action_index = usize::MAX;
 
+            println!("play() - is_turn: {:?}", is_turn);
+
+            for (i, &action) in actions.iter().enumerate().take(5) {
+                println!("play() - for loop action: {:?}", action);
+            }
+
+            println!("play() - action_card: {}", action_card);
+
             // find the action index from available actions
             for (i, &action) in actions.iter().enumerate() {
                 if action == Action::Chance(action_card) {
+                    println!("play() - action == Action::Chance(action_card): {}", i);
                     action_index = i;
                     break;
                 }
             }
+
+            println!("play() - action_index: {}", action_index);
 
             // find the action index from isomorphic chances
             if action_index == usize::MAX {
@@ -337,6 +350,8 @@ impl PostFlopGame {
                 } else {
                     &self.isomorphism_card_river[node.turn as usize & 3]
                 };
+
+                println!("play() - isomorphic_cards: {:?}", isomorphic_cards);
                 for (i, &repr_index) in isomorphism.iter().enumerate() {
                     if action_card == isomorphic_cards[i] {
                         action_index = repr_index as usize;
@@ -362,6 +377,7 @@ impl PostFlopGame {
 
             // panic if the action is not found
             if action_index == usize::MAX {
+                println!("play() - action_index: {}", action_index);
                 panic!("Invalid action");
             }
 
@@ -382,6 +398,8 @@ impl PostFlopGame {
             // panic if the action is invalid
             let node = self.node();
             if action >= node.num_actions() {
+                println!("play() - action: {}", action);
+                println!("play() - num_actions: {}", node.num_actions());
                 panic!("Invalid action");
             }
 

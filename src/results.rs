@@ -270,6 +270,7 @@ pub fn select_spot(
 
     game.apply_history(&history);
 
+    println!("test 1");
     let current_player = current_player_str(game);
     let num_actions = if ["terminal", "chance"].contains(&current_player) {
         0
@@ -293,6 +294,7 @@ pub fn select_spot(
         .map(|&x| if x < 0 { 0 } else { x as usize })
         .collect();
 
+    println!("test 2");
     let next_actions_str = actions_after(game, &append);
     let can_chance_reports = selected_chance_index_tmp != -1
         && state.spots[(selected_chance_index_tmp + 3) as usize..selected_spot_index_tmp as usize]
@@ -302,6 +304,7 @@ pub fn select_spot(
 
     state.can_chance_reports = can_chance_reports;
 
+    println!("test 3");
     if can_chance_reports {
         let (player, num_actions) = if next_actions_str == "terminal" {
             ("terminal", 0)
@@ -337,9 +340,11 @@ pub fn select_spot(
         state.chance_reports = None;
     }
 
+    println!("test 4");
     let empty_append: Vec<usize> = Vec::new();
     state.total_bet_amount = total_bet_amount(game, &empty_append);
     state.total_bet_amount_appended = total_bet_amount(game, &append);
+    println!("test 5");
 
     // Update spots if needed (splice)
     if need_splice {
@@ -356,6 +361,8 @@ pub fn select_spot(
             splice_spots_player(state, spot_index, next_actions_str)?;
         }
     }
+
+    println!("test 6");
 
     if let Some(spot) = state.spots.get_mut(selected_spot_index_tmp as usize) {
         if spot.spot_type == SpotType::Player && selected_chance_index_tmp == -1 {
@@ -542,6 +549,7 @@ fn splice_spots_terminal(
     state: &mut GameState,
     spot_index: usize,
 ) -> Result<(), String> {
+    println!("splice_spots_terminal() - spot_index: {}", spot_index);
     let prev_spot = &state.spots[spot_index - 1];
     let prev_action = &prev_spot.actions[prev_spot.selected_index as usize];
 
@@ -597,6 +605,7 @@ fn splice_spots_chance(
     state: &mut GameState,
     spot_index: usize,
 ) -> Result<(i32, i32), String> {
+    println!("splice_spots_chance() - spot_index: {}", spot_index);
     let prev_spot = &state.spots[spot_index - 1];
     let turn_spot = state
         .spots
@@ -604,12 +613,15 @@ fn splice_spots_chance(
         .take(spot_index)
         .find(|spot| spot.player == "turn");
 
+    println!("splice spots chance test 1");
     let mut append_array = Vec::new();
     if state.selected_chance_index != -1 {
         for i in state.selected_chance_index as usize..spot_index {
             append_array.push(state.spots[i].selected_index);
         }
     }
+
+    println!("splice spots chance test 2");
 
     let mut possible_cards = 0u64;
     if !(turn_spot.is_some()
@@ -619,6 +631,7 @@ fn splice_spots_chance(
         possible_cards = game.possible_cards();
     }
 
+    println!("splice spots chance test 3");
     append_array.push(-1);
     let append_array_usize: Vec<usize> = append_array
         .iter()
@@ -627,6 +640,7 @@ fn splice_spots_chance(
     let next_actions_str = actions_after(game, &append_array_usize);
     let next_actions: Vec<&str> = next_actions_str.split('/').collect();
 
+    println!("splice spots chance test 4");
     let mut num_bet_actions = next_actions.len();
     while num_bet_actions > 0
         && next_actions[next_actions.len() - num_bet_actions]
@@ -641,6 +655,7 @@ fn splice_spots_chance(
     let can_chance_reports = state.selected_chance_index == -1;
     state.can_chance_reports = can_chance_reports;
 
+    println!("splice spots chance test 5");
     if can_chance_reports {
         let num_actions = next_actions.len();
         match get_specific_chance_reports(game, &append_array_usize, "oop", num_actions) {
@@ -654,6 +669,7 @@ fn splice_spots_chance(
         }
     }
 
+    println!("splice spots chance test 6");
     let new_chance_spot = Spot {
         spot_type: SpotType::Chance,
         index: spot_index,
@@ -738,6 +754,7 @@ fn splice_spots_player(
     spot_index: usize,
     actions_str: String,
 ) -> Result<(), String> {
+    println!("splice_spots_player() - spot_index: {}", spot_index);
     let prev_spot = &state.spots[spot_index - 1];
     let player = if prev_spot.player == "oop" {
         "ip"
