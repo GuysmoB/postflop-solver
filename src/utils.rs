@@ -4,6 +4,7 @@ use crate::deal;
 use crate::holes_to_strings;
 use crate::play;
 use crate::results::select_spot;
+use crate::save_exploration_results;
 use crate::Card;
 use crate::GameState;
 use crate::PostFlopGame;
@@ -11,6 +12,13 @@ use crate::Spot;
 use crate::SpotCard;
 use crate::SpotType;
 use rand::Rng;
+
+/// Structure pour stocker une carte prédéfinie
+#[derive(Clone, Debug)]
+pub struct PredefinedCard {
+    pub card_index: usize,
+    pub card_value: Card,
+}
 
 #[derive(Clone)]
 pub struct SpecificResultData {
@@ -1149,11 +1157,246 @@ pub fn total_bet_amount(game: &mut PostFlopGame, append: &[usize]) -> Vec<u32> {
     ret
 }
 
-/// Explore systématiquement toutes les possibilités de l'arbre de décision
-/// avec des cartes turn et river fixées aléatoirement
-pub fn explore_all_paths(game: &mut PostFlopGame) -> Result<(), String> {
-    use rand::Rng;
+/// Fonction récursive pour explorer tous les chemins possibles dans l'arbre de décision
+pub fn explore_recursive(
+    game: &mut PostFlopGame,
+    state: &mut GameState,
+    path: &mut Vec<String>,
+    predefined_cards: &mut Vec<PredefinedCard>,
+    depth: usize,
+    max_depth: usize,
+    paths_explored: &mut i32,
+    terminals_reached: &mut i32,
+    verbose: bool, // Paramètre pour contrôler le niveau de détail des logs
+) -> Result<(), String> {
+    // Éviter une profondeur excessive
+    if depth >= max_depth {
+        if verbose {
+            println!("Profondeur maximale atteinte ({} niveaux)", max_depth);
+        }
+        return Ok(());
+    }
 
+    *paths_explored += 1;
+
+    // Traiter d'abord les nœuds chance
+    if state.selected_chance_index > -1 {
+        let chance_index = state.selected_chance_index as usize;
+
+        if verbose {
+            println!("\n=== NŒUD CHANCE DÉTECTÉ (Index: {}) ===", chance_index);
+        }
+
+        // Vérifier si l'index est valide
+        if chance_index >= state.spots.len() {
+            return Err(format!(
+                "Index de chance invalide: {} (taille spots: {})",
+                chance_index,
+                state.spots.len()
+            ));
+        }
+
+        let chance_spot = &state.spots[chance_index];
+
+        // Vérifier que c'est bien un nœud chance
+        if chance_spot.spot_type != SpotType::Chance {
+            return Err(format!(
+                "Le nœud à l'index {} n'est pas un nœud chance (type: {:?})",
+                chance_index, chance_spot.spot_type
+            ));
+        }
+
+        let is_turn = chance_spot.player == "turn";
+        let card_type_index = if is_turn { 0 } else { 1 };
+
+        // Sélection d'une carte
+        let card_index = if card_type_index < predefined_cards.len() {
+            predefined_cards[card_type_index].card_index
+        } else {
+            // Collecter les cartes disponibles
+            let available_cards: Vec<usize> = chance_spot
+                .cards
+                .iter()
+                .enumerate()
+                .filter(|(_, c)| !c.is_dead)
+                .map(|(idx, _)| idx)
+                .collect();
+
+            if available_cards.is_empty() {
+                return Err("Aucune carte disponible pour la distribution".to_string());
+            }
+
+            // Sélectionner une carte aléatoire
+            let mut rng = rand::thread_rng();
+            let random_card_idx = rng.gen_range(0..available_cards.len());
+            let idx = available_cards[random_card_idx];
+
+            // Stocker la carte pour réutilisation
+            let card_value = chance_spot.cards[idx].card as Card;
+            predefined_cards.push(PredefinedCard {
+                card_index: idx,
+                card_value,
+            });
+
+            idx
+        };
+
+        // Log de la carte distribuée
+        let card_value = chance_spot.cards[card_index].card as Card;
+        let card_str = card_to_string_simple(card_value);
+        path.push(format!("{}: {}", chance_spot.player, card_str));
+
+        if verbose {
+            println!("Distribution de la carte: {}", card_str);
+        }
+
+        // Sauvegarder l'état actuel
+        let history_before = game.cloned_history();
+        let mut new_state = state.clone();
+
+        // Distribuer la carte
+        deal(game, &mut new_state, card_index)?;
+
+        // Continuer l'exploration avec le nouvel état
+        explore_recursive(
+            game,
+            &mut new_state,
+            path,
+            predefined_cards,
+            depth + 1,
+            max_depth,
+            paths_explored,
+            terminals_reached,
+            verbose,
+        )?;
+
+        // Restaurer l'état du jeu
+        game.apply_history(&history_before);
+
+        // Retirer la dernière action du chemin
+        path.pop();
+
+        return Ok(());
+    }
+
+    let current_spot_index = state.selected_spot_index as usize;
+    let current_spot = match state.spots.get(current_spot_index) {
+        Some(spot) => spot,
+        None => return Err(format!("Spot à l'index {} non trouvé", current_spot_index)),
+    };
+
+    // Gestion selon le type de nœud
+    match current_spot.spot_type {
+        // 1. Nœud terminal - afficher le résultat complet et revenir
+        SpotType::Terminal => {
+            *terminals_reached += 1;
+
+            // Afficher le chemin complet uniquement pour les nœuds terminaux
+            println!("\n=== NŒUD TERMINAL ATTEINT (#{})=== ", *terminals_reached);
+            println!("Chemin complet depuis la racine:");
+            if path.is_empty() {
+                println!("  Racine (aucune action)");
+            } else {
+                println!("  RACINE");
+                for (idx, action) in path.iter().enumerate() {
+                    let prefix = if idx == path.len() - 1 {
+                        "  └─ "
+                    } else {
+                        "  ├─ "
+                    };
+                    println!("  {}({}){}", prefix, idx + 1, action);
+                }
+            }
+
+            println!(
+                "Board final: {}",
+                game.current_board()
+                    .iter()
+                    .map(|&c| card_to_string_simple(c))
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            );
+            println!("Pot final: {:.2} bb", current_spot.pot);
+            println!("Équité OOP: {:.2}%", current_spot.equity_oop * 100.0);
+            return Ok(());
+        }
+
+        // 2. Nœud joueur - explorer toutes les actions possibles
+        SpotType::Player => {
+            // Explorer chaque action
+            for (i, action) in current_spot.actions.iter().enumerate() {
+                // Log de l'action sélectionnée
+                let action_name = format!(
+                    "{}: {} {}",
+                    current_spot.player.to_uppercase(),
+                    action.name,
+                    if action.amount != "0" {
+                        &action.amount
+                    } else {
+                        ""
+                    }
+                );
+
+                // Afficher les taux d'action (stratégies)
+                let rate_str = if action.rate >= 0.0 {
+                    format!(" (taux: {:.1}%)", action.rate * 100.0)
+                } else {
+                    "".to_string()
+                };
+
+                // Ajouter l'action au chemin
+                path.push(format!("{}{}", action_name, rate_str));
+
+                // Sauvegarder l'état actuel
+                let history_before = game.cloned_history();
+                let mut new_state = state.clone();
+
+                // Jouer l'action, mais sans afficher de détails
+                play(game, &mut new_state, i)?;
+
+                // Continuer l'exploration avec le nouvel état
+                explore_recursive(
+                    game,
+                    &mut new_state,
+                    path,
+                    predefined_cards,
+                    depth + 1,
+                    max_depth,
+                    paths_explored,
+                    terminals_reached,
+                    verbose,
+                )?;
+
+                // Restaurer l'état du jeu
+                game.apply_history(&history_before);
+
+                // Retirer la dernière action du chemin
+                path.pop();
+            }
+
+            return Ok(());
+        }
+
+        // 3. Autres types de nœuds (racine) - continuer l'exploration
+        _ => {
+            // Simplement passer au nœud suivant
+            explore_recursive(
+                game,
+                state,
+                path,
+                predefined_cards,
+                depth + 1,
+                max_depth,
+                paths_explored,
+                terminals_reached,
+                verbose,
+            )?;
+            return Ok(());
+        }
+    }
+}
+
+pub fn explore_all_paths(game: &mut PostFlopGame) -> Result<(), String> {
     println!("=== EXPLORATION SYSTÉMATIQUE DE L'ARBRE DE DÉCISION ===");
     println!(
         "Board initial: {}",
@@ -1185,258 +1428,12 @@ pub fn explore_all_paths(game: &mut PostFlopGame) -> Result<(), String> {
     state.spots.push(root_spot);
     select_spot(game, &mut state, 1, true, false)?;
 
-    // Structure pour stocker une carte prédéfinie
-    #[derive(Clone, Debug)]
-    struct PredefinedCard {
-        card_index: usize,
-        card_value: Card,
-    }
-
     // Variable pour stocker les cartes prédéfinies pour la turn et la river
     let mut predefined_cards = Vec::new();
 
     // Compteur pour les chemins explorés et terminaux atteints
     let mut paths_explored = 0;
     let mut terminals_reached = 0;
-
-    // Fonction récursive pour explorer tous les chemins possibles
-    fn explore_recursive(
-        game: &mut PostFlopGame,
-        state: &mut GameState,
-        path: &mut Vec<String>,
-        predefined_cards: &mut Vec<PredefinedCard>,
-        depth: usize,
-        max_depth: usize,
-        paths_explored: &mut i32,
-        terminals_reached: &mut i32,
-        verbose: bool, // Paramètre pour contrôler le niveau de détail des logs
-    ) -> Result<(), String> {
-        // Éviter une profondeur excessive
-        if depth >= max_depth {
-            if verbose {
-                println!("Profondeur maximale atteinte ({} niveaux)", max_depth);
-            }
-            return Ok(());
-        }
-
-        *paths_explored += 1;
-
-        // Traiter d'abord les nœuds chance
-        if state.selected_chance_index > -1 {
-            let chance_index = state.selected_chance_index as usize;
-
-            if verbose {
-                println!("\n=== NŒUD CHANCE DÉTECTÉ (Index: {}) ===", chance_index);
-            }
-
-            // Vérifier si l'index est valide
-            if chance_index >= state.spots.len() {
-                return Err(format!(
-                    "Index de chance invalide: {} (taille spots: {})",
-                    chance_index,
-                    state.spots.len()
-                ));
-            }
-
-            let chance_spot = &state.spots[chance_index];
-
-            // Vérifier que c'est bien un nœud chance
-            if chance_spot.spot_type != SpotType::Chance {
-                return Err(format!(
-                    "Le nœud à l'index {} n'est pas un nœud chance (type: {:?})",
-                    chance_index, chance_spot.spot_type
-                ));
-            }
-
-            let is_turn = chance_spot.player == "turn";
-            let card_type_index = if is_turn { 0 } else { 1 };
-
-            // Sélection d'une carte
-            let card_index = if card_type_index < predefined_cards.len() {
-                predefined_cards[card_type_index].card_index
-            } else {
-                // Collecter les cartes disponibles
-                let available_cards: Vec<usize> = chance_spot
-                    .cards
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, c)| !c.is_dead)
-                    .map(|(idx, _)| idx)
-                    .collect();
-
-                if available_cards.is_empty() {
-                    return Err("Aucune carte disponible pour la distribution".to_string());
-                }
-
-                // Sélectionner une carte aléatoire
-                let mut rng = rand::thread_rng();
-                let random_card_idx = rng.gen_range(0..available_cards.len());
-                let idx = available_cards[random_card_idx];
-
-                // Stocker la carte pour réutilisation
-                let card_value = chance_spot.cards[idx].card as Card;
-                predefined_cards.push(PredefinedCard {
-                    card_index: idx,
-                    card_value,
-                });
-
-                idx
-            };
-
-            // Log de la carte distribuée
-            let card_value = chance_spot.cards[card_index].card as Card;
-            let card_str = card_to_string_simple(card_value);
-            path.push(format!("{}: {}", chance_spot.player, card_str));
-
-            if verbose {
-                println!("Distribution de la carte: {}", card_str);
-            }
-
-            // Sauvegarder l'état actuel
-            let history_before = game.cloned_history();
-            let mut new_state = state.clone();
-
-            // Distribuer la carte
-            deal(game, &mut new_state, card_index)?;
-
-            // Continuer l'exploration avec le nouvel état
-            explore_recursive(
-                game,
-                &mut new_state,
-                path,
-                predefined_cards,
-                depth + 1,
-                max_depth,
-                paths_explored,
-                terminals_reached,
-                verbose,
-            )?;
-
-            // Restaurer l'état du jeu
-            game.apply_history(&history_before);
-
-            // Retirer la dernière action du chemin
-            path.pop();
-
-            return Ok(());
-        }
-
-        let current_spot_index = state.selected_spot_index as usize;
-        let current_spot = match state.spots.get(current_spot_index) {
-            Some(spot) => spot,
-            None => return Err(format!("Spot à l'index {} non trouvé", current_spot_index)),
-        };
-
-        // Gestion selon le type de nœud
-        match current_spot.spot_type {
-            // 1. Nœud terminal - afficher le résultat complet et revenir
-            SpotType::Terminal => {
-                *terminals_reached += 1;
-
-                // Afficher le chemin complet uniquement pour les nœuds terminaux
-                println!("\n=== NŒUD TERMINAL ATTEINT (#{})=== ", *terminals_reached);
-                println!("Chemin complet depuis la racine:");
-                if path.is_empty() {
-                    println!("  Racine (aucune action)");
-                } else {
-                    println!("  RACINE");
-                    for (idx, action) in path.iter().enumerate() {
-                        let prefix = if idx == path.len() - 1 {
-                            "  └─ "
-                        } else {
-                            "  ├─ "
-                        };
-                        println!("  {}({}){}", prefix, idx + 1, action);
-                    }
-                }
-
-                println!(
-                    "Board final: {}",
-                    game.current_board()
-                        .iter()
-                        .map(|&c| card_to_string_simple(c))
-                        .collect::<Vec<_>>()
-                        .join(" ")
-                );
-                println!("Pot final: {:.2} bb", current_spot.pot);
-                println!("Équité OOP: {:.2}%", current_spot.equity_oop * 100.0);
-                return Ok(());
-            }
-
-            // 3. Nœud joueur - explorer toutes les actions possibles sans afficher d'informations
-            SpotType::Player => {
-                // Explorer chaque action
-                for (i, action) in current_spot.actions.iter().enumerate() {
-                    // Log de l'action sélectionnée
-                    let action_name = format!(
-                        "{}: {} {}",
-                        current_spot.player.to_uppercase(),
-                        action.name,
-                        if action.amount != "0" {
-                            &action.amount
-                        } else {
-                            ""
-                        }
-                    );
-
-                    // Afficher les taux d'action (stratégies)
-                    let rate_str = if action.rate >= 0.0 {
-                        format!(" (taux: {:.1}%)", action.rate * 100.0)
-                    } else {
-                        "".to_string()
-                    };
-
-                    // Ajouter l'action au chemin
-                    path.push(format!("{}{}", action_name, rate_str));
-
-                    // Sauvegarder l'état actuel
-                    let history_before = game.cloned_history();
-                    let mut new_state = state.clone();
-
-                    // Jouer l'action, mais sans afficher de détails
-                    play(game, &mut new_state, i)?;
-
-                    // Continuer l'exploration avec le nouvel état
-                    explore_recursive(
-                        game,
-                        &mut new_state,
-                        path,
-                        predefined_cards,
-                        depth + 1,
-                        max_depth,
-                        paths_explored,
-                        terminals_reached,
-                        verbose,
-                    )?;
-
-                    // Restaurer l'état du jeu
-                    game.apply_history(&history_before);
-
-                    // Retirer la dernière action du chemin
-                    path.pop();
-                }
-
-                return Ok(());
-            }
-
-            // 4. Autres types de nœuds (racine) - continuer l'exploration
-            _ => {
-                // Simplement passer au nœud suivant
-                explore_recursive(
-                    game,
-                    state,
-                    path,
-                    predefined_cards,
-                    depth + 1,
-                    max_depth,
-                    paths_explored,
-                    terminals_reached,
-                    verbose,
-                )?;
-                return Ok(());
-            }
-        }
-    }
 
     // Commencer l'exploration récursive
     let mut path = Vec::new();
@@ -1467,6 +1464,12 @@ pub fn explore_all_paths(game: &mut PostFlopGame) -> Result<(), String> {
             card_to_string_simple(card.card_value),
             card.card_index
         );
+    }
+
+    // Sauvegarder les résultats en JSON
+    match save_exploration_results(game, "results.json") {
+        Ok(_) => println!("Résultats de l'exploration sauvegardés en JSON"),
+        Err(e) => println!("Erreur lors de la sauvegarde des résultats: {}", e),
     }
 
     result
