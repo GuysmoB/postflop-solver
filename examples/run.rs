@@ -77,23 +77,23 @@ fn main() {
 
     let card_config = CardConfig {
         range: [oop_range.parse().unwrap(), ip_range.parse().unwrap()],
-        flop: flop_from_str("Td5d3h").unwrap(),
+        flop: flop_from_str("9d5s3d").unwrap(),
         turn: NOT_DEALT, // card_from_str("Qc").unwrap(),
         river: NOT_DEALT,
     };
 
-    let bet_sizes = BetSizeOptions::try_from(("50%", "60%")).unwrap();
+    let bet_sizes = BetSizeOptions::try_from(("50%", "2x")).unwrap();
 
     let tree_config = TreeConfig {
         initial_state: BoardState::Flop,
         starting_pot: 20,
-        effective_stack: 100,
+        effective_stack: 200,
         rake_rate: 0.0,
         rake_cap: 0.0,
         flop_bet_sizes: [bet_sizes.clone(), bet_sizes.clone()],
         turn_bet_sizes: [bet_sizes.clone(), bet_sizes.clone()],
         river_bet_sizes: [bet_sizes.clone(), bet_sizes],
-        turn_donk_sizes: None,
+        turn_donk_sizes: Some(DonkSizeOptions::try_from("50%").unwrap()),
         river_donk_sizes: Some(DonkSizeOptions::try_from("50%").unwrap()),
         add_allin_threshold: 1.5,
         force_allin_threshold: 0.20,
@@ -168,19 +168,15 @@ fn main() {
     // S'assurer que nous sommes à la racine
     game.back_to_root();
 
+    explore_all_paths(&mut game);
+
     // println!("\n=== DÉTAILS DES MAINS ===");
-    // explore_tree(&mut game);
+    // explore_game_tree(&mut game);
 
-    match run_bet_call_turn_scenario(&mut game) {
-        Ok(_) => println!("Scénario exécuté avec succès!"),
-        Err(e) => println!("Erreur: {}", e),
-    }
-
-    // println!("\nExploration de tous les chemins d'actions possibles:");
-    // println!("\n=== STATISTIQUES DU NŒUD ACTUEL ===");
-    // let stats = get_node_statistics(&mut game);
-    // let json_string = serde_json::to_string_pretty(&stats).unwrap();
-    // println!("{}", json_string);
+    // match run_bet_call_turn_scenario(&mut game) {
+    //     Ok(_) => println!("Scénario exécuté avec succès!"),
+    //     Err(e) => println!("Erreur: {}", e),
+    // }
 }
 
 fn log_game_state(game: &PostFlopGame) {

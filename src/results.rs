@@ -52,7 +52,7 @@ pub struct Spot {
     pub equity_oop: f64,
 }
 
-// Gestionnaire d'état global (similaire aux refs de Vue)
+#[derive(Clone)]
 pub struct GameState {
     pub spots: Vec<Spot>,
     pub selected_spot_index: i32,
@@ -203,10 +203,10 @@ pub fn select_spot(
     need_splice: bool,
     from_deal: bool,
 ) -> Result<SpecificResultData, String> {
-    println!(
-        "select_spot() - spot_index: {}, need_splice: {}, from_deal: {}",
-        spot_index, need_splice, from_deal
-    );
+    // println!(
+    //     "select_spot() - spot_index: {}, need_splice: {}, from_deal: {}",
+    //     spot_index, need_splice, from_deal
+    // );
 
     if !need_splice
         && (spot_index == state.selected_spot_index as usize && !from_deal
@@ -270,7 +270,7 @@ pub fn select_spot(
 
     game.apply_history(&history);
 
-    println!("test 1");
+    // println!("test 1");
     let current_player = current_player_str(game);
     let num_actions = if ["terminal", "chance"].contains(&current_player) {
         0
@@ -294,7 +294,7 @@ pub fn select_spot(
         .map(|&x| if x < 0 { 0 } else { x as usize })
         .collect();
 
-    println!("test 2");
+    // println!("test 2");
     let next_actions_str = actions_after(game, &append);
     let can_chance_reports = selected_chance_index_tmp != -1
         && state.spots[(selected_chance_index_tmp + 3) as usize..selected_spot_index_tmp as usize]
@@ -304,7 +304,7 @@ pub fn select_spot(
 
     state.can_chance_reports = can_chance_reports;
 
-    println!("test 3");
+    // println!("test 3");
     if can_chance_reports {
         let (player, num_actions) = if next_actions_str == "terminal" {
             ("terminal", 0)
@@ -325,10 +325,10 @@ pub fn select_spot(
 
         match get_specific_chance_reports(game, &append, player, num_actions) {
             Ok(reports) => {
-                println!(
-                    "Rapports de chance obtenus avec succès ({} valeurs)",
-                    reports.strategy.len()
-                );
+                // println!(
+                //     "Rapports de chance obtenus avec succès ({} valeurs)",
+                //     reports.strategy.len()
+                // );
                 state.chance_reports = Some(reports);
             }
             Err(e) => {
@@ -340,11 +340,11 @@ pub fn select_spot(
         state.chance_reports = None;
     }
 
-    println!("test 4");
+    // println!("test 4");
     let empty_append: Vec<usize> = Vec::new();
     state.total_bet_amount = total_bet_amount(game, &empty_append);
     state.total_bet_amount_appended = total_bet_amount(game, &append);
-    println!("test 5");
+    // println!("test 5");
 
     // Update spots if needed (splice)
     if need_splice {
@@ -362,7 +362,7 @@ pub fn select_spot(
         }
     }
 
-    println!("test 6");
+    // println!("test 6");
 
     if let Some(spot) = state.spots.get_mut(selected_spot_index_tmp as usize) {
         if spot.spot_type == SpotType::Player && selected_chance_index_tmp == -1 {
@@ -379,8 +379,8 @@ pub fn select_spot(
     state.selected_chance_index = selected_chance_index_tmp;
     state.is_dealing = false;
 
-    println!("selected_spot_index: {}", state.selected_spot_index,);
-    println!("selected_chance_index: {}", state.selected_chance_index,);
+    // println!("selected_spot_index: {}", state.selected_spot_index,);
+    // println!("selected_chance_index: {}", state.selected_chance_index,);
 
     Ok(results)
 }
@@ -392,11 +392,11 @@ fn update_action_rates(
     results: &SpecificResultData,
     player_index: usize,
 ) {
-    println!("update_action_rates() - spot_type: {:?}", spot.spot_type);
+    // println!("update_action_rates() - spot_type: {:?}", spot.spot_type);
 
     // Vérifier si les résultats sont vides pour ce joueur
     if results.is_empty {
-        println!("Résultats vides, pas de mise à jour des taux");
+        // println!("Résultats vides, pas de mise à jour des taux");
         // Mettre tous les taux à -1 pour indiquer qu'ils sont indisponibles
         for action in spot.actions.iter_mut() {
             action.rate = -1.0;
@@ -432,15 +432,15 @@ fn update_action_rates(
             action.rate = -1.0;
         }
 
-        println!("Action {}: {}, Taux: {:.4}", i, action.name, action.rate);
+        // println!("Action {}: {}, Taux: {:.4}", i, action.name, action.rate);
     }
 }
 
 fn process_from_deal(game: &mut PostFlopGame, state: &mut GameState) -> i32 {
-    println!(
-        "process_from_deal() - selected_chance_index: {}",
-        state.selected_chance_index
-    );
+    // println!(
+    //     "process_from_deal() - selected_chance_index: {}",
+    //     state.selected_chance_index
+    // );
 
     let selected_chance_idx = state.selected_chance_index as usize;
     let find_river_index = state
@@ -549,7 +549,7 @@ fn splice_spots_terminal(
     state: &mut GameState,
     spot_index: usize,
 ) -> Result<(), String> {
-    println!("splice_spots_terminal() - spot_index: {}", spot_index);
+    // println!("splice_spots_terminal() - spot_index: {}", spot_index);
     let prev_spot = &state.spots[spot_index - 1];
     let prev_action = &prev_spot.actions[prev_spot.selected_index as usize];
 
@@ -605,7 +605,7 @@ fn splice_spots_chance(
     state: &mut GameState,
     spot_index: usize,
 ) -> Result<(i32, i32), String> {
-    println!("splice_spots_chance() - spot_index: {}", spot_index);
+    // println!("splice_spots_chance() - spot_index: {}", spot_index);
     let prev_spot = &state.spots[spot_index - 1];
     let turn_spot = state
         .spots
@@ -613,7 +613,7 @@ fn splice_spots_chance(
         .take(spot_index)
         .find(|spot| spot.player == "turn");
 
-    println!("splice spots chance test 1");
+    // println!("splice spots chance test 1");
     let mut append_array = Vec::new();
     if state.selected_chance_index != -1 {
         for i in state.selected_chance_index as usize..spot_index {
@@ -621,7 +621,7 @@ fn splice_spots_chance(
         }
     }
 
-    println!("splice spots chance test 2");
+    // println!("splice spots chance test 2");
 
     let mut possible_cards = 0u64;
     if !(turn_spot.is_some()
@@ -631,7 +631,7 @@ fn splice_spots_chance(
         possible_cards = game.possible_cards();
     }
 
-    println!("splice spots chance test 3");
+    // println!("splice spots chance test 3");
     append_array.push(-1);
     let append_array_usize: Vec<usize> = append_array
         .iter()
@@ -640,7 +640,7 @@ fn splice_spots_chance(
     let next_actions_str = actions_after(game, &append_array_usize);
     let next_actions: Vec<&str> = next_actions_str.split('/').collect();
 
-    println!("splice spots chance test 4");
+    // println!("splice spots chance test 4");
     let mut num_bet_actions = next_actions.len();
     while num_bet_actions > 0
         && next_actions[next_actions.len() - num_bet_actions]
@@ -655,12 +655,12 @@ fn splice_spots_chance(
     let can_chance_reports = state.selected_chance_index == -1;
     state.can_chance_reports = can_chance_reports;
 
-    println!("splice spots chance test 5");
+    // println!("splice spots chance test 5");
     if can_chance_reports {
         let num_actions = next_actions.len();
         match get_specific_chance_reports(game, &append_array_usize, "oop", num_actions) {
             Ok(reports) => {
-                println!("Rapports de chance obtenus avec succès");
+                // println!("Rapports de chance obtenus avec succès");
                 state.chance_reports = Some(reports);
             }
             Err(e) => {
@@ -669,7 +669,7 @@ fn splice_spots_chance(
         }
     }
 
-    println!("splice spots chance test 6");
+    // println!("splice spots chance test 6");
     let new_chance_spot = Spot {
         spot_type: SpotType::Chance,
         index: spot_index,
@@ -739,10 +739,10 @@ fn splice_spots_chance(
         state.selected_chance_index
     };
 
-    println!(
-        "splice_spots_chance - new_selected_chance_index: {}, new_selected_spot_index: {}",
-        new_selected_chance_index, new_selected_spot_index
-    );
+    // println!(
+    //     "splice_spots_chance - new_selected_chance_index: {}, new_selected_spot_index: {}",
+    //     new_selected_chance_index, new_selected_spot_index
+    // );
 
     Ok((new_selected_chance_index, new_selected_spot_index))
 }
@@ -754,7 +754,7 @@ fn splice_spots_player(
     spot_index: usize,
     actions_str: String,
 ) -> Result<(), String> {
-    println!("splice_spots_player() - spot_index: {}", spot_index);
+    // println!("splice_spots_player() - spot_index: {}", spot_index);
     let prev_spot = &state.spots[spot_index - 1];
     let player = if prev_spot.player == "oop" {
         "ip"
@@ -813,8 +813,8 @@ pub fn play(
 ) -> Result<(), String> {
     let spot_index = state.selected_spot_index as usize;
 
-    state.log_state("play()");
-    println!("play() - action_index: {}", action_index);
+    // state.log_state("play()");
+    // println!("play() - action_index: {}", action_index);
     // Récupérer le spot actuel
 
     let spot: &mut Spot = match state.spots.get_mut(spot_index) {

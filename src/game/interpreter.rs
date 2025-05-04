@@ -304,7 +304,7 @@ impl PostFlopGame {
                 action as Card
             };
 
-            println!("play() - actual_card: {}", actual_card);
+            // println!("play() - actual_card: {}", actual_card);
 
             // swap the suit if swapping was performed in turn
             let action_card = if let Some((suit1, suit2)) = self.turn_swapped_suit {
@@ -322,24 +322,24 @@ impl PostFlopGame {
             let actions = self.available_actions();
             let mut action_index = usize::MAX;
 
-            println!("play() - is_turn: {:?}", is_turn);
+            // println!("play() - is_turn: {:?}", is_turn);
 
-            for (i, &action) in actions.iter().enumerate().take(5) {
-                println!("play() - for loop action: {:?}", action);
-            }
+            // for (i, &action) in actions.iter().enumerate().take(5) {
+            //     println!("play() - for loop action: {:?}", action);
+            // }
 
-            println!("play() - action_card: {}", action_card);
+            // println!("play() - action_card: {}", action_card);
 
             // find the action index from available actions
             for (i, &action) in actions.iter().enumerate() {
                 if action == Action::Chance(action_card) {
-                    println!("play() - action == Action::Chance(action_card): {}", i);
+                    // println!("play() - action == Action::Chance(action_card): {}", i);
                     action_index = i;
                     break;
                 }
             }
 
-            println!("play() - action_index: {}", action_index);
+            // println!("play() - action_index: {}", action_index);
 
             // find the action index from isomorphic chances
             if action_index == usize::MAX {
@@ -351,7 +351,7 @@ impl PostFlopGame {
                     &self.isomorphism_card_river[node.turn as usize & 3]
                 };
 
-                println!("play() - isomorphic_cards: {:?}", isomorphic_cards);
+                // println!("play() - isomorphic_cards: {:?}", isomorphic_cards);
                 for (i, &repr_index) in isomorphism.iter().enumerate() {
                     if action_card == isomorphic_cards[i] {
                         action_index = repr_index as usize;
