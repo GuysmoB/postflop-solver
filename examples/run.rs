@@ -82,7 +82,7 @@ fn main() {
         river: NOT_DEALT,
     };
 
-    let bet_sizes = BetSizeOptions::try_from(("50%", "2x")).unwrap();
+    let bet_sizes = BetSizeOptions::try_from(("50%", "")).unwrap();
 
     let tree_config = TreeConfig {
         initial_state: BoardState::Flop,

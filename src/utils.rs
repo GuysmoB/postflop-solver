@@ -1,3 +1,9 @@
+use std::fs::metadata;
+use std::fs::File;
+use std::io::BufWriter;
+use std::io::Write;
+use std::path::Path;
+
 use crate::action_tree::Action as GameAction;
 use crate::deal;
 // L'enum du jeu (Fold, Check, etc.)
@@ -407,7 +413,6 @@ pub fn get_specific_result(
     current_player: &str,
     num_actions: usize,
 ) -> Result<SpecificResultData, String> {
-    // 1. Récupérer les résultats bruts via get_results (comme dans le frontend)
     let buffer = get_results(game);
 
     // 2. Déterminer les tailles des ranges
@@ -1179,6 +1184,10 @@ pub fn explore_recursive(
 
     *paths_explored += 1;
 
+    if depth == 0 {
+        path.push("Flop".to_string());
+    }
+
     // Traiter d'abord les nœuds chance
     if state.selected_chance_index > -1 {
         let chance_index = state.selected_chance_index as usize;
@@ -1473,4 +1482,105 @@ pub fn explore_all_paths(game: &mut PostFlopGame) -> Result<(), String> {
     }
 
     result
+}
+
+// Fonctions utilitaires pour convertir des indices en caractères lisibles
+pub fn rank_to_char(rank: usize) -> char {
+    match rank {
+        0 => '2',
+        1 => '3',
+        2 => '4',
+        3 => '5',
+        4 => '6',
+        5 => '7',
+        6 => '8',
+        7 => '9',
+        8 => 'T',
+        9 => 'J',
+        10 => 'Q',
+        11 => 'K',
+        12 => 'A',
+        _ => '?',
+    }
+}
+
+pub fn suit_to_char(suit: usize) -> char {
+    match suit {
+        0 => 'c',
+        1 => 'd',
+        2 => 'h',
+        3 => 's',
+        _ => '?',
+    }
+}
+
+pub fn round_to_decimal_places(value: f32, decimal_places: u32) -> f32 {
+    let factor = 10.0_f32.powi(decimal_places as i32);
+    (value * factor).round() / factor
+}
+
+/// Saves the solver results for the current spot to a binary file if it doesn't already exist
+pub fn save_spot_results(
+    game: &mut PostFlopGame,
+    path_id: &str,
+    output_dir: &str,
+) -> Result<bool, String> {
+    // Create filename from path_id by replacing special chars
+    let filename = path_id
+        .replace(":", "_")
+        .replace(" ", "_")
+        .replace(",", "_")
+        .replace("-", "_");
+
+    // Create full path including directory
+    let full_path = format!("{}/{}.bin", output_dir, filename);
+
+    // Check if file already exists
+    if Path::new(&full_path).exists() {
+        return Ok(false); // File exists, didn't save
+    }
+
+    // Create directory if it doesn't exist
+    if !Path::new(output_dir).exists() {
+        std::fs::create_dir_all(output_dir)
+            .map_err(|e| format!("Failed to create directory {}: {}", output_dir, e))?;
+    }
+
+    // Get the solver results
+    let buffer = get_results(game);
+
+    // Open file for writing
+    let file = File::create(&full_path)
+        .map_err(|e| format!("Failed to create file {}: {}", full_path, e))?;
+
+    let mut writer = BufWriter::new(file);
+
+    // Write length of buffer as u64
+    let length = buffer.len() as u64;
+    writer
+        .write_all(&length.to_le_bytes())
+        .map_err(|e| format!("Error writing length: {}", e))?;
+
+    // Write buffer data
+    for &value in buffer.iter() {
+        writer
+            .write_all(&value.to_le_bytes())
+            .map_err(|e| format!("Error writing data: {}", e))?;
+    }
+
+    writer
+        .flush()
+        .map_err(|e| format!("Error flushing data: {}", e))?;
+
+    // Get file size to report
+    let metadata =
+        metadata(&full_path).map_err(|e| format!("Failed to get file metadata: {}", e))?;
+
+    println!(
+        "Saved results for '{}' ({:.2} KB)",
+        path_id,
+        metadata.len() as f64 / 1024.0
+    );
+
+    Ok(true) // File was saved
 }
