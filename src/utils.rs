@@ -1514,6 +1514,39 @@ pub fn suit_to_char(suit: usize) -> char {
     }
 }
 
+pub fn card_from_string(card_str: &str) -> Card {
+    let mut chars = card_str.chars();
+    let rank_char = chars.next().unwrap();
+    let suit_char = chars.next().unwrap();
+
+    let rank = match rank_char {
+        '2' => 0,
+        '3' => 1,
+        '4' => 2,
+        '5' => 3,
+        '6' => 4,
+        '7' => 5,
+        '8' => 6,
+        '9' => 7,
+        'T' => 8,
+        'J' => 9,
+        'Q' => 10,
+        'K' => 11,
+        'A' => 12,
+        _ => panic!("Invalid rank: {}", rank_char),
+    };
+
+    let suit = match suit_char {
+        's' => 0,
+        'h' => 1,
+        'c' => 2,
+        'd' => 3,
+        _ => panic!("Invalid suit: {}", suit_char),
+    };
+
+    rank + (suit * 13)
+}
+
 pub fn round_to_decimal_places(value: f32, decimal_places: u32) -> f32 {
     let factor = 10.0_f32.powi(decimal_places as i32);
     (value * factor).round() / factor
@@ -1576,11 +1609,11 @@ pub fn save_spot_results(
     let metadata =
         metadata(&full_path).map_err(|e| format!("Failed to get file metadata: {}", e))?;
 
-    println!(
-        "Saved results for '{}' ({:.2} KB)",
-        path_id,
-        metadata.len() as f64 / 1024.0
-    );
+    // println!(
+    //     "Saved results for '{}' ({:.2} KB)",
+    //     path_id,
+    //     metadata.len() as f64 / 1024.0
+    // );
 
     Ok(true) // File was saved
 }

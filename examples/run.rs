@@ -1,9 +1,11 @@
+use flate2::write::GzEncoder;
+use flate2::Compression;
 use postflop_solver::*;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::{BufWriter, Read, Write};
 
 // Utilisez les fonctions avec la notation du module
 use postflop_solver::card_to_string_simple;
@@ -82,7 +84,7 @@ fn main() {
         river: NOT_DEALT,
     };
 
-    let bet_sizes = BetSizeOptions::try_from(("50%", "")).unwrap();
+    let bet_sizes = BetSizeOptions::try_from(("50%, 100%, a", "2x, a")).unwrap();
 
     let tree_config = TreeConfig {
         initial_state: BoardState::Flop,
@@ -160,6 +162,7 @@ fn main() {
 
     // Finaliser la solution
     finalize(&mut game);
+    save_game_to_file(&game, "game.bin").unwrap();
 
     println!("Exploitability: {:.2}", exploitability);
 
@@ -260,4 +263,24 @@ fn log_game_state(game: &PostFlopGame) {
     println!("IP hands: {} combos", game.private_cards(1).len());
 
     println!("\n====================================");
+}
+
+fn save_game_to_file(game: &PostFlopGame, filename: &str) -> Result<(), String> {
+    let file = File::create(filename)
+        .map_err(|e| format!("Erreur lors de la création du fichier: {}", e))?;
+
+    // Créer un encodeur gzip avec un niveau de compression élevé
+    let encoder = GzEncoder::new(file, Compression::best());
+    let mut writer = BufWriter::new(encoder);
+
+    // Sérialiser le jeu dans le flux compressé
+    bincode::encode_into_std_write(game, &mut writer, bincode::config::standard())
+        .map_err(|e| format!("Erreur lors de la sérialisation: {}", e))?;
+
+    // Finaliser l'écriture
+    writer
+        .flush()
+        .map_err(|e| format!("Erreur lors de la finalisation: {}", e))?;
+
+    Ok(())
 }

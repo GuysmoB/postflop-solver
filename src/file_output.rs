@@ -81,7 +81,8 @@ fn build_node_recursive(
             ..Default::default()
         };
 
-        // save_spot_results(game, "F:", "solver_data");
+        let path_id = format_path_string(flop_actions, turn_actions, river_actions);
+        // save_spot_results(game, &path_id, "solver_data");
 
         let available_cards: Vec<usize> = chance_spot
             .cards
@@ -190,6 +191,16 @@ fn build_node_recursive(
                 path: format_path_string(flop_actions, turn_actions, river_actions),
                 ..Default::default()
             };
+
+            // make turn_actions empty
+            if *current_street == "T" {
+                turn_actions.clear();
+            } else if *current_street == "R" {
+                river_actions.clear();
+            }
+
+            let path_id = format_path_string(flop_actions, turn_actions, river_actions);
+            save_spot_results(game, &path_id, "solver_data");
 
             // Ajouter les actions disponibles
             let mut action_names = Vec::new();

@@ -1,3 +1,4 @@
 /target
 Cargo.lock
 results.json
+/solver_data
