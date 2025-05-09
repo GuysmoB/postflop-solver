@@ -84,7 +84,7 @@ fn main() {
         river: NOT_DEALT,
     };
 
-    let bet_sizes = BetSizeOptions::try_from(("50%, 100%, a", "2x, a")).unwrap();
+    let bet_sizes = BetSizeOptions::try_from(("50%", "60%")).unwrap();
 
     let tree_config = TreeConfig {
         initial_state: BoardState::Flop,
@@ -113,7 +113,7 @@ fn main() {
 
     // Paramètres de résolution
     let max_iterations = 10;
-    let target_exploitability = 0.03;
+    let target_exploitability = 0.1;
     let print_progress = true;
 
     println!("Démarrage de la résolution avec solve_step et finalize...");
@@ -152,7 +152,6 @@ fn main() {
                 max_iterations
             );
             print!("(exploitability = {exploitability:.4e})");
-            // io::stdout().flush().unwrap();
         }
     }
 
@@ -162,7 +161,6 @@ fn main() {
 
     // Finaliser la solution
     finalize(&mut game);
-    save_game_to_file(&game, "game.bin").unwrap();
 
     println!("Exploitability: {:.2}", exploitability);
 
@@ -171,9 +169,8 @@ fn main() {
     // S'assurer que nous sommes à la racine
     game.back_to_root();
 
-    explore_all_paths(&mut game);
-
-    // println!("\n=== DÉTAILS DES MAINS ===");
+    // explore_all_paths(&mut game);
+    run_bet_call_turn_scenario(&mut game).unwrap();
     // explore_game_tree(&mut game);
 
     // match run_bet_call_turn_scenario(&mut game) {

@@ -6,16 +6,15 @@ use std::path::Path;
 
 use crate::action_tree::Action as GameAction;
 use crate::deal;
-// L'enum du jeu (Fold, Check, etc.)
 use crate::holes_to_strings;
 use crate::play;
 use crate::results::select_spot;
 use crate::save_exploration_results;
+use crate::save_node_data;
 use crate::Card;
 use crate::GameState;
 use crate::PostFlopGame;
 use crate::Spot;
-use crate::SpotCard;
 use crate::SpotType;
 use rand::Rng;
 
@@ -39,6 +38,8 @@ pub struct SpecificResultData {
     pub eqr: Vec<Vec<f64>>,
     pub strategy: Vec<f64>,
     pub action_ev: Vec<f64>,
+    pub oop_cards: Vec<(u8, u8)>,
+    pub ip_cards: Vec<(u8, u8)>,
 }
 
 impl Default for SpecificResultData {
@@ -55,6 +56,8 @@ impl Default for SpecificResultData {
             eqr: vec![Vec::new(), Vec::new()],
             strategy: Vec::new(),
             action_ev: Vec::new(),
+            oop_cards: vec![(0, 0); 52],
+            ip_cards: vec![(0, 0); 52],
         }
     }
 }
@@ -420,6 +423,19 @@ pub fn get_specific_result(
     let ip_range_size = game.private_cards(1).len();
     let length = [oop_range_size, ip_range_size];
 
+    // Extraire les cartes privées des joueurs
+    let oop_cards = game
+        .private_cards(0)
+        .iter()
+        .map(|&c| (c.0 as u8, c.1 as u8))
+        .collect::<Vec<_>>();
+
+    let ip_cards = game
+        .private_cards(1)
+        .iter()
+        .map(|&c| (c.0 as u8, c.1 as u8))
+        .collect::<Vec<_>>();
+
     // 3. Parser le buffer comme dans le frontend
     let mut offset = 0;
     let mut weights: Vec<Vec<f64>> = vec![Vec::new(), Vec::new()];
@@ -538,6 +554,8 @@ pub fn get_specific_result(
         eqr,
         strategy,
         action_ev,
+        oop_cards,
+        ip_cards,
     })
 }
 
@@ -602,6 +620,17 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
     );
 
     play(game, &mut state, bet_idx)?;
+
+    match extract_updated_ranges(game) {
+        Ok((oop_range, ip_range)) => {
+            println!("OOP Range: {}", oop_range);
+            println!("IP Range: {}", ip_range);
+        }
+        Err(e) => println!("Error extracting ranges: {}", e),
+    }
+
+    display_top_hands(game, 5, "APRÈS OOP BET")?;
+    // save_node_data(game, "FLOP_OOP_BET", "solver_results")?;
 
     // ÉTAPE 2: IP CALL SUR LE FLOP
     println!("\n=== ÉTAPE 2: IP CALL SUR LE FLOP ===");
@@ -1301,32 +1330,32 @@ pub fn explore_recursive(
             *terminals_reached += 1;
 
             // Afficher le chemin complet uniquement pour les nœuds terminaux
-            println!("\n=== NŒUD TERMINAL ATTEINT (#{})=== ", *terminals_reached);
-            println!("Chemin complet depuis la racine:");
-            if path.is_empty() {
-                println!("  Racine (aucune action)");
-            } else {
-                println!("  RACINE");
-                for (idx, action) in path.iter().enumerate() {
-                    let prefix = if idx == path.len() - 1 {
-                        "  └─ "
-                    } else {
-                        "  ├─ "
-                    };
-                    println!("  {}({}){}", prefix, idx + 1, action);
-                }
-            }
+            // println!("\n=== NŒUD TERMINAL ATTEINT (#{})=== ", *terminals_reached);
+            // println!("Chemin complet depuis la racine:");
+            // if path.is_empty() {
+            //     println!("  Racine (aucune action)");
+            // } else {
+            //     println!("  RACINE");
+            //     for (idx, action) in path.iter().enumerate() {
+            //         let prefix = if idx == path.len() - 1 {
+            //             "  └─ "
+            //         } else {
+            //             "  ├─ "
+            //         };
+            //         println!("  {}({}){}", prefix, idx + 1, action);
+            //     }
+            // }
 
-            println!(
-                "Board final: {}",
-                game.current_board()
-                    .iter()
-                    .map(|&c| card_to_string_simple(c))
-                    .collect::<Vec<_>>()
-                    .join(" ")
-            );
-            println!("Pot final: {:.2} bb", current_spot.pot);
-            println!("Équité OOP: {:.2}%", current_spot.equity_oop * 100.0);
+            // println!(
+            //     "Board final: {}",
+            //     game.current_board()
+            //         .iter()
+            //         .map(|&c| card_to_string_simple(c))
+            //         .collect::<Vec<_>>()
+            //         .join(" ")
+            // );
+            // println!("Pot final: {:.2} bb", current_spot.pot);
+            // println!("Équité OOP: {:.2}%", current_spot.equity_oop * 100.0);
             return Ok(());
         }
 
@@ -1616,4 +1645,356 @@ pub fn save_spot_results(
     // );
 
     Ok(true) // File was saved
+}
+
+/// Saves the result of get_specific_result for flop actions to a file
+pub fn save_flop_results(
+    game: &mut PostFlopGame,
+    flop_actions: Option<&[String]>, // Add this parameter to accept flop actions
+) -> Result<(), String> {
+    // Only save if we're on the flop (board length = 3)
+    if game.current_board().len() == 3 && !game.is_terminal_node() && !game.is_chance_node() {
+        // Use the provided flop actions if available, otherwise use an empty vector
+        let actions = flop_actions.unwrap_or(&[]).to_vec();
+
+        // This creates a formatted path like "F:check" or "F:bet50-call" with real actions
+        let path_id = crate::file_output::format_path_string(
+            &actions,
+            &[], // Empty turn actions
+            &[], // Empty river actions
+        );
+
+        // Save the specific result data using the formatted path
+        if let Err(e) = save_hand_data_as_text(game, &path_id, "solver_results") {
+            println!("Error saving specific result data: {}", e);
+            return Err(e);
+        }
+    }
+
+    Ok(())
+}
+
+pub fn save_hand_data_as_text(
+    game: &mut PostFlopGame,
+    path_id: &str,
+    output_dir: &str,
+) -> Result<bool, String> {
+    let filename = path_id
+        .replace(":", "_")
+        .replace(" ", "_")
+        .replace(",", "_")
+        .replace("-", "_");
+
+    // Créer le chemin complet incluant le répertoire
+    let full_path = format!("{}/{}.txt", output_dir, filename);
+
+    // Créer le répertoire s'il n'existe pas
+    if !Path::new(output_dir).exists() {
+        std::fs::create_dir_all(output_dir)
+            .map_err(|e| format!("Échec de création du répertoire {}: {}", output_dir, e))?;
+    }
+
+    game.cache_normalized_weights();
+
+    // Ouvrir le fichier pour l'écriture
+    let file = File::create(&full_path)
+        .map_err(|e| format!("Échec de création du fichier {}: {}", full_path, e))?;
+    let mut writer = BufWriter::new(file);
+
+    // Écrire l'en-tête
+    writeln!(writer, "# HAND DATA FORMAT 1.0").map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+    // Écrire les informations du board
+    let board = game.current_board();
+    writeln!(writer, "board_size: {}", board.len())
+        .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+    let board_str = board
+        .iter()
+        .map(|&c| card_to_string_simple(c))
+        .collect::<Vec<_>>()
+        .join(" ");
+    writeln!(writer, "board: {}", board_str).map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+    // Écrire les informations de pot
+    let total_bet_amount = game.total_bet_amount();
+    let pot_base = game.tree_config().starting_pot + (total_bet_amount[0].min(total_bet_amount[1]));
+    let pot_oop = pot_base + total_bet_amount[0];
+    let pot_ip = pot_base + total_bet_amount[1];
+
+    writeln!(writer, "pot_oop: {}", pot_oop).map_err(|e| format!("Erreur d'écriture: {}", e))?;
+    writeln!(writer, "pot_ip: {}", pot_ip).map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+    // Écrire le joueur courant
+    let current_player = game.current_player();
+    writeln!(writer, "current_player: {}", current_player)
+        .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+    // Pour chaque joueur
+    for player in 0..2 {
+        let player_name = if player == 0 { "OOP" } else { "IP" };
+        writeln!(writer, "\n# PLAYER: {}", player_name)
+            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+        // Obtenir les valeurs utilisées par display_top_hands
+        let equity = game.equity(player);
+        let ev = game.expected_values(player);
+        let weights = game.normalized_weights(player);
+        let hands = game.private_cards(player);
+
+        // Convertir les noms des mains
+        let hand_strings = match holes_to_strings(hands) {
+            Ok(strings) => strings,
+            Err(_) => return Err("Erreur lors de la conversion des mains en chaînes".to_string()),
+        };
+
+        // Écrire le nombre de mains
+        let num_hands = hands.len();
+        writeln!(writer, "hands_count: {}", num_hands)
+            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+        // Écrire un en-tête pour les données
+        writeln!(writer, "hand,card1,card2,weight,equity,ev")
+            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+        // Pour chaque main, écrire toutes les données
+        for i in 0..num_hands {
+            let (card1, card2) = hands[i];
+            let hand_name = &hand_strings[i];
+
+            writeln!(
+                writer,
+                "{},{},{},{:.6},{:.6},{:.6}",
+                hand_name, card1, card2, weights[i], equity[i], ev[i]
+            )
+            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+        }
+    }
+
+    // Écrire les données de stratégie si ce n'est pas un nœud terminal ou chance
+    if !game.is_terminal_node() && !game.is_chance_node() {
+        writeln!(writer, "\n# STRATEGY").map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+        let player = game.current_player();
+        let strategy = game.strategy();
+        let action_evs = game.expected_values_detail(player);
+        let actions = game.available_actions();
+        let range_size = game.private_cards(player).len();
+
+        writeln!(writer, "num_actions: {}", actions.len())
+            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+        // Écrire les noms des actions
+        let action_names: Vec<String> = actions.iter().map(|a| format!("{:?}", a)).collect();
+        writeln!(writer, "actions: {}", action_names.join(","))
+            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+        // Écrire les données de stratégie
+        writeln!(writer, "strategy_data:").map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+        for hand_idx in 0..range_size {
+            let mut line = Vec::new();
+            for action_idx in 0..actions.len() {
+                let strategy_idx = action_idx * range_size + hand_idx;
+                if strategy_idx < strategy.len() {
+                    line.push(format!("{:.6}", strategy[strategy_idx]));
+                }
+            }
+            writeln!(writer, "{}", line.join(","))
+                .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+        }
+
+        // Écrire les EV des actions
+        writeln!(writer, "action_ev_data:").map_err(|e| format!("Erreur d'écriture: {}", e))?;
+
+        for hand_idx in 0..range_size {
+            let mut line = Vec::new();
+            for action_idx in 0..actions.len() {
+                let ev_idx = action_idx * range_size + hand_idx;
+                if ev_idx < action_evs.len() {
+                    line.push(format!("{:.6}", action_evs[ev_idx]));
+                }
+            }
+            writeln!(writer, "{}", line.join(","))
+                .map_err(|e| format!("Erreur d'écriture: {}", e))?;
+        }
+    }
+
+    // Terminer l'écriture
+    writer
+        .flush()
+        .map_err(|e| format!("Erreur de flush: {}", e))?;
+
+    // Obtenir la taille du fichier pour le rapport
+    let metadata =
+        metadata(&full_path).map_err(|e| format!("Échec d'obtention des métadonnées: {}", e))?;
+
+    println!(
+        "Données sauvegardées pour '{}' ({:.2} KB)",
+        path_id,
+        metadata.len() as f64 / 1024.0
+    );
+
+    Ok(true)
+}
+fn display_top_hands(
+    game: &mut PostFlopGame,
+    num_hands: usize,
+    stage_label: &str,
+) -> Result<(), String> {
+    println!("\n--- DÉTAIL DES MEILLEURES MAINS ({}) ---", stage_label);
+
+    // Calculer les résultats pour le nœud actuel
+    game.cache_normalized_weights();
+
+    // Pour chaque joueur (OOP=0, IP=1)
+    for player in 0..2 {
+        let player_label = if player == 0 { "OOP" } else { "IP" };
+        println!("\n{} - Meilleures mains:", player_label);
+
+        // Obtenir les valeurs d'équité et d'EV
+        let equity = game.equity(player);
+        let ev = game.expected_values(player);
+        let weights = game.normalized_weights(player);
+
+        // Convertir les noms des mains
+        let hands = game.private_cards(player);
+        let hand_strings = match holes_to_strings(hands) {
+            Ok(strings) => strings,
+            Err(_) => return Err("Erreur lors de la conversion des mains en chaînes".to_string()),
+        };
+
+        // Créer une structure pour trier les mains
+        struct HandData {
+            hand_name: String,
+            equity: f32,
+            ev: f32,
+            weight: f32,
+        }
+
+        // Collecter les données pour les mains avec un poids > 0
+        let mut hand_data: Vec<HandData> = hand_strings
+            .iter()
+            .enumerate()
+            .filter(|&(i, _)| weights[i] > 0.0)
+            .map(|(i, name)| HandData {
+                hand_name: name.clone(),
+                equity: equity[i],
+                ev: ev[i],
+                weight: weights[i],
+            })
+            .collect();
+
+        // Trier les mains par EV décroissant
+        hand_data.sort_by(|a, b| b.ev.partial_cmp(&a.ev).unwrap_or(std::cmp::Ordering::Equal));
+
+        // Afficher l'en-tête du tableau
+        println!(
+            "{:<6} {:<10} {:<12} {:<10}",
+            "Main", "Équité %", "EV (bb)", "Poids %"
+        );
+        println!("{}", "-".repeat(40));
+
+        // Afficher les N meilleures mains
+        for data in hand_data.iter().take(num_hands) {
+            println!(
+                "{:<6} {:<10.2} {:<12.2} {:<10.2}",
+                data.hand_name,
+                data.equity * 100.0,
+                data.ev,
+                data.weight * 100.0
+            );
+        }
+
+        // Afficher l'EV moyenne du joueur
+        let total_ev: f32 = hand_data.iter().map(|data| data.ev * data.weight).sum();
+        let total_weight: f32 = hand_data.iter().map(|data| data.weight).sum();
+        let avg_ev = if total_weight > 0.0 {
+            total_ev / total_weight
+        } else {
+            0.0
+        };
+
+        println!("\nEV moyenne {}: {:.2} bb", player_label, avg_ev);
+    }
+
+    println!("\n");
+    Ok(())
+}
+
+pub fn format_hand_cards(card_pair: (u8, u8)) -> String {
+    format!(
+        "{}{}{}{}",
+        rank_to_char((card_pair.0 % 13) as usize),
+        suit_to_char((card_pair.0 / 13) as usize),
+        rank_to_char((card_pair.1 % 13) as usize),
+        suit_to_char((card_pair.1 / 13) as usize)
+    )
+}
+
+pub fn extract_updated_ranges(game: &mut PostFlopGame) -> Result<(String, String), String> {
+    game.cache_normalized_weights();
+
+    // Extraire les mains et les poids
+    let oop_cards = game.private_cards(0);
+    let ip_cards = game.private_cards(1);
+    let oop_weights = game.normalized_weights(0);
+    let ip_weights = game.normalized_weights(1);
+
+    // Calculer les sommes totales des poids pour normalisation
+    let oop_total: f32 = oop_weights.iter().sum();
+    let ip_total: f32 = ip_weights.iter().sum();
+
+    // Convertir en format range compatible avec l'entrée du solver
+    let mut oop_range = String::new();
+    let mut ip_range = String::new();
+
+    // Conversion pour OOP avec normalisation
+    let mut oop_hands: Vec<(String, f32)> = Vec::new();
+    for (idx, &(card1, card2)) in oop_cards.iter().enumerate() {
+        if oop_weights[idx] > 0.001 {
+            // Normaliser le poids (pourcentage du poids total)
+            let normalized_weight = if oop_total > 0.0 {
+                oop_weights[idx] / oop_total * 100.0 // Convertir en pourcentage
+            } else {
+                0.0
+            };
+
+            let hand_str = format_hand_cards((card1, card2));
+            oop_hands.push((hand_str, normalized_weight));
+        }
+    }
+
+    // Conversion pour IP avec normalisation
+    let mut ip_hands: Vec<(String, f32)> = Vec::new();
+    for (idx, &(card1, card2)) in ip_cards.iter().enumerate() {
+        if ip_weights[idx] > 0.001 {
+            // Normaliser le poids
+            let normalized_weight = if ip_total > 0.0 {
+                ip_weights[idx] / ip_total * 100.0 // Convertir en pourcentage
+            } else {
+                0.0
+            };
+
+            let hand_str = format_hand_cards((card1, card2));
+            ip_hands.push((hand_str, normalized_weight));
+        }
+    }
+
+    // Convertir les vecteurs en strings de range
+    for (hand, weight) in oop_hands {
+        if !oop_range.is_empty() {
+            oop_range.push(',');
+        }
+        oop_range.push_str(&format!("{}:{:.2}", hand, weight));
+    }
+
+    for (hand, weight) in ip_hands {
+        if !ip_range.is_empty() {
+            ip_range.push(',');
+        }
+        ip_range.push_str(&format!("{}:{:.2}", hand, weight));
+    }
+
+    Ok((oop_range, ip_range))
 }

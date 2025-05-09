@@ -270,7 +270,6 @@ pub fn select_spot(
 
     game.apply_history(&history);
 
-    // println!("test 1");
     let current_player = current_player_str(game);
     let num_actions = if ["terminal", "chance"].contains(&current_player) {
         0
@@ -281,6 +280,33 @@ pub fn select_spot(
     let results = get_specific_result(game, current_player, num_actions)?;
     state.results = results.clone();
     state.results_empty = results.is_empty;
+
+    // Extract flop actions from the history
+    let mut flop_actions = Vec::new();
+    for i in 1..end_index {
+        if state.spots[i].selected_index != -1
+            && state.spots[i].spot_type == SpotType::Player
+            && state.spots[i].player != "turn"
+            && state.spots[i].player != "river"
+        {
+            if let Some(action) = state.spots[i]
+                .actions
+                .get(state.spots[i].selected_index as usize)
+            {
+                let action_str = if action.amount != "0" {
+                    format!("{}{}", action.name, action.amount)
+                } else {
+                    action.name.clone()
+                };
+                flop_actions.push(action_str);
+            }
+        }
+    }
+
+    // Save flop action results to file with the real action history
+    if let Err(e) = save_flop_results(game, Some(&flop_actions)) {
+        println!("Warning: Failed to save flop results: {}", e);
+    }
 
     let mut append_array: Vec<i32> = Vec::new();
     if selected_chance_index_tmp != -1 {
@@ -294,7 +320,6 @@ pub fn select_spot(
         .map(|&x| if x < 0 { 0 } else { x as usize })
         .collect();
 
-    // println!("test 2");
     let next_actions_str = actions_after(game, &append);
     let can_chance_reports = selected_chance_index_tmp != -1
         && state.spots[(selected_chance_index_tmp + 3) as usize..selected_spot_index_tmp as usize]
@@ -304,7 +329,6 @@ pub fn select_spot(
 
     state.can_chance_reports = can_chance_reports;
 
-    // println!("test 3");
     if can_chance_reports {
         let (player, num_actions) = if next_actions_str == "terminal" {
             ("terminal", 0)
@@ -340,11 +364,9 @@ pub fn select_spot(
         state.chance_reports = None;
     }
 
-    // println!("test 4");
     let empty_append: Vec<usize> = Vec::new();
     state.total_bet_amount = total_bet_amount(game, &empty_append);
     state.total_bet_amount_appended = total_bet_amount(game, &append);
-    // println!("test 5");
 
     // Update spots if needed (splice)
     if need_splice {
@@ -361,8 +383,6 @@ pub fn select_spot(
             splice_spots_player(state, spot_index, next_actions_str)?;
         }
     }
-
-    // println!("test 6");
 
     if let Some(spot) = state.spots.get_mut(selected_spot_index_tmp as usize) {
         if spot.spot_type == SpotType::Player && selected_chance_index_tmp == -1 {
@@ -1014,7 +1034,7 @@ pub fn get_specific_chance_reports(
     let combos_ip = buffer[offset..offset + 52].to_vec();
     offset += 52;
 
-    let equity_oop = buffer[offset..offset + 52].to_vec();
+    let equity_oop: Vec<f64> = buffer[offset..offset + 52].to_vec();
     offset += 52;
     let equity_ip = buffer[offset..offset + 52].to_vec();
     offset += 52;

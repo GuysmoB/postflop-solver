@@ -39,8 +39,8 @@ pub struct TreeNode {
 
 pub fn save_exploration_results(game: &mut PostFlopGame, filename: &str) -> Result<(), String> {
     let tree = build_exploration_tree(game)?;
-    let file = File::create(filename).map_err(|e| format!("Erreur création fichier: {}", e))?;
-    let writer = BufWriter::new(file);
+    // let file = File::create(filename).map_err(|e| format!("Erreur création fichier: {}", e))?;
+    // let writer = BufWriter::new(file);
     // serde_json::to_writer(writer, &tree)
     //     .map_err(|e| format!("Erreur sérialisation JSON: {}", e))?;
 
@@ -200,7 +200,7 @@ fn build_node_recursive(
             }
 
             let path_id = format_path_string(flop_actions, turn_actions, river_actions);
-            save_spot_results(game, &path_id, "solver_data");
+            // save_spot_results(game, &path_id, "solver_data");
 
             // Ajouter les actions disponibles
             let mut action_names = Vec::new();
@@ -325,14 +325,14 @@ fn build_exploration_tree(game: &mut PostFlopGame) -> Result<TreeNode, String> {
         prev_player: None,
     };
 
-    state.spots.push(root_spot);
-    select_spot(game, &mut state, 1, true, false)?;
-
     // Initialiser les vecteurs pour chaque street
     let mut flop_actions = Vec::new();
     let mut turn_actions = Vec::new();
     let mut river_actions = Vec::new();
     let mut current_street = "F"; // Commencer au flop
+
+    state.spots.push(root_spot);
+    select_spot(game, &mut state, 1, true, false)?;
 
     // Commencer la construction récursive
     build_node_recursive(
@@ -347,7 +347,7 @@ fn build_exploration_tree(game: &mut PostFlopGame) -> Result<TreeNode, String> {
 }
 
 /// Fonction utilitaire pour formater correctement le path_string
-fn format_path_string(
+pub fn format_path_string(
     flop_actions: &[String],
     turn_actions: &[String],
     river_actions: &[String],
