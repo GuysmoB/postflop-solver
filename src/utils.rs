@@ -416,7 +416,46 @@ pub fn get_specific_result(
     current_player: &str,
     num_actions: usize,
 ) -> Result<SpecificResultData, String> {
+    // Get results buffer
     let buffer = get_results(game);
+
+    // Save buffer to JSON file
+    let json_path = format!("{}/buffer_{}.json", "solver_results", current_player);
+    let file =
+        File::create(&json_path).map_err(|e| format!("Failed to create JSON file: {}", e))?;
+    let mut writer = BufWriter::new(file);
+
+    let mut json_parts = Vec::new();
+    json_parts.push("{\n".to_string());
+
+    // Ajouter chaque entrée manuellement avec les indices en ordre numérique
+    for i in 0..buffer.len() {
+        json_parts.push(format!("    \"{}\": {},\n", i, buffer[i]));
+    }
+
+    // Supprimer la dernière virgule et fermer l'objet
+    if json_parts.len() > 1 {
+        let last_idx = json_parts.len() - 1;
+        let last_entry = &json_parts[last_idx];
+        json_parts[last_idx] = last_entry.trim_end_matches(",\n").to_string() + "\n";
+    }
+    json_parts.push("}".to_string());
+
+    let json_data = json_parts.join("");
+
+    // Écrire dans le fichier
+    writer
+        .write_all(json_data.as_bytes())
+        .map_err(|e| format!("Failed to write JSON data: {}", e))?;
+
+    writer
+        .flush()
+        .map_err(|e| format!("Failed to flush JSON data: {}", e))?;
+
+    println!(
+        "Buffer saved to {} with proper numerical ordering",
+        json_path
+    );
 
     // 2. Déterminer les tailles des ranges
     let oop_range_size = game.private_cards(0).len();
@@ -598,7 +637,10 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
     state.spots.push(root_spot);
 
     // Sélectionner le premier spot (initialise le jeu)
-    select_spot(game, &mut state, 1, true, false)?;
+    let results = select_spot(game, &mut state, 1, true, false)?;
+    display_top_hands(game, 10, "ROOT", &results)?;
+
+    return Ok(());
 
     // ÉTAPE 1: OOP BET SUR LE FLOP
     println!("\n=== ÉTAPE 1: OOP BET SUR LE FLOP ===");
@@ -619,17 +661,17 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
         }
     );
 
-    play(game, &mut state, bet_idx)?;
+    let results = play(game, &mut state, bet_idx)?;
+    display_top_hands(game, 10, "APRÈS OOP BET", &results)?;
 
-    match extract_updated_ranges(game) {
-        Ok((oop_range, ip_range)) => {
-            println!("OOP Range: {}", oop_range);
-            println!("IP Range: {}", ip_range);
-        }
-        Err(e) => println!("Error extracting ranges: {}", e),
-    }
+    // match extract_updated_ranges(game) {
+    //     Ok((oop_range, ip_range)) => {
+    //         println!("OOP Range: {}", oop_range);
+    //         println!("IP Range: {}", ip_range);
+    //     }
+    //     Err(e) => println!("Error extracting ranges: {}", e),
+    // }
 
-    display_top_hands(game, 5, "APRÈS OOP BET")?;
     // save_node_data(game, "FLOP_OOP_BET", "solver_results")?;
 
     // ÉTAPE 2: IP CALL SUR LE FLOP
@@ -651,7 +693,8 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
         }
     );
 
-    play(game, &mut state, call_idx)?;
+    let results = play(game, &mut state, call_idx)?;
+    display_top_hands(game, 10, "APRÈS IP CALL", &results)?;
 
     // ÉTAPE 3: DISTRIBUTION DE LA TURN
     println!("\n=== ÉTAPE 3: DISTRIBUTION DE LA TURN ===");
@@ -1837,39 +1880,49 @@ pub fn save_hand_data_as_text(
 
     Ok(true)
 }
-fn display_top_hands(
+
+pub fn display_top_hands(
     game: &mut PostFlopGame,
     num_hands: usize,
     stage_label: &str,
+    results: &SpecificResultData,
 ) -> Result<(), String> {
     println!("\n--- DÉTAIL DES MEILLEURES MAINS ({}) ---", stage_label);
-
-    // Calculer les résultats pour le nœud actuel
-    game.cache_normalized_weights();
 
     // Pour chaque joueur (OOP=0, IP=1)
     for player in 0..2 {
         let player_label = if player == 0 { "OOP" } else { "IP" };
         println!("\n{} - Meilleures mains:", player_label);
 
-        // Obtenir les valeurs d'équité et d'EV
-        let equity = game.equity(player);
-        let ev = game.expected_values(player);
-        let weights = game.normalized_weights(player);
+        // Utiliser les données des résultats fournis
+        let equity = &results.equity[player];
+        let ev = &results.ev[player];
+        let weights = &results.weights[player];
 
-        // Convertir les noms des mains
-        let hands = game.private_cards(player);
-        let hand_strings = match holes_to_strings(hands) {
+        // Récupérer les mains et les convertir en chaînes
+        let hands = if player == 0 {
+            &results.oop_cards
+        } else {
+            &results.ip_cards
+        };
+        let hand_strings = match holes_to_strings(
+            hands
+                .iter()
+                .map(|&(c1, c2)| (c1 as Card, c2 as Card))
+                .collect::<Vec<_>>()
+                .as_slice(),
+        ) {
             Ok(strings) => strings,
             Err(_) => return Err("Erreur lors de la conversion des mains en chaînes".to_string()),
         };
 
-        // Créer une structure pour trier les mains
+        // Créer structure pour trier les mains
         struct HandData {
             hand_name: String,
-            equity: f32,
-            ev: f32,
-            weight: f32,
+            equity: f64,
+            ev: f64,
+            weight: f64,
+            index: usize, // Ajout de l'index pour retrouver la stratégie
         }
 
         // Collecter les données pour les mains avec un poids > 0
@@ -1882,11 +1935,36 @@ fn display_top_hands(
                 equity: equity[i],
                 ev: ev[i],
                 weight: weights[i],
+                index: i,
             })
             .collect();
 
         // Trier les mains par EV décroissant
         hand_data.sort_by(|a, b| b.ev.partial_cmp(&a.ev).unwrap_or(std::cmp::Ordering::Equal));
+
+        // Vérifier s'il s'agit du joueur actuel et si c'est un nœud de décision
+        let is_current_player = player == game.current_player();
+        let is_decision_node = !game.is_terminal_node() && !game.is_chance_node();
+
+        // Récupérer les actions disponibles et leurs fréquences/EVs si applicable
+        let actions = if is_current_player && is_decision_node {
+            game.available_actions()
+        } else {
+            vec![]
+        };
+
+        let range_size = hands.len();
+        let strategy = if is_current_player && is_decision_node {
+            game.strategy()
+        } else {
+            vec![]
+        };
+
+        let action_evs = if is_current_player && is_decision_node {
+            game.expected_values_detail(player)
+        } else {
+            vec![]
+        };
 
         // Afficher l'en-tête du tableau
         println!(
@@ -1895,7 +1973,7 @@ fn display_top_hands(
         );
         println!("{}", "-".repeat(40));
 
-        // Afficher les N meilleures mains
+        // Afficher les N meilleures mains avec leurs détails d'action
         for data in hand_data.iter().take(num_hands) {
             println!(
                 "{:<6} {:<10.2} {:<12.2} {:<10.2}",
@@ -1904,11 +1982,43 @@ fn display_top_hands(
                 data.ev,
                 data.weight * 100.0
             );
+
+            // Si c'est un nœud de décision et le joueur actuel, afficher les fréquences et EVs par action
+            if is_current_player && is_decision_node && !actions.is_empty() {
+                println!("  Actions disponibles:");
+
+                for (action_idx, action) in actions.iter().enumerate() {
+                    let action_str = format!("{:?}", action).replace("(", " ").replace(")", "");
+
+                    // Calculer les indices avec précaution
+                    let strat_idx = action_idx * range_size + data.index;
+                    let ev_idx = action_idx * range_size + data.index;
+
+                    // Récupérer fréquence et EV pour cette action/main
+                    let frequency = if strat_idx < strategy.len() {
+                        strategy[strat_idx] * 100.0
+                    } else {
+                        0.0
+                    };
+                    let action_ev = if ev_idx < action_evs.len() {
+                        action_evs[ev_idx]
+                    } else {
+                        0.0
+                    };
+
+                    // Afficher la ligne de détail
+                    println!(
+                        "    {:<10}: {:<8.2}% (EV: {:.2} bb)",
+                        action_str, frequency, action_ev
+                    );
+                }
+                println!(); // Ligne vide entre les mains
+            }
         }
 
         // Afficher l'EV moyenne du joueur
-        let total_ev: f32 = hand_data.iter().map(|data| data.ev * data.weight).sum();
-        let total_weight: f32 = hand_data.iter().map(|data| data.weight).sum();
+        let total_ev: f64 = hand_data.iter().map(|data| data.ev * data.weight).sum();
+        let total_weight: f64 = hand_data.iter().map(|data| data.weight).sum();
         let avg_ev = if total_weight > 0.0 {
             total_ev / total_weight
         } else {
@@ -1916,6 +2026,54 @@ fn display_top_hands(
         };
 
         println!("\nEV moyenne {}: {:.2} bb", player_label, avg_ev);
+
+        // Si c'est le joueur actuel, afficher la stratégie globale
+        if is_current_player && is_decision_node && !actions.is_empty() {
+            println!("\nStratégie globale {}:", player_label);
+
+            for (action_idx, action) in actions.iter().enumerate() {
+                let action_str = format!("{:?}", action).replace("(", " ").replace(")", "");
+
+                // Calculer la fréquence moyenne pour cette action
+                let mut total_freq = 0.0;
+                let mut total_weight = 0.0;
+                let norm_weights = game.normalized_weights(player);
+
+                for hand_idx in 0..range_size {
+                    let strat_idx = action_idx * range_size + hand_idx;
+                    if strat_idx < strategy.len() {
+                        total_freq += strategy[strat_idx] * norm_weights[hand_idx];
+                        total_weight += norm_weights[hand_idx];
+                    }
+                }
+
+                let avg_freq = if total_weight > 0.0 {
+                    (total_freq / total_weight) * 100.0
+                } else {
+                    0.0
+                };
+
+                // Calculer l'EV moyenne pour cette action
+                let mut total_ev = 0.0;
+                for hand_idx in 0..range_size {
+                    let ev_idx = action_idx * range_size + hand_idx;
+                    if ev_idx < action_evs.len() {
+                        total_ev += action_evs[ev_idx] * norm_weights[hand_idx];
+                    }
+                }
+
+                let avg_ev = if total_weight > 0.0 {
+                    total_ev / total_weight
+                } else {
+                    0.0
+                };
+
+                println!(
+                    "  {:<10}: {:<8.2}% (EV: {:.2} bb)",
+                    action_str, avg_freq, avg_ev
+                );
+            }
+        }
     }
 
     println!("\n");

@@ -79,7 +79,7 @@ fn main() {
 
     let card_config = CardConfig {
         range: [oop_range.parse().unwrap(), ip_range.parse().unwrap()],
-        flop: flop_from_str("9d5s3d").unwrap(),
+        flop: flop_from_str("Td5d3h").unwrap(),
         turn: NOT_DEALT, // card_from_str("Qc").unwrap(),
         river: NOT_DEALT,
     };
@@ -113,7 +113,7 @@ fn main() {
 
     // Paramètres de résolution
     let max_iterations = 10;
-    let target_exploitability = 0.1;
+    let target_exploitability = 0.01;
     let print_progress = true;
 
     println!("Démarrage de la résolution avec solve_step et finalize...");

@@ -1,3 +1,4 @@
+use crate::holes_to_strings;
 use crate::utils::*;
 use crate::weighted_average;
 use crate::Card;
@@ -280,6 +281,34 @@ pub fn select_spot(
     let results = get_specific_result(game, current_player, num_actions)?;
     state.results = results.clone();
     state.results_empty = results.is_empty;
+
+    // if !results.weights[0].is_empty() {
+    //     println!("=== SORTED OOP WEIGHTS (LOWEST TO HIGHEST) ===");
+
+    //     // Get private cards for OOP player
+    //     let oop_cards = game.private_cards(0);
+
+    //     // Convert all hole cards to strings
+    //     let hand_strings = match holes_to_strings(oop_cards) {
+    //         Ok(strings) => strings,
+    //         Err(_) => vec!["Unknown".to_string(); oop_cards.len()],
+    //     };
+
+    //     let mut sorted_weights: Vec<(usize, f64)> = results.weights[0]
+    //         .iter()
+    //         .enumerate()
+    //         .map(|(i, &w)| (i, w))
+    //         .collect();
+    //     sorted_weights.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
+
+    //     // Display first 10 lowest weights
+    //     for (i, (hand_idx, weight)) in sorted_weights.iter().take(10).enumerate() {
+    //         // Use the pre-converted hand string
+    //         let hand_str = &hand_strings[*hand_idx];
+
+    //         println!("#{}: {} - Weight: {:.4}", i + 1, hand_str, weight);
+    //     }
+    // }
 
     // Extract flop actions from the history
     let mut flop_actions = Vec::new();
@@ -830,7 +859,7 @@ pub fn play(
     game: &mut PostFlopGame,
     state: &mut GameState,
     action_index: usize,
-) -> Result<(), String> {
+) -> Result<SpecificResultData, String> {
     let spot_index = state.selected_spot_index as usize;
 
     // state.log_state("play()");
@@ -864,15 +893,12 @@ pub fn play(
         return Err(format!("Action à l'index {} non trouvée", action_index));
     }
 
-    // Mettre à jour l'index sélectionné
     spot.selected_index = action_index as i32;
 
-    // Naviguer au spot suivant avec needSplice=true
-    select_spot(game, state, spot_index + 1, true, false).map(|_| ())
+    select_spot(game, state, spot_index + 1, true, false)
 }
 
 /// Function to deal a card at the currently selected chance node
-/// Based on deal() from ResultNav.vue
 pub fn deal(
     game: &mut PostFlopGame,
     state: &mut GameState,
@@ -913,7 +939,6 @@ pub fn deal(
     chance_spot.selected_index = card_index as i32;
 
     // Call select_spot to update the game state with from_deal=true
-    // Exactly as done in ResultNav.vue
     select_spot(game, state, state.selected_spot_index as usize, false, true)
 }
 
