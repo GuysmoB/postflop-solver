@@ -416,46 +416,45 @@ pub fn get_specific_result(
     current_player: &str,
     num_actions: usize,
 ) -> Result<SpecificResultData, String> {
-    // Get results buffer
     let buffer = get_results(game);
 
     // Save buffer to JSON file
-    let json_path = format!("{}/buffer_{}.json", "solver_results", current_player);
-    let file =
-        File::create(&json_path).map_err(|e| format!("Failed to create JSON file: {}", e))?;
-    let mut writer = BufWriter::new(file);
+    // let json_path = format!("{}/buffer_{}.json", "solver_results", current_player);
+    // let file =
+    //     File::create(&json_path).map_err(|e| format!("Failed to create JSON file: {}", e))?;
+    // let mut writer = BufWriter::new(file);
 
-    let mut json_parts = Vec::new();
-    json_parts.push("{\n".to_string());
+    // let mut json_parts = Vec::new();
+    // json_parts.push("{\n".to_string());
 
-    // Ajouter chaque entrée manuellement avec les indices en ordre numérique
-    for i in 0..buffer.len() {
-        json_parts.push(format!("    \"{}\": {},\n", i, buffer[i]));
-    }
+    // // Ajouter chaque entrée manuellement avec les indices en ordre numérique
+    // for i in 0..buffer.len() {
+    //     json_parts.push(format!("    \"{}\": {},\n", i, buffer[i]));
+    // }
 
-    // Supprimer la dernière virgule et fermer l'objet
-    if json_parts.len() > 1 {
-        let last_idx = json_parts.len() - 1;
-        let last_entry = &json_parts[last_idx];
-        json_parts[last_idx] = last_entry.trim_end_matches(",\n").to_string() + "\n";
-    }
-    json_parts.push("}".to_string());
+    // // Supprimer la dernière virgule et fermer l'objet
+    // if json_parts.len() > 1 {
+    //     let last_idx = json_parts.len() - 1;
+    //     let last_entry = &json_parts[last_idx];
+    //     json_parts[last_idx] = last_entry.trim_end_matches(",\n").to_string() + "\n";
+    // }
+    // json_parts.push("}".to_string());
 
-    let json_data = json_parts.join("");
+    // let json_data = json_parts.join("");
 
-    // Écrire dans le fichier
-    writer
-        .write_all(json_data.as_bytes())
-        .map_err(|e| format!("Failed to write JSON data: {}", e))?;
+    // // Écrire dans le fichier
+    // writer
+    //     .write_all(json_data.as_bytes())
+    //     .map_err(|e| format!("Failed to write JSON data: {}", e))?;
 
-    writer
-        .flush()
-        .map_err(|e| format!("Failed to flush JSON data: {}", e))?;
+    // writer
+    //     .flush()
+    //     .map_err(|e| format!("Failed to flush JSON data: {}", e))?;
 
-    println!(
-        "Buffer saved to {} with proper numerical ordering",
-        json_path
-    );
+    // println!(
+    //     "Buffer saved to {} with proper numerical ordering",
+    //     json_path
+    // );
 
     // 2. Déterminer les tailles des ranges
     let oop_range_size = game.private_cards(0).len();
@@ -639,8 +638,6 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
     // Sélectionner le premier spot (initialise le jeu)
     let results = select_spot(game, &mut state, 1, true, false)?;
     display_top_hands(game, 10, "ROOT", &results)?;
-
-    return Ok(());
 
     // ÉTAPE 1: OOP BET SUR LE FLOP
     println!("\n=== ÉTAPE 1: OOP BET SUR LE FLOP ===");

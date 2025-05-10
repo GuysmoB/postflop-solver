@@ -1,11 +1,9 @@
-use flate2::write::GzEncoder;
-use flate2::Compression;
 use postflop_solver::*;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{BufWriter, Read, Write};
+use std::io::{Read, Write};
 
 // Utilisez les fonctions avec la notation du module
 use postflop_solver::card_to_string_simple;
@@ -113,7 +111,7 @@ fn main() {
 
     // Paramètres de résolution
     let max_iterations = 10;
-    let target_exploitability = 0.01;
+    let target_exploitability = 0.03;
     let print_progress = true;
 
     println!("Démarrage de la résolution avec solve_step et finalize...");
@@ -152,6 +150,7 @@ fn main() {
                 max_iterations
             );
             print!("(exploitability = {exploitability:.4e})");
+            // io::stdout().flush().unwrap();
         }
     }
 
@@ -169,14 +168,19 @@ fn main() {
     // S'assurer que nous sommes à la racine
     game.back_to_root();
 
-    // explore_all_paths(&mut game);
-    run_bet_call_turn_scenario(&mut game).unwrap();
-    // explore_game_tree(&mut game);
+    // println!("\n=== DÉTAILS DES MAINS ===");
+    // explore_tree(&mut game);
 
-    // match run_bet_call_turn_scenario(&mut game) {
-    //     Ok(_) => println!("Scénario exécuté avec succès!"),
-    //     Err(e) => println!("Erreur: {}", e),
-    // }
+    match run_bet_call_turn_scenario(&mut game) {
+        Ok(_) => println!("Scénario exécuté avec succès!"),
+        Err(e) => println!("Erreur: {}", e),
+    }
+
+    // println!("\nExploration de tous les chemins d'actions possibles:");
+    // println!("\n=== STATISTIQUES DU NŒUD ACTUEL ===");
+    // let stats = get_node_statistics(&mut game);
+    // let json_string = serde_json::to_string_pretty(&stats).unwrap();
+    // println!("{}", json_string);
 }
 
 fn log_game_state(game: &PostFlopGame) {
@@ -260,24 +264,4 @@ fn log_game_state(game: &PostFlopGame) {
     println!("IP hands: {} combos", game.private_cards(1).len());
 
     println!("\n====================================");
-}
-
-fn save_game_to_file(game: &PostFlopGame, filename: &str) -> Result<(), String> {
-    let file = File::create(filename)
-        .map_err(|e| format!("Erreur lors de la création du fichier: {}", e))?;
-
-    // Créer un encodeur gzip avec un niveau de compression élevé
-    let encoder = GzEncoder::new(file, Compression::best());
-    let mut writer = BufWriter::new(encoder);
-
-    // Sérialiser le jeu dans le flux compressé
-    bincode::encode_into_std_write(game, &mut writer, bincode::config::standard())
-        .map_err(|e| format!("Erreur lors de la sérialisation: {}", e))?;
-
-    // Finaliser l'écriture
-    writer
-        .flush()
-        .map_err(|e| format!("Erreur lors de la finalisation: {}", e))?;
-
-    Ok(())
 }

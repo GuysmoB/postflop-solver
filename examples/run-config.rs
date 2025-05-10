@@ -8,39 +8,25 @@ use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SolverConfig {
-    // Ranges
     oop_range: String,
     ip_range: String,
-
-    // Board
     flop: String,
-    turn: Option<String>,  // Optional turn card
-    river: Option<String>, // Optional river card
-
-    // Game structure
-    initial_state: String, // "Flop", "Turn", "River"
+    turn: Option<String>,
+    river: Option<String>,
+    initial_state: String,
     starting_pot: i32,
     effective_stack: i32,
-
-    // Rake info
     rake_rate: f64,
     rake_cap: f64,
-
-    oop_bet_sizes: String,   // Ex: "50%"
-    oop_raise_sizes: String, // Ex: "60%"
-    ip_bet_sizes: String,    // Ex: "50%"
-    ip_raise_sizes: String,  // Ex: "60%"
-
-    // Donk options
-    turn_donk_sizes: Option<String>,  // Ex: "50%"
-    river_donk_sizes: Option<String>, // Ex: "50%"
-
-    // Thresholds
+    oop_bet_sizes: String,
+    oop_raise_sizes: String,
+    ip_bet_sizes: String,
+    ip_raise_sizes: String,
+    turn_donk_sizes: Option<String>,
+    river_donk_sizes: Option<String>,
     add_allin_threshold: f64,
     force_allin_threshold: f64,
     merging_threshold: f64,
-
-    // Solver parameters
     max_iterations: u32,
     target_exploitability: f32,
     use_compression: bool,
@@ -54,10 +40,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    // Charger la configuration depuis le fichier JSON
     let config = load_config(&args[1])?;
-
-    // Parse board
     let flop = flop_from_str(&config.flop).unwrap();
     let turn = if let Some(turn_str) = &config.turn {
         card_from_str(turn_str).unwrap()
@@ -70,7 +53,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         NOT_DEALT
     };
 
-    // Set up card config
     let card_config = CardConfig {
         range: [
             config.oop_range.parse().unwrap(),
@@ -91,7 +73,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         BetSizeOptions::try_from((config.ip_bet_sizes.as_str(), config.ip_raise_sizes.as_str()))
             .unwrap();
 
-    // Créer les options de donk
     let turn_donk_sizes = config
         .turn_donk_sizes
         .as_ref()
@@ -125,24 +106,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         merging_threshold: config.merging_threshold,
     };
 
-    // Construction et résolution du jeu
     let action_tree = ActionTree::new(tree_config.clone())?;
     let mut game = PostFlopGame::with_config(card_config, action_tree)?;
-
-    // Afficher les informations du jeu chargé
-    // log_game_state(&game);
-
-    // Allocation de mémoire
     game.allocate_memory(config.use_compression);
 
-    // Paramètres de résolution
     let max_iterations = config.max_iterations;
     let target_exploitability = config.target_exploitability;
     let print_progress = true;
-
     let mut exploitability = compute_exploitability(&game);
 
-    // Afficher l'exploitabilité initiale
     if print_progress {
         print!("iteration: 0 / {max_iterations} ");
         print!("(exploitability = {exploitability:.4e})");
@@ -180,8 +152,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Exploitability: {:.2}", exploitability);
 
     game.back_to_root();
-    // explore_and_save_ranges(&mut game, "solver_results", 3)?;
-    run_bet_call_turn_scenario(&mut game)?;
+    explore_and_save_ranges(&mut game, "solver_results", 3)?;
+    // run_bet_call_turn_scenario(&mut game)?;
     // explore_game_tree(&mut game);
     Ok(())
 }

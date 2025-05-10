@@ -282,34 +282,6 @@ pub fn select_spot(
     state.results = results.clone();
     state.results_empty = results.is_empty;
 
-    // if !results.weights[0].is_empty() {
-    //     println!("=== SORTED OOP WEIGHTS (LOWEST TO HIGHEST) ===");
-
-    //     // Get private cards for OOP player
-    //     let oop_cards = game.private_cards(0);
-
-    //     // Convert all hole cards to strings
-    //     let hand_strings = match holes_to_strings(oop_cards) {
-    //         Ok(strings) => strings,
-    //         Err(_) => vec!["Unknown".to_string(); oop_cards.len()],
-    //     };
-
-    //     let mut sorted_weights: Vec<(usize, f64)> = results.weights[0]
-    //         .iter()
-    //         .enumerate()
-    //         .map(|(i, &w)| (i, w))
-    //         .collect();
-    //     sorted_weights.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
-
-    //     // Display first 10 lowest weights
-    //     for (i, (hand_idx, weight)) in sorted_weights.iter().take(10).enumerate() {
-    //         // Use the pre-converted hand string
-    //         let hand_str = &hand_strings[*hand_idx];
-
-    //         println!("#{}: {} - Weight: {:.4}", i + 1, hand_str, weight);
-    //     }
-    // }
-
     // Extract flop actions from the history
     let mut flop_actions = Vec::new();
     for i in 1..end_index {

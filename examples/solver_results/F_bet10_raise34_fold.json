@@ -1,2890 +1,2974 @@
 {
-  "path_id": "F:bet10-raise34-fold",
+  "path_id": "F:Bet10-Raise34-Fold",
   "board_size": 3,
-  "board": "3d 5s 9d",
+  "board": "3h 5d Td",
   "pot_oop": 40.0,
   "pot_ip": 64.0,
   "current_player": 24,
   "oop_player": {
-    "hands_count": 138,
+    "hands_count": 151,
     "hands": [
       {
         "hand": "5c4c",
-        "weight": 25.543308,
-        "equity": 0.45763415,
-        "ev": 0.0000019073486,
+        "weight": 0.21542,
+        "equity": 0.503925,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "Ac4c",
-        "weight": 33.044266,
-        "equity": 0.35922438,
+        "weight": 0.263094,
+        "equity": 0.403667,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "5h4h",
-        "weight": 25.543308,
-        "equity": 0.45763415,
-        "ev": 0.0000019073486,
+        "weight": 0.138333,
+        "equity": 0.524005,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "Ah4h",
-        "weight": 33.044266,
-        "equity": 0.35922438,
+        "weight": 0.145032,
+        "equity": 0.430165,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "5s4s",
+        "weight": 0.21542,
+        "equity": 0.503925,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "As4s",
-        "weight": 17.326553,
-        "equity": 0.38692135,
-        "ev": -0.0000019073486,
+        "weight": 0.263094,
+        "equity": 0.403667,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "6c5c",
-        "weight": 24.468994,
-        "equity": 0.46737236,
+        "weight": 0.221067,
+        "equity": 0.506155,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "7c5c",
-        "weight": 27.917233,
-        "equity": 0.45928073,
-        "ev": 0.0000019073486,
+        "weight": 0.275936,
+        "equity": 0.497883,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8c5c",
-        "weight": 30.29823,
-        "equity": 0.45414904,
-        "ev": 0.0000019073486,
+        "weight": 0.309524,
+        "equity": 0.490872,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "Ac5c",
-        "weight": 22.599094,
-        "equity": 0.47667935,
+        "weight": 0.231288,
+        "equity": 0.50756,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "6h5h",
-        "weight": 24.468994,
-        "equity": 0.46737236,
-        "ev": 0.0,
+        "weight": 0.14201,
+        "equity": 0.526317,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "7h5h",
-        "weight": 27.917233,
-        "equity": 0.45928073,
-        "ev": 0.0000019073486,
+        "weight": 0.171584,
+        "equity": 0.518104,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8h5h",
-        "weight": 30.29823,
-        "equity": 0.45414904,
-        "ev": 0.0000019073486,
+        "weight": 0.187587,
+        "equity": 0.511821,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "Ah5h",
-        "weight": 22.599094,
-        "equity": 0.47667935,
+        "weight": 0.147369,
+        "equity": 0.533486,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "6s5s",
+        "weight": 0.221067,
+        "equity": 0.506155,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "7s5s",
+        "weight": 0.275936,
+        "equity": 0.497883,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "8s5s",
+        "weight": 0.309524,
+        "equity": 0.490872,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "As5s",
+        "weight": 0.231288,
+        "equity": 0.50756,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "6d6c",
-        "weight": 30.24024,
-        "equity": 0.4735345,
+        "weight": 0.293404,
+        "equity": 0.500448,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "6h6c",
-        "weight": 35.99706,
-        "equity": 0.4508253,
-        "ev": 0.0,
+        "weight": 0.455775,
+        "equity": 0.473857,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "6s6c",
-        "weight": 37.12512,
-        "equity": 0.45111305,
-        "ev": 0.0000019073486,
+        "weight": 0.405324,
+        "equity": 0.473015,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "7c6c",
-        "weight": 5.597608,
-        "equity": 0.36275175,
-        "ev": -0.0000019073486,
+        "weight": 0.402675,
+        "equity": 0.275577,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8c6c",
-        "weight": 37.815918,
-        "equity": 0.26101154,
-        "ev": -0.0000019073486,
+        "weight": 0.594856,
+        "equity": 0.167774,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "9c6c",
-        "weight": 6.548508,
-        "equity": 0.51924485,
+        "weight": 0.527325,
+        "equity": 0.175837,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "6h6d",
-        "weight": 30.24024,
-        "equity": 0.4735345,
-        "ev": 0.0,
+        "weight": 0.295253,
+        "equity": 0.501313,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "6s6d",
-        "weight": 29.339888,
-        "equity": 0.47396722,
+        "weight": 0.293404,
+        "equity": 0.500448,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "8d6d",
+        "weight": 0.01833,
+        "equity": 0.435882,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "9d6d",
+        "weight": 0.016967,
+        "equity": 0.442179,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "6s6h",
-        "weight": 37.12512,
-        "equity": 0.45111305,
-        "ev": 0.0000019073486,
+        "weight": 0.455775,
+        "equity": 0.473857,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "7h6h",
-        "weight": 5.597608,
-        "equity": 0.36275175,
-        "ev": -0.0000019073486,
-        "strategy": null
-      },
-      {
-        "hand": "8h6h",
-        "weight": 37.815918,
-        "equity": 0.26101154,
-        "ev": -0.0000019073486,
-        "strategy": null
-      },
-      {
-        "hand": "9h6h",
-        "weight": 6.548508,
-        "equity": 0.51924485,
+        "weight": 0.295686,
+        "equity": 0.306367,
         "ev": 0.0,
         "strategy": null
       },
       {
+        "hand": "8h6h",
+        "weight": 0.566723,
+        "equity": 0.204297,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "9h6h",
+        "weight": 0.513972,
+        "equity": 0.21191,
+        "ev": -2e-6,
+        "strategy": null
+      },
+      {
         "hand": "7s6s",
-        "weight": 1.8777691,
-        "equity": 0.38776523,
-        "ev": 0.0000019073486,
+        "weight": 0.402675,
+        "equity": 0.275577,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8s6s",
-        "weight": 30.918661,
-        "equity": 0.2916001,
+        "weight": 0.594856,
+        "equity": 0.167774,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "9s6s",
-        "weight": 0.38070086,
-        "equity": 0.5395861,
+        "weight": 0.527325,
+        "equity": 0.175837,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "7d7c",
-        "weight": 31.148977,
-        "equity": 0.47916052,
+        "weight": 0.272434,
+        "equity": 0.512647,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "7h7c",
-        "weight": 37.208485,
-        "equity": 0.4561953,
-        "ev": -0.0000019073486,
+        "weight": 0.395644,
+        "equity": 0.486149,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "7s7c",
-        "weight": 36.001762,
-        "equity": 0.45664388,
+        "weight": 0.391394,
+        "equity": 0.485187,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8c7c",
-        "weight": 31.514462,
-        "equity": 0.2640846,
-        "ev": -0.0000019073486,
+        "weight": 0.514112,
+        "equity": 0.171662,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "9c7c",
-        "weight": 7.6479626,
-        "equity": 0.5129437,
+        "weight": 0.49923,
+        "equity": 0.181047,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "7h7d",
-        "weight": 31.148977,
-        "equity": 0.47916052,
+        "weight": 0.277128,
+        "equity": 0.513609,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "7s7d",
-        "weight": 31.48679,
-        "equity": 0.4796483,
+        "weight": 0.272434,
+        "equity": 0.512647,
         "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "8d7d",
+        "weight": 0.017931,
+        "equity": 0.441176,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "9d7d",
+        "weight": 0.017673,
+        "equity": 0.448274,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "7s7h",
-        "weight": 36.001762,
-        "equity": 0.45664388,
-        "ev": 0.0,
+        "weight": 0.395644,
+        "equity": 0.486149,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "8h7h",
-        "weight": 31.514462,
-        "equity": 0.2640846,
-        "ev": -0.0000019073486,
+        "weight": 0.508449,
+        "equity": 0.207814,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "9h7h",
-        "weight": 7.6479626,
-        "equity": 0.5129437,
-        "ev": 0.0,
+        "weight": 0.498741,
+        "equity": 0.216602,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "8s7s",
-        "weight": 30.673742,
-        "equity": 0.2946893,
+        "weight": 0.514112,
+        "equity": 0.171662,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "9s7s",
-        "weight": 0.52494675,
-        "equity": 0.5332701,
+        "weight": 0.49923,
+        "equity": 0.181047,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8d8c",
-        "weight": 31.364302,
-        "equity": 0.48529175,
-        "ev": 0.0000019073486,
+        "weight": 0.245154,
+        "equity": 0.525172,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8h8c",
-        "weight": 35.328804,
-        "equity": 0.4593211,
+        "weight": 0.33119,
+        "equity": 0.496251,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8s8c",
-        "weight": 35.403694,
-        "equity": 0.45889947,
-        "ev": -0.0000019073486,
+        "weight": 0.333091,
+        "equity": 0.496172,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "9c8c",
-        "weight": 9.43237,
-        "equity": 0.5079684,
-        "ev": -0.0000019073486,
+        "weight": 0.492678,
+        "equity": 0.183913,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "Ac8c",
-        "weight": 49.019073,
-        "equity": 0.29149872,
-        "ev": -0.0000019073486,
+        "weight": 0.432719,
+        "equity": 0.330743,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "8h8d",
-        "weight": 31.364302,
-        "equity": 0.48529175,
-        "ev": 0.0000019073486,
+        "weight": 0.245419,
+        "equity": 0.525319,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8s8d",
-        "weight": 31.670967,
-        "equity": 0.48490986,
+        "weight": 0.245154,
+        "equity": 0.525172,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "9d8d",
+        "weight": 0.015033,
+        "equity": 0.454718,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "8s8h",
-        "weight": 35.403694,
-        "equity": 0.45889947,
-        "ev": -0.0000019073486,
+        "weight": 0.33119,
+        "equity": 0.496251,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "9h8h",
-        "weight": 9.43237,
-        "equity": 0.5079684,
-        "ev": -0.0000019073486,
+        "weight": 0.486208,
+        "equity": 0.219276,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "Ah8h",
-        "weight": 49.019073,
-        "equity": 0.29149872,
-        "ev": -0.0000019073486,
+        "weight": 0.549998,
+        "equity": 0.360647,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "9s8s",
-        "weight": 0.78706825,
-        "equity": 0.5276854,
+        "weight": 0.492678,
+        "equity": 0.183913,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "As8s",
-        "weight": 50.15898,
-        "equity": 0.32200447,
-        "ev": -0.0000019073486,
+        "weight": 0.432719,
+        "equity": 0.330743,
+        "ev": -2e-6,
+        "strategy": null
+      },
+      {
+        "hand": "9d9c",
+        "weight": 0.179303,
+        "equity": 0.544903,
+        "ev": 2e-6,
+        "strategy": null
+      },
+      {
+        "hand": "9h9c",
+        "weight": 0.242427,
+        "equity": 0.516321,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "9s9c",
+        "weight": 0.237829,
+        "equity": 0.516294,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "Kc9c",
-        "weight": 0.76039624,
-        "equity": 0.5268019,
-        "ev": -0.0000019073486,
+        "weight": 0.635245,
+        "equity": 0.232802,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "Ac9c",
+        "weight": 0.439541,
+        "equity": 0.341221,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "9h9d",
+        "weight": 0.180653,
+        "equity": 0.544997,
+        "ev": 0.0,
+        "strategy": null
+      },
+      {
+        "hand": "9s9d",
+        "weight": 0.179303,
+        "equity": 0.544903,
+        "ev": 2e-6,
+        "strategy": null
+      },
+      {
+        "hand": "9s9h",
+        "weight": 0.242427,
+        "equity": 0.516321,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "Kh9h",
-        "weight": 0.76039624,
-        "equity": 0.5268019,
-        "ev": -0.0000019073486,
+        "weight": 0.527982,
+        "equity": 0.267958,
+        "ev": -2e-6,
         "strategy": null
       },
       {
-        "hand": "TdTc",
-        "weight": 1.6708874,
-        "equity": 0.5369183,
-        "ev": 0.0000019073486,
+        "hand": "Ah9h",
+        "weight": 0.506402,
+        "equity": 0.37031,
+        "ev": 0.0,
         "strategy": null
       },
       {
-        "hand": "ThTc",
-        "weight": 7.6899743,
-        "equity": 0.50988394,
-        "ev": -0.0000019073486,
+        "hand": "Ks9s",
+        "weight": 0.635245,
+        "equity": 0.232802,
+        "ev": 0.0,
         "strategy": null
       },
       {
-        "hand": "TsTc",
-        "weight": 7.8869996,
-        "equity": 0.50946546,
+        "hand": "As9s",
+        "weight": 0.439541,
+        "equity": 0.341221,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "JcTc",
-        "weight": 50.328793,
-        "equity": 0.17757234,
+        "weight": 0.07486,
+        "equity": 0.592864,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "QcTc",
-        "weight": 46.583183,
-        "equity": 0.18500745,
-        "ev": 0.0,
+        "weight": 0.040819,
+        "equity": 0.597423,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "KcTc",
-        "weight": 63.06731,
-        "equity": 0.20233357,
+        "weight": 0.039486,
+        "equity": 0.596317,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AcTc",
-        "weight": 47.764206,
-        "equity": 0.31116092,
-        "ev": 0.0,
-        "strategy": null
-      },
-      {
-        "hand": "ThTd",
-        "weight": 1.6708874,
-        "equity": 0.5369183,
-        "ev": 0.0000019073486,
-        "strategy": null
-      },
-      {
-        "hand": "TsTd",
-        "weight": 1.8912343,
-        "equity": 0.5365804,
-        "ev": 0.0000019073486,
-        "strategy": null
-      },
-      {
-        "hand": "TsTh",
-        "weight": 7.8869996,
-        "equity": 0.50946546,
+        "weight": 0.007284,
+        "equity": 0.633617,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "JhTh",
-        "weight": 50.328793,
-        "equity": 0.17757234,
+        "weight": 0.020007,
+        "equity": 0.613966,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "QhTh",
-        "weight": 46.583183,
-        "equity": 0.18500745,
+        "weight": 0.024768,
+        "equity": 0.618941,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KhTh",
-        "weight": 63.06731,
-        "equity": 0.20233357,
-        "ev": 0.0,
-        "strategy": null
-      },
-      {
-        "hand": "AhTh",
-        "weight": 47.764206,
-        "equity": 0.31116092,
+        "weight": 0.086194,
+        "equity": 0.616907,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "JsTs",
-        "weight": 48.523582,
-        "equity": 0.21331868,
-        "ev": -0.0000038146973,
+        "weight": 0.07486,
+        "equity": 0.592864,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "QsTs",
-        "weight": 43.21619,
-        "equity": 0.22075304,
-        "ev": 0.0000019073486,
+        "weight": 0.040819,
+        "equity": 0.597423,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "KsTs",
-        "weight": 59.84172,
-        "equity": 0.23574916,
+        "weight": 0.039486,
+        "equity": 0.596317,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AsTs",
-        "weight": 50.3232,
-        "equity": 0.3398351,
+        "weight": 0.007284,
+        "equity": 0.633617,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "QcJc",
-        "weight": 36.567696,
-        "equity": 0.19575253,
+        "weight": 0.496194,
+        "equity": 0.23927,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KcJc",
-        "weight": 46.774334,
-        "equity": 0.22927815,
-        "ev": 0.0,
+        "weight": 0.580184,
+        "equity": 0.279051,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "AcJc",
-        "weight": 53.74876,
-        "equity": 0.35433888,
-        "ev": 0.0,
+        "weight": 0.527739,
+        "equity": 0.391342,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AdJc",
-        "weight": 38.419807,
-        "equity": 0.3851447,
-        "ev": 0.0,
+        "weight": 0.356363,
+        "equity": 0.432461,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "AhJc",
-        "weight": 53.709618,
-        "equity": 0.35433882,
-        "ev": 0.0,
+        "weight": 0.509705,
+        "equity": 0.391801,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AsJc",
-        "weight": 56.03587,
-        "equity": 0.35417226,
-        "ev": -0.0000019073486,
+        "weight": 0.527787,
+        "equity": 0.391342,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AcJd",
-        "weight": 43.361263,
-        "equity": 0.38012946,
-        "ev": 0.0,
+        "weight": 0.409676,
+        "equity": 0.421808,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AhJd",
-        "weight": 43.361263,
-        "equity": 0.38012946,
+        "weight": 0.413726,
+        "equity": 0.422342,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AsJd",
-        "weight": 43.507313,
-        "equity": 0.38002127,
-        "ev": 0.0,
+        "weight": 0.409676,
+        "equity": 0.421808,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "QhJh",
-        "weight": 36.567696,
-        "equity": 0.19575253,
+        "weight": 0.409993,
+        "equity": 0.274235,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KhJh",
-        "weight": 46.774334,
-        "equity": 0.22927815,
-        "ev": 0.0,
+        "weight": 0.477598,
+        "equity": 0.312089,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AcJh",
-        "weight": 53.709618,
-        "equity": 0.35433882,
-        "ev": 0.0,
+        "weight": 0.496355,
+        "equity": 0.391794,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "AdJh",
-        "weight": 38.419807,
-        "equity": 0.3851447,
-        "ev": 0.0,
+        "weight": 0.35761,
+        "equity": 0.432975,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AhJh",
-        "weight": 53.74876,
-        "equity": 0.35433888,
+        "weight": 0.432709,
+        "equity": 0.418762,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AsJh",
-        "weight": 56.03587,
-        "equity": 0.35417226,
-        "ev": -0.0000019073486,
+        "weight": 0.496355,
+        "equity": 0.391794,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "QsJs",
-        "weight": 36.580765,
-        "equity": 0.23080143,
+        "weight": 0.496194,
+        "equity": 0.23927,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KsJs",
-        "weight": 44.913662,
-        "equity": 0.26115695,
-        "ev": 0.0000019073486,
+        "weight": 0.580184,
+        "equity": 0.279051,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "AcJs",
-        "weight": 55.75715,
-        "equity": 0.35337695,
-        "ev": -0.0000019073486,
+        "weight": 0.527787,
+        "equity": 0.391342,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AdJs",
-        "weight": 38.03634,
-        "equity": 0.38411075,
-        "ev": 0.0,
+        "weight": 0.356363,
+        "equity": 0.432461,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "AhJs",
-        "weight": 55.75715,
-        "equity": 0.35337695,
-        "ev": -0.0000019073486,
+        "weight": 0.509705,
+        "equity": 0.391801,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AsJs",
-        "weight": 46.67267,
-        "equity": 0.3809178,
-        "ev": 0.0,
+        "weight": 0.527739,
+        "equity": 0.391342,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "KcQc",
-        "weight": 40.46178,
-        "equity": 0.27472073,
-        "ev": 0.0000019073486,
+        "weight": 0.519825,
+        "equity": 0.326579,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "KdQc",
-        "weight": 37.989468,
-        "equity": 0.300179,
-        "ev": -0.0000019073486,
+        "weight": 0.405354,
+        "equity": 0.357214,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KhQc",
-        "weight": 40.45362,
-        "equity": 0.27472094,
-        "ev": -0.0000019073486,
+        "weight": 0.529286,
+        "equity": 0.326904,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KsQc",
-        "weight": 43.493877,
-        "equity": 0.27231574,
+        "weight": 0.520188,
+        "equity": 0.326579,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AcQc",
-        "weight": 42.699986,
-        "equity": 0.3920899,
-        "ev": -0.0000019073486,
+        "weight": 0.448979,
+        "equity": 0.434551,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AdQc",
-        "weight": 29.66703,
-        "equity": 0.41587612,
-        "ev": -0.0000019073486,
+        "weight": 0.275561,
+        "equity": 0.473783,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AhQc",
-        "weight": 42.820328,
-        "equity": 0.39208993,
-        "ev": 0.0000019073486,
+        "weight": 0.468982,
+        "equity": 0.435286,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AsQc",
-        "weight": 45.00079,
-        "equity": 0.3917388,
-        "ev": -0.0000019073486,
+        "weight": 0.448686,
+        "equity": 0.434551,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KcQd",
-        "weight": 38.861965,
-        "equity": 0.3072049,
-        "ev": 0.0000019073486,
+        "weight": 0.410829,
+        "equity": 0.360902,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KhQd",
-        "weight": 38.861965,
-        "equity": 0.3072049,
-        "ev": 0.0000019073486,
+        "weight": 0.420235,
+        "equity": 0.361272,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "KsQd",
-        "weight": 40.79156,
-        "equity": 0.3048784,
+        "weight": 0.410829,
+        "equity": 0.360902,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AcQd",
-        "weight": 32.460423,
-        "equity": 0.42079332,
-        "ev": 0.0,
+        "weight": 0.267713,
+        "equity": 0.467018,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AhQd",
-        "weight": 32.460423,
-        "equity": 0.42079332,
+        "weight": 0.287815,
+        "equity": 0.467783,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AsQd",
-        "weight": 31.663315,
-        "equity": 0.42050487,
-        "ev": 0.0,
+        "weight": 0.267713,
+        "equity": 0.467018,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "KcQh",
-        "weight": 40.45362,
-        "equity": 0.27472094,
-        "ev": -0.0000019073486,
+        "weight": 0.519577,
+        "equity": 0.327143,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KdQh",
-        "weight": 37.989468,
-        "equity": 0.300179,
-        "ev": -0.0000019073486,
+        "weight": 0.404951,
+        "equity": 0.357826,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "KhQh",
-        "weight": 40.46178,
-        "equity": 0.27472073,
-        "ev": 0.0000019073486,
+        "weight": 0.450603,
+        "equity": 0.357389,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "KsQh",
-        "weight": 43.493877,
-        "equity": 0.27231574,
+        "weight": 0.519577,
+        "equity": 0.327143,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AcQh",
-        "weight": 42.820328,
-        "equity": 0.39208993,
-        "ev": 0.0000019073486,
+        "weight": 0.446923,
+        "equity": 0.435757,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AdQh",
-        "weight": 29.66703,
-        "equity": 0.41587612,
-        "ev": -0.0000019073486,
+        "weight": 0.277133,
+        "equity": 0.475066,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AhQh",
-        "weight": 42.699986,
-        "equity": 0.3920899,
-        "ev": -0.0000019073486,
+        "weight": 0.270795,
+        "equity": 0.461044,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AsQh",
-        "weight": 45.00079,
-        "equity": 0.3917388,
-        "ev": -0.0000019073486,
+        "weight": 0.446923,
+        "equity": 0.435757,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KcQs",
-        "weight": 41.60036,
-        "equity": 0.27384496,
+        "weight": 0.520188,
+        "equity": 0.326579,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KdQs",
-        "weight": 38.22021,
-        "equity": 0.29929364,
-        "ev": -0.0000019073486,
+        "weight": 0.405354,
+        "equity": 0.357214,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KhQs",
-        "weight": 41.60036,
-        "equity": 0.27384496,
+        "weight": 0.529286,
+        "equity": 0.326904,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "KsQs",
-        "weight": 43.519142,
-        "equity": 0.3042782,
-        "ev": 0.0,
+        "weight": 0.519825,
+        "equity": 0.326579,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "AcQs",
-        "weight": 43.206123,
-        "equity": 0.39150566,
+        "weight": 0.448686,
+        "equity": 0.434551,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AdQs",
-        "weight": 29.097252,
-        "equity": 0.41522712,
-        "ev": 0.0000019073486,
+        "weight": 0.275561,
+        "equity": 0.473783,
+        "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AhQs",
-        "weight": 43.206123,
-        "equity": 0.39150566,
+        "weight": 0.468982,
+        "equity": 0.435286,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AsQs",
-        "weight": 33.25671,
-        "equity": 0.41736367,
+        "weight": 0.448979,
+        "equity": 0.434551,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AcKc",
-        "weight": 44.67788,
-        "equity": 0.41061506,
+        "weight": 0.399098,
+        "equity": 0.459702,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AdKc",
-        "weight": 28.031715,
-        "equity": 0.4321341,
-        "ev": 0.0,
+        "weight": 0.233918,
+        "equity": 0.498187,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AhKc",
-        "weight": 44.534046,
-        "equity": 0.4107405,
-        "ev": -0.0000019073486,
-        "strategy": null
-      },
-      {
-        "hand": "AsKc",
-        "weight": 45.86689,
-        "equity": 0.41025567,
+        "weight": 0.39547,
+        "equity": 0.460691,
         "ev": 0.0,
         "strategy": null
       },
       {
+        "hand": "AsKc",
+        "weight": 0.364221,
+        "equity": 0.459802,
+        "ev": 2e-6,
+        "strategy": null
+      },
+      {
         "hand": "AcKd",
-        "weight": 30.667988,
-        "equity": 0.43826956,
+        "weight": 0.212313,
+        "equity": 0.489857,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AhKd",
-        "weight": 30.667988,
-        "equity": 0.43826956,
+        "weight": 0.219917,
+        "equity": 0.490803,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AsKd",
-        "weight": 31.702593,
-        "equity": 0.4378152,
+        "weight": 0.212313,
+        "equity": 0.489857,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AcKh",
-        "weight": 44.534046,
-        "equity": 0.4107405,
-        "ev": -0.0000019073486,
-        "strategy": null
-      },
-      {
-        "hand": "AdKh",
-        "weight": 28.031715,
-        "equity": 0.4321341,
+        "weight": 0.386504,
+        "equity": 0.460753,
         "ev": 0.0,
         "strategy": null
       },
       {
+        "hand": "AdKh",
+        "weight": 0.237454,
+        "equity": 0.49926,
+        "ev": 2e-6,
+        "strategy": null
+      },
+      {
         "hand": "AhKh",
-        "weight": 44.67788,
-        "equity": 0.41061506,
+        "weight": 0.202593,
+        "equity": 0.484773,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AsKh",
-        "weight": 45.86689,
-        "equity": 0.41025567,
+        "weight": 0.386504,
+        "equity": 0.460753,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AcKs",
-        "weight": 47.01059,
-        "equity": 0.40839076,
-        "ev": 0.0,
+        "weight": 0.364221,
+        "equity": 0.459802,
+        "ev": 2e-6,
         "strategy": null
       },
       {
         "hand": "AdKs",
-        "weight": 29.224577,
-        "equity": 0.42962477,
-        "ev": -0.0000019073486,
+        "weight": 0.233918,
+        "equity": 0.498187,
+        "ev": -2e-6,
         "strategy": null
       },
       {
         "hand": "AhKs",
-        "weight": 47.01059,
-        "equity": 0.40839076,
+        "weight": 0.39547,
+        "equity": 0.460691,
         "ev": 0.0,
         "strategy": null
       },
       {
         "hand": "AsKs",
-        "weight": 32.23549,
-        "equity": 0.43307865,
+        "weight": 0.399098,
+        "equity": 0.459702,
         "ev": 0.0,
         "strategy": null
       }
     ],
-    "range_string": "TcAc:25.54,TcJs:33.04,Qc3d:25.54,QcKs:33.04,KcAs:17.33,Ac5d:24.47,Ac9d:27.92,AcKd:30.30,AcJs:22.60,3d7d:24.47,3dJd:27.92,3d2h:30.30,3dKs:22.60,5d6d:30.24,5d7d:36.00,5d8d:37.13,5d9d:5.60,5dKd:37.82,5d4h:6.55,6d7d:30.24,6d8d:29.34,7d8d:37.13,7dJd:5.60,7d2h:37.82,7d6h:6.55,8dQd:1.88,8d3h:30.92,8d7h:0.38,9dTd:31.15,9dJd:37.21,9dQd:36.00,9dKd:31.51,9d4h:7.65,TdJd:31.15,TdQd:31.49,JdQd:36.00,Jd2h:31.51,Jd6h:7.65,Qd3h:30.67,Qd7h:0.52,KdAd:31.36,Kd2h:35.33,Kd3h:35.40,Kd4h:9.43,KdJs:49.02,Ad2h:31.36,Ad3h:31.67,2h3h:35.40,2h6h:9.43,2hKs:49.02,3h7h:0.79,3hAs:50.16,4h7s:0.76,6h9s:0.76,8h9h:1.67,8hTh:7.69,8hJh:7.89,8hQh:50.33,8h3s:46.58,8h7s:63.07,8hJs:47.76,9hTh:1.67,9hJh:1.89,ThJh:7.89,ThAh:50.33,Th5s:46.58,Th9s:63.07,ThKs:47.76,Jh2s:48.52,Jh6s:43.22,JhTs:59.84,JhAs:50.32,Qh3s:36.57,Qh7s:46.77,QhJs:53.75,QhQs:38.42,QhKs:53.71,QhAs:56.04,KhJs:43.36,KhKs:43.36,KhAs:43.51,Ah5s:36.57,Ah9s:46.77,AhJs:53.71,AhQs:38.42,AhKs:53.75,AhAs:56.04,2s6s:36.58,2sTs:44.91,2sJs:55.76,2sQs:38.04,2sKs:55.76,2sAs:46.67,3s7s:40.46,3s8s:37.99,3s9s:40.45,3sTs:43.49,3sJs:42.70,3sQs:29.67,3sKs:42.82,3sAs:45.00,4s7s:38.86,4s9s:38.86,4sTs:40.79,4sJs:32.46,4sKs:32.46,4sAs:31.66,5s7s:40.45,5s8s:37.99,5s9s:40.46,5sTs:43.49,5sJs:42.82,5sQs:29.67,5sKs:42.70,5sAs:45.00,6s7s:41.60,6s8s:38.22,6s9s:41.60,6sTs:43.52,6sJs:43.21,6sQs:29.10,6sKs:43.21,6sAs:33.26,7sJs:44.68,7sQs:28.03,7sKs:44.53,7sAs:45.87,8sJs:30.67,8sKs:30.67,8sAs:31.70,9sJs:44.53,9sQs:28.03,9sKs:44.68,9sAs:45.87,TsJs:47.01,TsQs:29.22,TsKs:47.01,TsAs:32.24"
+    "range_string": "5c4c:0.2154,Ac4c:0.2631,5h4h:0.1383,Ah4h:0.1450,5s4s:0.2154,As4s:0.2631,6c5c:0.2211,7c5c:0.2759,8c5c:0.3095,Ac5c:0.2313,6h5h:0.1420,7h5h:0.1716,8h5h:0.1876,Ah5h:0.1474,6s5s:0.2211,7s5s:0.2759,8s5s:0.3095,As5s:0.2313,6d6c:0.2934,6h6c:0.4558,6s6c:0.4053,7c6c:0.4027,8c6c:0.5949,9c6c:0.5273,6h6d:0.2953,6s6d:0.2934,8d6d:0.0183,9d6d:0.0170,6s6h:0.4558,7h6h:0.2957,8h6h:0.5667,9h6h:0.5140,7s6s:0.4027,8s6s:0.5949,9s6s:0.5273,7d7c:0.2724,7h7c:0.3956,7s7c:0.3914,8c7c:0.5141,9c7c:0.4992,7h7d:0.2771,7s7d:0.2724,8d7d:0.0179,9d7d:0.0177,7s7h:0.3956,8h7h:0.5084,9h7h:0.4987,8s7s:0.5141,9s7s:0.4992,8d8c:0.2452,8h8c:0.3312,8s8c:0.3331,9c8c:0.4927,Ac8c:0.4327,8h8d:0.2454,8s8d:0.2452,9d8d:0.0150,8s8h:0.3312,9h8h:0.4862,Ah8h:0.5500,9s8s:0.4927,As8s:0.4327,9d9c:0.1793,9h9c:0.2424,9s9c:0.2378,Kc9c:0.6352,Ac9c:0.4395,9h9d:0.1807,9s9d:0.1793,9s9h:0.2424,Kh9h:0.5280,Ah9h:0.5064,Ks9s:0.6352,As9s:0.4395,JcTc:0.0749,QcTc:0.0408,KcTc:0.0395,AcTc:0.0073,JhTh:0.0200,QhTh:0.0248,KhTh:0.0862,JsTs:0.0749,QsTs:0.0408,KsTs:0.0395,AsTs:0.0073,QcJc:0.4962,KcJc:0.5802,AcJc:0.5277,AdJc:0.3564,AhJc:0.5097,AsJc:0.5278,AcJd:0.4097,AhJd:0.4137,AsJd:0.4097,QhJh:0.4100,KhJh:0.4776,AcJh:0.4964,AdJh:0.3576,AhJh:0.4327,AsJh:0.4964,QsJs:0.4962,KsJs:0.5802,AcJs:0.5278,AdJs:0.3564,AhJs:0.5097,AsJs:0.5277,KcQc:0.5198,KdQc:0.4054,KhQc:0.5293,KsQc:0.5202,AcQc:0.4490,AdQc:0.2756,AhQc:0.4690,AsQc:0.4487,KcQd:0.4108,KhQd:0.4202,KsQd:0.4108,AcQd:0.2677,AhQd:0.2878,AsQd:0.2677,KcQh:0.5196,KdQh:0.4050,KhQh:0.4506,KsQh:0.5196,AcQh:0.4469,AdQh:0.2771,AhQh:0.2708,AsQh:0.4469,KcQs:0.5202,KdQs:0.4054,KhQs:0.5293,KsQs:0.5198,AcQs:0.4487,AdQs:0.2756,AhQs:0.4690,AsQs:0.4490,AcKc:0.3991,AdKc:0.2339,AhKc:0.3955,AsKc:0.3642,AcKd:0.2123,AhKd:0.2199,AsKd:0.2123,AcKh:0.3865,AdKh:0.2375,AhKh:0.2026,AsKh:0.3865,AcKs:0.3642,AdKs:0.2339,AhKs:0.3955,AsKs:0.3991"
   },
   "ip_player": {
-    "hands_count": 272,
+    "hands_count": 271,
     "hands": [
       {
         "hand": "2d2c",
-        "weight": 15.920784,
-        "equity": 0.6078017,
+        "weight": 0.412242,
+        "equity": 0.590685,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "2h2c",
-        "weight": 10.379225,
-        "equity": 0.58931136,
+        "weight": 0.425382,
+        "equity": 0.571722,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "2s2c",
-        "weight": 10.532209,
-        "equity": 0.59007293,
+        "weight": 0.426258,
+        "equity": 0.570749,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ac2c",
-        "weight": 9.353879,
-        "equity": 0.45292684,
+        "weight": 0.328304,
+        "equity": 0.485035,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "2h2d",
-        "weight": 15.920784,
-        "equity": 0.6078017,
+        "weight": 0.407143,
+        "equity": 0.591658,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "2s2d",
-        "weight": 15.945019,
-        "equity": 0.60856324,
+        "weight": 0.412242,
+        "equity": 0.590685,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ad2d",
-        "weight": 54.23883,
-        "equity": 0.65412045,
+        "weight": 0.961985,
+        "equity": 0.674725,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "2s2h",
-        "weight": 10.532209,
-        "equity": 0.59007293,
+        "weight": 0.425382,
+        "equity": 0.571722,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ah2h",
-        "weight": 9.353879,
-        "equity": 0.45292684,
+        "weight": 0.182564,
+        "equity": 0.512554,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "As2s",
-        "weight": 5.0118604,
-        "equity": 0.48077086,
+        "weight": 0.328304,
+        "equity": 0.485035,
         "ev": 64.0,
         "strategy": null
       },
       {
-        "hand": "3h3c",
-        "weight": 60.01206,
-        "equity": 0.94554543,
+        "hand": "3d3c",
+        "weight": 0.998702,
+        "equity": 0.942697,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "3s3c",
-        "weight": 60.011578,
-        "equity": 0.94554937,
+        "weight": 0.998683,
+        "equity": 0.940153,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "5c3c",
-        "weight": 58.437412,
-        "equity": 0.88627315,
+        "weight": 0.999035,
+        "equity": 0.877397,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ac3c",
-        "weight": 6.17931,
-        "equity": 0.65213156,
+        "weight": 0.28034,
+        "equity": 0.630232,
         "ev": 64.0,
         "strategy": null
       },
       {
-        "hand": "3s3h",
-        "weight": 60.011578,
-        "equity": 0.94554937,
+        "hand": "3s3d",
+        "weight": 0.998702,
+        "equity": 0.942697,
         "ev": 64.0,
         "strategy": null
       },
       {
-        "hand": "5h3h",
-        "weight": 58.437412,
-        "equity": 0.88627315,
+        "hand": "Ad3d",
+        "weight": 0.837356,
+        "equity": 0.788537,
         "ev": 64.0,
         "strategy": null
       },
       {
-        "hand": "Ah3h",
-        "weight": 6.17931,
-        "equity": 0.65213156,
+        "hand": "5s3s",
+        "weight": 0.999035,
+        "equity": 0.877397,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "As3s",
+        "weight": 0.28034,
+        "equity": 0.630232,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "4d4c",
-        "weight": 21.053198,
-        "equity": 0.6256145,
+        "weight": 0.405289,
+        "equity": 0.612088,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "4h4c",
-        "weight": 9.72339,
-        "equity": 0.6095532,
+        "weight": 0.42437,
+        "equity": 0.594957,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "4s4c",
-        "weight": 11.220733,
-        "equity": 0.6079362,
+        "weight": 0.417991,
+        "equity": 0.594485,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "5c4c",
-        "weight": 7.769157,
-        "equity": 0.6582521,
+        "weight": 0.148386,
+        "equity": 0.644956,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6c4c",
-        "weight": 0.027611375,
-        "equity": 0.44711977,
+        "weight": 0.023509,
+        "equity": 0.443345,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ac4c",
-        "weight": 7.372514,
-        "equity": 0.46398267,
+        "weight": 0.28733,
+        "equity": 0.499913,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "4h4d",
-        "weight": 21.053198,
-        "equity": 0.6256145,
+        "weight": 0.408319,
+        "equity": 0.612592,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "4s4d",
-        "weight": 21.887941,
-        "equity": 0.6241626,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "5d4d",
-        "weight": 58.3865,
-        "equity": 0.78931594,
+        "weight": 0.405289,
+        "equity": 0.612088,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6d4d",
-        "weight": 36.633804,
-        "equity": 0.64787614,
+        "weight": 0.894308,
+        "equity": 0.644965,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ad4d",
-        "weight": 53.712086,
-        "equity": 0.6602745,
+        "weight": 0.957426,
+        "equity": 0.68209,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "4s4h",
-        "weight": 11.220733,
-        "equity": 0.6079362,
+        "weight": 0.42437,
+        "equity": 0.594957,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "5h4h",
-        "weight": 7.769157,
-        "equity": 0.6582521,
+        "weight": 0.053349,
+        "equity": 0.662452,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6h4h",
-        "weight": 0.027611375,
-        "equity": 0.44711977,
+        "weight": 0.001239,
+        "equity": 0.468763,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ah4h",
-        "weight": 7.372514,
-        "equity": 0.46398267,
+        "weight": 0.127545,
+        "equity": 0.526154,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "5s4s",
+        "weight": 0.148386,
+        "equity": 0.644956,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6s4s",
-        "weight": 0.034525022,
-        "equity": 0.47135273,
+        "weight": 0.023509,
+        "equity": 0.443345,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "As4s",
-        "weight": 2.2579634,
-        "equity": 0.49028504,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "5d5c",
-        "weight": 58.40825,
-        "equity": 0.94851184,
+        "weight": 0.28733,
+        "equity": 0.499913,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "5h5c",
-        "weight": 56.823895,
-        "equity": 0.9457928,
+        "weight": 0.998756,
+        "equity": 0.940739,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "5s5c",
+        "weight": 0.998821,
+        "equity": 0.939848,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6c5c",
-        "weight": 7.336191,
-        "equity": 0.6706113,
+        "weight": 0.080492,
+        "equity": 0.654632,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7c5c",
-        "weight": 8.442792,
-        "equity": 0.6630263,
+        "weight": 0.258849,
+        "equity": 0.647706,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kc5c",
-        "weight": 6.4081464,
-        "equity": 0.67239666,
+        "weight": 0.167603,
+        "equity": 0.658483,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ac5c",
-        "weight": 3.7666037,
-        "equity": 0.68747044,
+        "weight": 0.172136,
+        "equity": 0.671278,
         "ev": 64.0,
         "strategy": null
       },
       {
-        "hand": "5h5d",
-        "weight": 58.40825,
-        "equity": 0.94851184,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "6d5d",
-        "weight": 57.739334,
-        "equity": 0.79736584,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "7d5d",
-        "weight": 57.94712,
-        "equity": 0.79460156,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "Kd5d",
-        "weight": 37.51689,
-        "equity": 0.8133453,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "Ad5d",
-        "weight": 35.140045,
-        "equity": 0.8268824,
+        "hand": "5s5h",
+        "weight": 0.998756,
+        "equity": 0.940739,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6h5h",
-        "weight": 7.336191,
-        "equity": 0.6706113,
+        "weight": 0.04581,
+        "equity": 0.673716,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7h5h",
-        "weight": 8.442792,
-        "equity": 0.6630263,
+        "weight": 0.075132,
+        "equity": 0.666955,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kh5h",
-        "weight": 6.4081464,
-        "equity": 0.67239666,
+        "weight": 0.049865,
+        "equity": 0.683841,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ah5h",
-        "weight": 3.7666037,
-        "equity": 0.68747044,
+        "weight": 0.048873,
+        "equity": 0.696699,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "6s5s",
+        "weight": 0.080492,
+        "equity": 0.654632,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "7s5s",
+        "weight": 0.258849,
+        "equity": 0.647706,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "Ks5s",
+        "weight": 0.167603,
+        "equity": 0.658483,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "As5s",
+        "weight": 0.172136,
+        "equity": 0.671278,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6d6c",
-        "weight": 9.909142,
-        "equity": 0.69014144,
+        "weight": 0.345069,
+        "equity": 0.679162,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6h6c",
-        "weight": 19.081234,
-        "equity": 0.67317146,
+        "weight": 0.391386,
+        "equity": 0.659818,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6s6c",
-        "weight": 9.548586,
-        "equity": 0.6744813,
+        "weight": 0.374461,
+        "equity": 0.656923,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7c6c",
-        "weight": 0.028828576,
-        "equity": 0.45435396,
+        "weight": 0.27115,
+        "equity": 0.340514,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8c6c",
-        "weight": 13.527519,
-        "equity": 0.34889853,
+        "weight": 0.274247,
+        "equity": 0.240565,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9c6c",
-        "weight": 9.113849,
-        "equity": 0.7707257,
+        "weight": 0.277615,
+        "equity": 0.273767,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kc6c",
-        "weight": 5.9052963,
-        "equity": 0.28325108,
+        "weight": 0.323503,
+        "equity": 0.306199,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ac6c",
-        "weight": 3.8236852,
-        "equity": 0.39454392,
+        "weight": 0.321964,
+        "equity": 0.426074,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6h6d",
-        "weight": 9.909142,
-        "equity": 0.69014144,
+        "weight": 0.358229,
+        "equity": 0.68205,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6s6d",
-        "weight": 10.962144,
-        "equity": 0.6915165,
+        "weight": 0.345069,
+        "equity": 0.679162,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7d6d",
-        "weight": 48.838978,
-        "equity": 0.6540881,
+        "weight": 0.370003,
+        "equity": 0.587607,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8d6d",
-        "weight": 15.019208,
-        "equity": 0.5943594,
+        "weight": 0.085041,
+        "equity": 0.532523,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "9d6d",
+        "weight": 0.149603,
+        "equity": 0.556153,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kd6d",
-        "weight": 45.6414,
-        "equity": 0.5571277,
+        "weight": 0.719426,
+        "equity": 0.577963,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ad6d",
-        "weight": 52.697784,
-        "equity": 0.6203841,
+        "weight": 0.953517,
+        "equity": 0.644992,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "6s6h",
-        "weight": 9.548586,
-        "equity": 0.6744813,
+        "weight": 0.391386,
+        "equity": 0.659818,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7h6h",
-        "weight": 0.028828576,
-        "equity": 0.45435396,
+        "weight": 0.249232,
+        "equity": 0.372891,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8h6h",
-        "weight": 13.527519,
-        "equity": 0.34889853,
+        "weight": 0.314201,
+        "equity": 0.279472,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9h6h",
-        "weight": 9.113849,
-        "equity": 0.7707257,
+        "weight": 0.31873,
+        "equity": 0.312299,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kh6h",
-        "weight": 5.9052963,
-        "equity": 0.28325108,
+        "weight": 0.36727,
+        "equity": 0.343846,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ah6h",
-        "weight": 3.8236852,
-        "equity": 0.39454392,
+        "weight": 0.365784,
+        "equity": 0.458969,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7s6s",
-        "weight": 0.03408902,
-        "equity": 0.47910976,
+        "weight": 0.27115,
+        "equity": 0.340514,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8s6s",
-        "weight": 14.571282,
-        "equity": 0.38003018,
+        "weight": 0.274247,
+        "equity": 0.240565,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9s6s",
-        "weight": 4.1153164,
-        "equity": 0.78240633,
+        "weight": 0.277615,
+        "equity": 0.273767,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ks6s",
-        "weight": 9.803677,
-        "equity": 0.32053137,
+        "weight": 0.323503,
+        "equity": 0.306199,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "As6s",
-        "weight": 6.460691,
-        "equity": 0.4259611,
+        "weight": 0.321964,
+        "equity": 0.426074,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7d7c",
-        "weight": 11.262831,
-        "equity": 0.71721655,
+        "weight": 0.381246,
+        "equity": 0.712134,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7h7c",
-        "weight": 8.352717,
-        "equity": 0.70032513,
+        "weight": 0.398016,
+        "equity": 0.693698,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7s7c",
-        "weight": 8.074527,
-        "equity": 0.70155,
+        "weight": 0.400327,
+        "equity": 0.690747,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8c7c",
-        "weight": 11.3861,
-        "equity": 0.35754055,
+        "weight": 0.274183,
+        "equity": 0.25459,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9c7c",
-        "weight": 13.006544,
-        "equity": 0.7628712,
+        "weight": 0.282046,
+        "equity": 0.29019,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Tc7c",
-        "weight": 8.250335,
-        "equity": 0.249143,
+        "weight": 0.150609,
+        "equity": 0.791559,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kc7c",
-        "weight": 5.4092355,
-        "equity": 0.27459413,
+        "weight": 0.31867,
+        "equity": 0.299522,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ac7c",
-        "weight": 3.714915,
-        "equity": 0.39547428,
+        "weight": 0.322908,
+        "equity": 0.428145,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7h7d",
-        "weight": 11.262831,
-        "equity": 0.71721655,
+        "weight": 0.350753,
+        "equity": 0.714904,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7s7d",
-        "weight": 13.197005,
-        "equity": 0.71835893,
+        "weight": 0.381246,
+        "equity": 0.712134,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8d7d",
-        "weight": 3.2723265,
-        "equity": 0.6027161,
+        "weight": 0.083931,
+        "equity": 0.544968,
         "ev": 64.0,
         "strategy": null
       },
       {
-        "hand": "Td7d",
-        "weight": 0.29146692,
-        "equity": 0.5350811,
+        "hand": "9d7d",
+        "weight": 0.099843,
+        "equity": 0.568983,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kd7d",
-        "weight": 39.13824,
-        "equity": 0.55247617,
+        "weight": 0.681694,
+        "equity": 0.574144,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ad7d",
-        "weight": 52.809917,
-        "equity": 0.62108463,
+        "weight": 0.959942,
+        "equity": 0.646079,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "7s7h",
-        "weight": 8.074527,
-        "equity": 0.70155,
+        "weight": 0.398016,
+        "equity": 0.693698,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8h7h",
-        "weight": 11.3861,
-        "equity": 0.35754055,
+        "weight": 0.31628,
+        "equity": 0.293328,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9h7h",
-        "weight": 13.006544,
-        "equity": 0.7628712,
+        "weight": 0.3241,
+        "equity": 0.327922,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Th7h",
-        "weight": 8.250335,
-        "equity": 0.249143,
+        "weight": 0.041202,
+        "equity": 0.806123,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kh7h",
-        "weight": 5.4092355,
-        "equity": 0.27459413,
+        "weight": 0.364065,
+        "equity": 0.337077,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ah7h",
-        "weight": 3.714915,
-        "equity": 0.39547428,
+        "weight": 0.366816,
+        "equity": 0.46037,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8s7s",
-        "weight": 12.435496,
-        "equity": 0.3888433,
+        "weight": 0.274183,
+        "equity": 0.25459,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9s7s",
-        "weight": 11.046555,
-        "equity": 0.77589434,
+        "weight": 0.282046,
+        "equity": 0.29019,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ts7s",
-        "weight": 11.135407,
-        "equity": 0.2867366,
+        "weight": 0.150609,
+        "equity": 0.791559,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ks7s",
-        "weight": 9.275871,
-        "equity": 0.31186163,
+        "weight": 0.31867,
+        "equity": 0.299522,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "As7s",
-        "weight": 6.437926,
-        "equity": 0.4263038,
+        "weight": 0.322908,
+        "equity": 0.428145,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8d8c",
-        "weight": 9.340325,
-        "equity": 0.7534429,
+        "weight": 0.257483,
+        "equity": 0.748273,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8h8c",
-        "weight": 3.5724087,
-        "equity": 0.73480105,
+        "weight": 0.292235,
+        "equity": 0.727367,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8s8c",
-        "weight": 4.8338313,
-        "equity": 0.7364359,
+        "weight": 0.303077,
+        "equity": 0.724086,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9c8c",
-        "weight": 8.442313,
-        "equity": 0.76089287,
+        "weight": 0.270135,
+        "equity": 0.300369,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Tc8c",
-        "weight": 6.891263,
-        "equity": 0.24827197,
+        "weight": 0.156968,
+        "equity": 0.787308,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Jc8c",
-        "weight": 5.3007755,
-        "equity": 0.2405808,
+        "weight": 0.34278,
+        "equity": 0.296327,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Qc8c",
-        "weight": 4.1468396,
-        "equity": 0.24218899,
+        "weight": 0.319542,
+        "equity": 0.280701,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kc8c",
-        "weight": 4.23857,
-        "equity": 0.26363248,
+        "weight": 0.300815,
+        "equity": 0.288977,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ac8c",
-        "weight": 2.998608,
-        "equity": 0.39878583,
+        "weight": 0.317412,
+        "equity": 0.43002,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8h8d",
-        "weight": 9.340325,
-        "equity": 0.7534429,
+        "weight": 0.244163,
+        "equity": 0.751339,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8s8d",
-        "weight": 10.558815,
-        "equity": 0.75498617,
+        "weight": 0.257483,
+        "equity": 0.748273,
         "ev": 64.0,
         "strategy": null
       },
       {
-        "hand": "Td8d",
-        "weight": 0.7778221,
-        "equity": 0.5365546,
+        "hand": "9d8d",
+        "weight": 0.095085,
+        "equity": 0.579744,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Jd8d",
-        "weight": 4.8517995,
-        "equity": 0.53189504,
+        "weight": 0.318574,
+        "equity": 0.572695,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Qd8d",
-        "weight": 18.672579,
-        "equity": 0.53427356,
+        "weight": 0.376154,
+        "equity": 0.564608,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kd8d",
-        "weight": 36.131115,
-        "equity": 0.5478855,
+        "weight": 0.861476,
+        "equity": 0.569631,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ad8d",
-        "weight": 52.451984,
-        "equity": 0.6265969,
+        "weight": 0.959619,
+        "equity": 0.650474,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "8s8h",
-        "weight": 4.8338313,
-        "equity": 0.7364359,
+        "weight": 0.292235,
+        "equity": 0.727367,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9h8h",
-        "weight": 8.442313,
-        "equity": 0.76089287,
+        "weight": 0.307801,
+        "equity": 0.33817,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Th8h",
-        "weight": 6.891263,
-        "equity": 0.24827197,
+        "weight": 0.051597,
+        "equity": 0.802606,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Jh8h",
-        "weight": 5.3007755,
-        "equity": 0.2405808,
+        "weight": 0.37617,
+        "equity": 0.333095,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Qh8h",
-        "weight": 4.1468396,
-        "equity": 0.24218899,
+        "weight": 0.35855,
+        "equity": 0.318458,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kh8h",
-        "weight": 4.23857,
-        "equity": 0.26363248,
+        "weight": 0.341242,
+        "equity": 0.327555,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ah8h",
-        "weight": 2.998608,
-        "equity": 0.39878583,
+        "weight": 0.355058,
+        "equity": 0.461179,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9s8s",
-        "weight": 10.12636,
-        "equity": 0.7756842,
+        "weight": 0.270135,
+        "equity": 0.300369,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ts8s",
-        "weight": 10.179694,
-        "equity": 0.28697836,
+        "weight": 0.156968,
+        "equity": 0.787308,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Js8s",
-        "weight": 9.109624,
-        "equity": 0.27919334,
+        "weight": 0.34278,
+        "equity": 0.296327,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Qs8s",
-        "weight": 7.003496,
-        "equity": 0.28108203,
+        "weight": 0.319542,
+        "equity": 0.280701,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ks8s",
-        "weight": 7.3747234,
-        "equity": 0.30261946,
+        "weight": 0.300815,
+        "equity": 0.288977,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "As8s",
-        "weight": 5.6010485,
-        "equity": 0.42979524,
+        "weight": 0.317412,
+        "equity": 0.43002,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "9d9c",
+        "weight": 0.191283,
+        "equity": 0.786873,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9h9c",
-        "weight": 54.571026,
-        "equity": 0.95757014,
+        "weight": 0.206072,
+        "equity": 0.768098,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9s9c",
-        "weight": 54.57034,
-        "equity": 0.95765406,
+        "weight": 0.231672,
+        "equity": 0.764826,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Tc9c",
-        "weight": 11.582044,
-        "equity": 0.77305984,
+        "weight": 0.183331,
+        "equity": 0.786748,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Jc9c",
-        "weight": 8.811042,
-        "equity": 0.7808809,
+        "weight": 0.352006,
+        "equity": 0.309784,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Qc9c",
-        "weight": 9.025336,
-        "equity": 0.7858045,
+        "weight": 0.329432,
+        "equity": 0.294807,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kc9c",
-        "weight": 13.695032,
-        "equity": 0.78656065,
+        "weight": 0.325701,
+        "equity": 0.311023,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ac9c",
-        "weight": 15.258002,
-        "equity": 0.8049046,
+        "weight": 0.325739,
+        "equity": 0.446133,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "9h9d",
+        "weight": 0.182301,
+        "equity": 0.78997,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "9s9d",
+        "weight": 0.191283,
+        "equity": 0.786873,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "Jd9d",
+        "weight": 0.336081,
+        "equity": 0.578565,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "Qd9d",
+        "weight": 0.422088,
+        "equity": 0.570795,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "Kd9d",
+        "weight": 0.872359,
+        "equity": 0.584031,
+        "ev": 64.0,
+        "strategy": null
+      },
+      {
+        "hand": "Ad9d",
+        "weight": 0.926522,
+        "equity": 0.666809,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "9s9h",
-        "weight": 54.57034,
-        "equity": 0.95765406,
+        "weight": 0.206072,
+        "equity": 0.768098,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Th9h",
-        "weight": 11.582044,
-        "equity": 0.77305984,
+        "weight": 0.059464,
+        "equity": 0.80206,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Jh9h",
-        "weight": 8.811042,
-        "equity": 0.7808809,
+        "weight": 0.383817,
+        "equity": 0.345772,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Qh9h",
-        "weight": 9.025336,
-        "equity": 0.7858045,
+        "weight": 0.366903,
+        "equity": 0.331619,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Kh9h",
-        "weight": 13.695032,
-        "equity": 0.78656065,
+        "weight": 0.359244,
+        "equity": 0.34903,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ah9h",
-        "weight": 15.258002,
-        "equity": 0.8049046,
+        "weight": 0.362865,
+        "equity": 0.477194,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ts9s",
-        "weight": 9.419031,
-        "equity": 0.78802526,
+        "weight": 0.183331,
+        "equity": 0.786748,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Js9s",
-        "weight": 4.1502895,
-        "equity": 0.7951527,
+        "weight": 0.352006,
+        "equity": 0.309784,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Qs9s",
-        "weight": 5.5249133,
-        "equity": 0.8000847,
+        "weight": 0.329432,
+        "equity": 0.294807,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "Ks9s",
-        "weight": 7.2316837,
-        "equity": 0.8015691,
+        "weight": 0.325701,
+        "equity": 0.311023,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "As9s",
-        "weight": 17.43343,
-        "equity": 0.82107025,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "TdTc",
-        "weight": 27.095316,
-        "equity": 0.7798245,
+        "weight": 0.325739,
+        "equity": 0.446133,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "ThTc",
-        "weight": 27.810959,
-        "equity": 0.7606006,
+        "weight": 0.950664,
+        "equity": 0.953734,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "TsTc",
-        "weight": 26.634611,
-        "equity": 0.76328874,
+        "weight": 0.94986,
+        "equity": 0.953619,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "JcTc",
-        "weight": 11.536744,
-        "equity": 0.25330663,
+        "weight": 0.179381,
+        "equity": 0.811792,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QcTc",
-        "weight": 9.865738,
-        "equity": 0.25324404,
+        "weight": 0.107558,
+        "equity": 0.819506,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KcTc",
-        "weight": 10.192652,
-        "equity": 0.2748391,
+        "weight": 0.375785,
+        "equity": 0.821415,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcTc",
-        "weight": 7.330901,
-        "equity": 0.40650052,
+        "weight": 0.916809,
+        "equity": 0.836607,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdTc",
-        "weight": 31.179691,
-        "equity": 0.42989534,
+        "weight": 0.807026,
+        "equity": 0.856811,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhTc",
-        "weight": 6.502208,
-        "equity": 0.40534824,
+        "weight": 0.894181,
+        "equity": 0.839239,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsTc",
-        "weight": 7.270976,
-        "equity": 0.40530738,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "ThTd",
-        "weight": 27.095316,
-        "equity": 0.7798245,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "TsTd",
-        "weight": 25.105095,
-        "equity": 0.78237605,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "JdTd",
-        "weight": 20.504759,
-        "equity": 0.53532493,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "QdTd",
-        "weight": 24.568266,
-        "equity": 0.54170763,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "KdTd",
-        "weight": 41.131702,
-        "equity": 0.5612075,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "AcTd",
-        "weight": 22.016,
-        "equity": 0.44815734,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "AdTd",
-        "weight": 52.45368,
-        "equity": 0.64358735,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "AhTd",
-        "weight": 22.016,
-        "equity": 0.44815734,
-        "ev": 64.0,
-        "strategy": null
-      },
-      {
-        "hand": "AsTd",
-        "weight": 23.439602,
-        "equity": 0.44807062,
+        "weight": 0.920423,
+        "equity": 0.83666,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "TsTh",
-        "weight": 26.634611,
-        "equity": 0.76328874,
+        "weight": 0.950664,
+        "equity": 0.953734,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "JhTh",
-        "weight": 11.536744,
-        "equity": 0.25330663,
+        "weight": 0.054023,
+        "equity": 0.82591,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QhTh",
-        "weight": 9.865738,
-        "equity": 0.25324404,
+        "weight": 0.217656,
+        "equity": 0.833763,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KhTh",
-        "weight": 10.192652,
-        "equity": 0.2748391,
+        "weight": 0.655209,
+        "equity": 0.836407,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcTh",
-        "weight": 6.502208,
-        "equity": 0.40534824,
+        "weight": 0.912741,
+        "equity": 0.837986,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdTh",
-        "weight": 31.179691,
-        "equity": 0.42989534,
+        "weight": 0.792763,
+        "equity": 0.858033,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhTh",
-        "weight": 7.330901,
-        "equity": 0.40650052,
+        "weight": 0.863493,
+        "equity": 0.851151,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsTh",
-        "weight": 7.270976,
-        "equity": 0.40530738,
+        "weight": 0.912741,
+        "equity": 0.837986,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "JsTs",
-        "weight": 16.483322,
-        "equity": 0.29186535,
+        "weight": 0.179381,
+        "equity": 0.811792,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QsTs",
-        "weight": 13.627321,
-        "equity": 0.29250118,
+        "weight": 0.107558,
+        "equity": 0.819506,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KsTs",
-        "weight": 14.269726,
-        "equity": 0.3149081,
+        "weight": 0.375785,
+        "equity": 0.821415,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcTs",
-        "weight": 6.593224,
-        "equity": 0.40901214,
+        "weight": 0.920423,
+        "equity": 0.83666,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdTs",
-        "weight": 31.250229,
-        "equity": 0.4332158,
+        "weight": 0.807026,
+        "equity": 0.856811,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhTs",
-        "weight": 6.593224,
-        "equity": 0.40901214,
+        "weight": 0.894181,
+        "equity": 0.839239,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsTs",
-        "weight": 10.289424,
-        "equity": 0.44001973,
+        "weight": 0.916809,
+        "equity": 0.836607,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "JdJc",
-        "weight": 53.92135,
-        "equity": 0.8051014,
+        "weight": 0.786316,
+        "equity": 0.823574,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "JhJc",
-        "weight": 51.336292,
-        "equity": 0.785511,
+        "weight": 0.737769,
+        "equity": 0.811603,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "JsJc",
-        "weight": 51.40495,
-        "equity": 0.78822947,
+        "weight": 0.760841,
+        "equity": 0.80915,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QcJc",
-        "weight": 8.534913,
-        "equity": 0.25964725,
+        "weight": 0.443676,
+        "equity": 0.318143,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KcJc",
-        "weight": 8.911496,
-        "equity": 0.2862093,
+        "weight": 0.413512,
+        "equity": 0.339764,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KdJc",
-        "weight": 22.962852,
-        "equity": 0.32348752,
+        "weight": 0.58249,
+        "equity": 0.371213,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KhJc",
-        "weight": 8.036318,
-        "equity": 0.28367206,
+        "weight": 0.423501,
+        "equity": 0.340577,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KsJc",
-        "weight": 8.741605,
-        "equity": 0.28622496,
+        "weight": 0.399793,
+        "equity": 0.337685,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcJc",
-        "weight": 6.8264875,
-        "equity": 0.46423516,
+        "weight": 0.395299,
+        "equity": 0.502678,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdJc",
-        "weight": 26.144812,
-        "equity": 0.49256784,
+        "weight": 0.527978,
+        "equity": 0.525367,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhJc",
-        "weight": 6.8254685,
-        "equity": 0.4642348,
+        "weight": 0.40427,
+        "equity": 0.501464,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsJc",
-        "weight": 7.705241,
-        "equity": 0.46396708,
+        "weight": 0.3953,
+        "equity": 0.502678,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "JhJd",
-        "weight": 53.92135,
-        "equity": 0.8051014,
+        "weight": 0.789577,
+        "equity": 0.825897,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "JsJd",
-        "weight": 53.39558,
-        "equity": 0.8076651,
+        "weight": 0.786316,
+        "equity": 0.823574,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QdJd",
-        "weight": 33.15728,
-        "equity": 0.54816556,
+        "weight": 0.895588,
+        "equity": 0.574344,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KcJd",
-        "weight": 23.65063,
-        "equity": 0.32457656,
+        "weight": 0.519476,
+        "equity": 0.370318,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KdJd",
-        "weight": 48.753628,
-        "equity": 0.5707316,
+        "weight": 0.955082,
+        "equity": 0.597726,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KhJd",
-        "weight": 23.65063,
-        "equity": 0.32457656,
+        "weight": 0.542847,
+        "equity": 0.373069,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KsJd",
-        "weight": 24.669392,
-        "equity": 0.3270001,
+        "weight": 0.519476,
+        "equity": 0.370318,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcJd",
-        "weight": 19.066792,
-        "equity": 0.50139433,
+        "weight": 0.458832,
+        "equity": 0.533568,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdJd",
-        "weight": 40.588184,
-        "equity": 0.6812276,
+        "weight": 0.919017,
+        "equity": 0.700059,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhJd",
-        "weight": 19.066792,
-        "equity": 0.50139433,
+        "weight": 0.467605,
+        "equity": 0.532554,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsJd",
-        "weight": 20.142763,
-        "equity": 0.5011305,
+        "weight": 0.458832,
+        "equity": 0.533568,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "JsJh",
-        "weight": 51.40495,
-        "equity": 0.78822947,
+        "weight": 0.737769,
+        "equity": 0.811603,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QhJh",
-        "weight": 8.534913,
-        "equity": 0.25964725,
+        "weight": 0.497539,
+        "equity": 0.352682,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KcJh",
-        "weight": 8.036318,
-        "equity": 0.28367206,
+        "weight": 0.413237,
+        "equity": 0.340138,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KdJh",
-        "weight": 22.962852,
-        "equity": 0.32348752,
+        "weight": 0.592948,
+        "equity": 0.373497,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KhJh",
-        "weight": 8.911496,
-        "equity": 0.2862093,
+        "weight": 0.459437,
+        "equity": 0.377086,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KsJh",
-        "weight": 8.741605,
-        "equity": 0.28622496,
+        "weight": 0.413237,
+        "equity": 0.340138,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcJh",
-        "weight": 6.8254685,
-        "equity": 0.4642348,
+        "weight": 0.400684,
+        "equity": 0.506083,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdJh",
-        "weight": 26.144812,
-        "equity": 0.49256784,
+        "weight": 0.520628,
+        "equity": 0.528485,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhJh",
-        "weight": 6.8264875,
-        "equity": 0.46423516,
+        "weight": 0.35183,
+        "equity": 0.530847,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsJh",
-        "weight": 7.705241,
-        "equity": 0.46396708,
+        "weight": 0.400684,
+        "equity": 0.506083,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QsJs",
-        "weight": 11.773717,
-        "equity": 0.29856867,
+        "weight": 0.443676,
+        "equity": 0.318143,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KcJs",
-        "weight": 8.266391,
-        "equity": 0.28590703,
+        "weight": 0.399793,
+        "equity": 0.337685,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KdJs",
-        "weight": 23.306032,
-        "equity": 0.3255933,
+        "weight": 0.58249,
+        "equity": 0.371213,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KhJs",
-        "weight": 8.266391,
-        "equity": 0.28590703,
+        "weight": 0.423501,
+        "equity": 0.340577,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KsJs",
-        "weight": 12.017204,
-        "equity": 0.3255028,
+        "weight": 0.413512,
+        "equity": 0.339764,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcJs",
-        "weight": 7.061616,
-        "equity": 0.46728837,
+        "weight": 0.3953,
+        "equity": 0.502678,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdJs",
-        "weight": 25.02518,
-        "equity": 0.4953216,
+        "weight": 0.527978,
+        "equity": 0.525367,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhJs",
-        "weight": 7.061616,
-        "equity": 0.46728837,
+        "weight": 0.40427,
+        "equity": 0.501464,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsJs",
-        "weight": 7.205105,
-        "equity": 0.4941833,
+        "weight": 0.395299,
+        "equity": 0.502678,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QdQc",
-        "weight": 51.965244,
-        "equity": 0.84071314,
+        "weight": 0.999993,
+        "equity": 0.853268,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QhQc",
-        "weight": 49.537247,
-        "equity": 0.8215964,
+        "weight": 1.0,
+        "equity": 0.840955,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QsQc",
-        "weight": 49.684574,
-        "equity": 0.8242289,
+        "weight": 1.0,
+        "equity": 0.838581,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KcQc",
-        "weight": 8.372887,
-        "equity": 0.33460605,
+        "weight": 0.412446,
+        "equity": 0.387709,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KdQc",
-        "weight": 22.927917,
-        "equity": 0.37774855,
+        "weight": 0.582282,
+        "equity": 0.426601,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KhQc",
-        "weight": 8.376476,
-        "equity": 0.3346057,
+        "weight": 0.431081,
+        "equity": 0.39178,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KsQc",
-        "weight": 9.04588,
-        "equity": 0.33688247,
+        "weight": 0.412479,
+        "equity": 0.38771,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcQc",
-        "weight": 5.3546443,
-        "equity": 0.5585657,
+        "weight": 0.387513,
+        "equity": 0.577484,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdQc",
-        "weight": 21.050869,
-        "equity": 0.5886079,
+        "weight": 0.487083,
+        "equity": 0.604921,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhQc",
-        "weight": 5.3555927,
-        "equity": 0.55856377,
+        "weight": 0.397934,
+        "equity": 0.577595,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsQc",
-        "weight": 5.648182,
-        "equity": 0.5582571,
+        "weight": 0.38751,
+        "equity": 0.577484,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QhQd",
-        "weight": 51.965244,
-        "equity": 0.84071314,
+        "weight": 0.999921,
+        "equity": 0.855488,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QsQd",
-        "weight": 52.096664,
-        "equity": 0.8431909,
+        "weight": 0.999993,
+        "equity": 0.853268,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KcQd",
-        "weight": 24.24611,
-        "equity": 0.37297678,
+        "weight": 0.533631,
+        "equity": 0.4176,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KdQd",
-        "weight": 49.602463,
-        "equity": 0.6042338,
+        "weight": 0.945069,
+        "equity": 0.632276,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KhQd",
-        "weight": 24.24611,
-        "equity": 0.37297678,
+        "weight": 0.553086,
+        "equity": 0.421426,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KsQd",
-        "weight": 25.037624,
-        "equity": 0.37511626,
+        "weight": 0.533631,
+        "equity": 0.4176,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcQd",
-        "weight": 10.335465,
-        "equity": 0.5900474,
+        "weight": 0.402443,
+        "equity": 0.60612,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdQd",
-        "weight": 35.381794,
-        "equity": 0.7412895,
+        "weight": 0.883123,
+        "equity": 0.751104,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhQd",
-        "weight": 10.335465,
-        "equity": 0.5900474,
+        "weight": 0.403594,
+        "equity": 0.60629,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsQd",
-        "weight": 11.397583,
-        "equity": 0.5898545,
+        "weight": 0.402443,
+        "equity": 0.60612,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "QsQh",
-        "weight": 49.684574,
-        "equity": 0.8242289,
+        "weight": 1.0,
+        "equity": 0.840955,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KcQh",
-        "weight": 8.376476,
-        "equity": 0.3346057,
+        "weight": 0.425591,
+        "equity": 0.38958,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KdQh",
-        "weight": 22.927917,
-        "equity": 0.37774855,
+        "weight": 0.598102,
+        "equity": 0.428305,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KhQh",
-        "weight": 8.372887,
-        "equity": 0.33460605,
+        "weight": 0.430896,
+        "equity": 0.423691,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KsQh",
-        "weight": 9.04588,
-        "equity": 0.33688247,
+        "weight": 0.425591,
+        "equity": 0.38958,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcQh",
-        "weight": 5.3555927,
-        "equity": 0.55856377,
+        "weight": 0.395244,
+        "equity": 0.580388,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdQh",
-        "weight": 21.050869,
-        "equity": 0.5886079,
+        "weight": 0.473071,
+        "equity": 0.607518,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhQh",
-        "weight": 5.3546443,
-        "equity": 0.5585657,
+        "weight": 0.255513,
+        "equity": 0.603316,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsQh",
-        "weight": 5.648182,
-        "equity": 0.5582571,
+        "weight": 0.395244,
+        "equity": 0.580388,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KcQs",
-        "weight": 8.540774,
-        "equity": 0.33649278,
+        "weight": 0.412479,
+        "equity": 0.38771,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KdQs",
-        "weight": 23.103964,
-        "equity": 0.37948632,
+        "weight": 0.582282,
+        "equity": 0.426601,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KhQs",
-        "weight": 8.540774,
-        "equity": 0.33649278,
+        "weight": 0.431081,
+        "equity": 0.39178,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "KsQs",
-        "weight": 11.746849,
-        "equity": 0.3712033,
+        "weight": 0.412446,
+        "equity": 0.387709,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcQs",
-        "weight": 5.521999,
-        "equity": 0.5610116,
+        "weight": 0.38751,
+        "equity": 0.577484,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdQs",
-        "weight": 18.962786,
-        "equity": 0.59083706,
+        "weight": 0.487083,
+        "equity": 0.604921,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhQs",
-        "weight": 5.521999,
-        "equity": 0.5610116,
+        "weight": 0.397934,
+        "equity": 0.577595,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsQs",
-        "weight": 4.3015594,
-        "equity": 0.58374345,
+        "weight": 0.387513,
+        "equity": 0.577484,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdKc",
-        "weight": 6.312564,
-        "equity": 0.67181927,
+        "weight": 0.318001,
+        "equity": 0.669894,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhKc",
-        "weight": 5.224927,
-        "equity": 0.6388547,
+        "weight": 0.257948,
+        "equity": 0.639793,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsKc",
-        "weight": 5.6075363,
-        "equity": 0.63931406,
+        "weight": 0.258302,
+        "equity": 0.63785,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcKd",
-        "weight": 11.98554,
-        "equity": 0.6674813,
+        "weight": 0.319196,
+        "equity": 0.66745,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhKd",
-        "weight": 11.98554,
-        "equity": 0.6674813,
+        "weight": 0.330828,
+        "equity": 0.669287,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsKd",
-        "weight": 13.3071785,
-        "equity": 0.66791856,
+        "weight": 0.319196,
+        "equity": 0.66745,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcKh",
-        "weight": 5.224927,
-        "equity": 0.6388547,
+        "weight": 0.239047,
+        "equity": 0.642012,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdKh",
-        "weight": 6.312564,
-        "equity": 0.67181927,
+        "weight": 0.283304,
+        "equity": 0.673606,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AsKh",
-        "weight": 5.6075363,
-        "equity": 0.63931406,
+        "weight": 0.239047,
+        "equity": 0.642012,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AcKs",
-        "weight": 5.045957,
-        "equity": 0.6409646,
+        "weight": 0.258302,
+        "equity": 0.63785,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AdKs",
-        "weight": 5.9647856,
-        "equity": 0.6737728,
+        "weight": 0.318001,
+        "equity": 0.669894,
         "ev": 64.0,
         "strategy": null
       },
       {
         "hand": "AhKs",
-        "weight": 5.045957,
-        "equity": 0.6409646,
+        "weight": 0.257948,
+        "equity": 0.639793,
         "ev": 64.0,
         "strategy": null
       }
     ],
-    "range_string": "2c3c:15.92,2c4c:10.38,2c5c:10.53,2cJs:9.35,3c4c:15.92,3c5c:15.95,3cQs:54.24,4c5c:10.53,4cKs:9.35,5cAs:5.01,6c8c:60.01,6c9c:60.01,6cAc:58.44,6cJs:6.18,8c9c:60.01,8c3d:58.44,8cKs:6.18,TcJc:21.05,TcQc:9.72,TcKc:11.22,TcAc:7.77,Tc5d:0.03,TcJs:7.37,JcQc:21.05,JcKc:21.89,Jc2d:58.39,Jc6d:36.63,JcQs:53.71,QcKc:11.22,Qc3d:7.77,Qc7d:0.03,QcKs:7.37,Kc8d:0.03,KcAs:2.26,Ac2d:58.41,Ac3d:56.82,Ac5d:7.34,Ac9d:8.44,Ac7s:6.41,AcJs:3.77,2d3d:58.41,2d6d:57.74,2dTd:57.95,2d8s:37.52,2dQs:35.14,3d7d:7.34,3dJd:8.44,3d9s:6.41,3dKs:3.77,5d6d:9.91,5d7d:19.08,5d8d:9.55,5d9d:0.03,5dKd:13.53,5d4h:9.11,5d7s:5.91,5dJs:3.82,6d7d:9.91,6d8d:10.96,6dTd:48.84,6dAd:15.02,6d8s:45.64,6dQs:52.70,7d8d:9.55,7dJd:0.03,7d2h:13.53,7d6h:9.11,7d9s:5.91,7dKs:3.82,8dQd:0.03,8d3h:14.57,8d7h:4.12,8dTs:9.80,8dAs:6.46,9dTd:11.26,9dJd:8.35,9dQd:8.07,9dKd:11.39,9d4h:13.01,9d8h:8.25,9d7s:5.41,9dJs:3.71,TdJd:11.26,TdQd:13.20,TdAd:3.27,Td9h:0.29,Td8s:39.14,TdQs:52.81,JdQd:8.07,Jd2h:11.39,Jd6h:13.01,JdTh:8.25,Jd9s:5.41,JdKs:3.71,Qd3h:12.44,Qd7h:11.05,QdJh:11.14,QdTs:9.28,QdAs:6.44,KdAd:9.34,Kd2h:3.57,Kd3h:4.83,Kd4h:8.44,Kd8h:6.89,KdQh:5.30,Kd3s:4.15,Kd7s:4.24,KdJs:3.00,Ad2h:9.34,Ad3h:10.56,Ad9h:0.78,AdKh:4.85,Ad4s:18.67,Ad8s:36.13,AdQs:52.45,2h3h:4.83,2h6h:8.44,2hTh:6.89,2hAh:5.30,2h5s:4.15,2h9s:4.24,2hKs:3.00,3h7h:10.13,3hJh:10.18,3h2s:9.11,3h6s:7.00,3hTs:7.37,3hAs:5.60,4h6h:54.57,4h7h:54.57,4h8h:11.58,4hQh:8.81,4h3s:9.03,4h7s:13.70,4hJs:15.26,6h7h:54.57,6hTh:11.58,6hAh:8.81,6h5s:9.03,6h9s:13.70,6hKs:15.26,7hJh:9.42,7h2s:4.15,7h6s:5.52,7hTs:7.23,7hAs:17.43,8h9h:27.10,8hTh:27.81,8hJh:26.63,8hQh:11.54,8h3s:9.87,8h7s:10.19,8hJs:7.33,8hQs:31.18,8hKs:6.50,8hAs:7.27,9hTh:27.10,9hJh:25.11,9hKh:20.50,9h4s:24.57,9h8s:41.13,9hJs:22.02,9hQs:52.45,9hKs:22.02,9hAs:23.44,ThJh:26.63,ThAh:11.54,Th5s:9.87,Th9s:10.19,ThJs:6.50,ThQs:31.18,ThKs:7.33,ThAs:7.27,Jh2s:16.48,Jh6s:13.63,JhTs:14.27,JhJs:6.59,JhQs:31.25,JhKs:6.59,JhAs:10.29,QhKh:53.92,QhAh:51.34,Qh2s:51.40,Qh3s:8.53,Qh7s:8.91,Qh8s:22.96,Qh9s:8.04,QhTs:8.74,QhJs:6.83,QhQs:26.14,QhKs:6.83,QhAs:7.71,KhAh:53.92,Kh2s:53.40,Kh4s:33.16,Kh7s:23.65,Kh8s:48.75,Kh9s:23.65,KhTs:24.67,KhJs:19.07,KhQs:40.59,KhKs:19.07,KhAs:20.14,Ah2s:51.40,Ah5s:8.53,Ah7s:8.04,Ah8s:22.96,Ah9s:8.91,AhTs:8.74,AhJs:6.83,AhQs:26.14,AhKs:6.83,AhAs:7.71,2s6s:11.77,2s7s:8.27,2s8s:23.31,2s9s:8.27,2sTs:12.02,2sJs:7.06,2sQs:25.03,2sKs:7.06,2sAs:7.21,3s4s:51.97,3s5s:49.54,3s6s:49.68,3s7s:8.37,3s8s:22.93,3s9s:8.38,3sTs:9.05,3sJs:5.35,3sQs:21.05,3sKs:5.36,3sAs:5.65,4s5s:51.97,4s6s:52.10,4s7s:24.25,4s8s:49.60,4s9s:24.25,4sTs:25.04,4sJs:10.34,4sQs:35.38,4sKs:10.34,4sAs:11.40,5s6s:49.68,5s7s:8.38,5s8s:22.93,5s9s:8.37,5sTs:9.05,5sJs:5.36,5sQs:21.05,5sKs:5.35,5sAs:5.65,6s7s:8.54,6s8s:23.10,6s9s:8.54,6sTs:11.75,6sJs:5.52,6sQs:18.96,6sKs:5.52,6sAs:4.30,7sQs:6.31,7sKs:5.22,7sAs:5.61,8sJs:11.99,8sKs:11.99,8sAs:13.31,9sJs:5.22,9sQs:6.31,9sAs:5.61,TsJs:5.05,TsQs:5.96,TsKs:5.05"
+    "range_string": "2d2c:0.4122,2h2c:0.4254,2s2c:0.4263,Ac2c:0.3283,2h2d:0.4071,2s2d:0.4122,Ad2d:0.9620,2s2h:0.4254,Ah2h:0.1826,As2s:0.3283,3d3c:0.9987,3s3c:0.9987,5c3c:0.9990,Ac3c:0.2803,3s3d:0.9987,Ad3d:0.8374,5s3s:0.9990,As3s:0.2803,4d4c:0.4053,4h4c:0.4244,4s4c:0.4180,5c4c:0.1484,6c4c:0.0235,Ac4c:0.2873,4h4d:0.4083,4s4d:0.4053,6d4d:0.8943,Ad4d:0.9574,4s4h:0.4244,5h4h:0.0533,6h4h:0.0012,Ah4h:0.1275,5s4s:0.1484,6s4s:0.0235,As4s:0.2873,5h5c:0.9988,5s5c:0.9988,6c5c:0.0805,7c5c:0.2588,Kc5c:0.1676,Ac5c:0.1721,5s5h:0.9988,6h5h:0.0458,7h5h:0.0751,Kh5h:0.0499,Ah5h:0.0489,6s5s:0.0805,7s5s:0.2588,Ks5s:0.1676,As5s:0.1721,6d6c:0.3451,6h6c:0.3914,6s6c:0.3745,7c6c:0.2712,8c6c:0.2742,9c6c:0.2776,Kc6c:0.3235,Ac6c:0.3220,6h6d:0.3582,6s6d:0.3451,7d6d:0.3700,8d6d:0.0850,9d6d:0.1496,Kd6d:0.7194,Ad6d:0.9535,6s6h:0.3914,7h6h:0.2492,8h6h:0.3142,9h6h:0.3187,Kh6h:0.3673,Ah6h:0.3658,7s6s:0.2712,8s6s:0.2742,9s6s:0.2776,Ks6s:0.3235,As6s:0.3220,7d7c:0.3812,7h7c:0.3980,7s7c:0.4003,8c7c:0.2742,9c7c:0.2820,Tc7c:0.1506,Kc7c:0.3187,Ac7c:0.3229,7h7d:0.3508,7s7d:0.3812,8d7d:0.0839,9d7d:0.0998,Kd7d:0.6817,Ad7d:0.9599,7s7h:0.3980,8h7h:0.3163,9h7h:0.3241,Th7h:0.0412,Kh7h:0.3641,Ah7h:0.3668,8s7s:0.2742,9s7s:0.2820,Ts7s:0.1506,Ks7s:0.3187,As7s:0.3229,8d8c:0.2575,8h8c:0.2922,8s8c:0.3031,9c8c:0.2701,Tc8c:0.1570,Jc8c:0.3428,Qc8c:0.3195,Kc8c:0.3008,Ac8c:0.3174,8h8d:0.2442,8s8d:0.2575,9d8d:0.0951,Jd8d:0.3186,Qd8d:0.3762,Kd8d:0.8615,Ad8d:0.9596,8s8h:0.2922,9h8h:0.3078,Th8h:0.0516,Jh8h:0.3762,Qh8h:0.3585,Kh8h:0.3412,Ah8h:0.3551,9s8s:0.2701,Ts8s:0.1570,Js8s:0.3428,Qs8s:0.3195,Ks8s:0.3008,As8s:0.3174,9d9c:0.1913,9h9c:0.2061,9s9c:0.2317,Tc9c:0.1833,Jc9c:0.3520,Qc9c:0.3294,Kc9c:0.3257,Ac9c:0.3257,9h9d:0.1823,9s9d:0.1913,Jd9d:0.3361,Qd9d:0.4221,Kd9d:0.8724,Ad9d:0.9265,9s9h:0.2061,Th9h:0.0595,Jh9h:0.3838,Qh9h:0.3669,Kh9h:0.3592,Ah9h:0.3629,Ts9s:0.1833,Js9s:0.3520,Qs9s:0.3294,Ks9s:0.3257,As9s:0.3257,ThTc:0.9507,TsTc:0.9499,JcTc:0.1794,QcTc:0.1076,KcTc:0.3758,AcTc:0.9168,AdTc:0.8070,AhTc:0.8942,AsTc:0.9204,TsTh:0.9507,JhTh:0.0540,QhTh:0.2177,KhTh:0.6552,AcTh:0.9127,AdTh:0.7928,AhTh:0.8635,AsTh:0.9127,JsTs:0.1794,QsTs:0.1076,KsTs:0.3758,AcTs:0.9204,AdTs:0.8070,AhTs:0.8942,AsTs:0.9168,JdJc:0.7863,JhJc:0.7378,JsJc:0.7608,QcJc:0.4437,KcJc:0.4135,KdJc:0.5825,KhJc:0.4235,KsJc:0.3998,AcJc:0.3953,AdJc:0.5280,AhJc:0.4043,AsJc:0.3953,JhJd:0.7896,JsJd:0.7863,QdJd:0.8956,KcJd:0.5195,KdJd:0.9551,KhJd:0.5428,KsJd:0.5195,AcJd:0.4588,AdJd:0.9190,AhJd:0.4676,AsJd:0.4588,JsJh:0.7378,QhJh:0.4975,KcJh:0.4132,KdJh:0.5929,KhJh:0.4594,KsJh:0.4132,AcJh:0.4007,AdJh:0.5206,AhJh:0.3518,AsJh:0.4007,QsJs:0.4437,KcJs:0.3998,KdJs:0.5825,KhJs:0.4235,KsJs:0.4135,AcJs:0.3953,AdJs:0.5280,AhJs:0.4043,AsJs:0.3953,QdQc:1.0000,QhQc:1.0000,QsQc:1.0000,KcQc:0.4124,KdQc:0.5823,KhQc:0.4311,KsQc:0.4125,AcQc:0.3875,AdQc:0.4871,AhQc:0.3979,AsQc:0.3875,QhQd:0.9999,QsQd:1.0000,KcQd:0.5336,KdQd:0.9451,KhQd:0.5531,KsQd:0.5336,AcQd:0.4024,AdQd:0.8831,AhQd:0.4036,AsQd:0.4024,QsQh:1.0000,KcQh:0.4256,KdQh:0.5981,KhQh:0.4309,KsQh:0.4256,AcQh:0.3952,AdQh:0.4731,AhQh:0.2555,AsQh:0.3952,KcQs:0.4125,KdQs:0.5823,KhQs:0.4311,KsQs:0.4124,AcQs:0.3875,AdQs:0.4871,AhQs:0.3979,AsQs:0.3875,AdKc:0.3180,AhKc:0.2579,AsKc:0.2583,AcKd:0.3192,AhKd:0.3308,AsKd:0.3192,AcKh:0.2390,AdKh:0.2833,AsKh:0.2390,AcKs:0.2583,AdKs:0.3180,AhKs:0.2579"
   }
 }

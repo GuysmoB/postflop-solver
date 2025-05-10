@@ -5,7 +5,8 @@ use std::io::{self, BufReader, BufWriter, Write};
 use std::path::Path;
 
 use crate::{
-    card_to_string_simple, format_hand_cards, format_path_string, holes_to_strings, PostFlopGame,
+    card_to_string_simple, format_hand_cards, format_path_string, holes_to_strings, play,
+    select_spot, GameState, PostFlopGame, SpecificResultData, Spot, SpotType,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -19,9 +20,9 @@ struct HandStrategy {
 #[derive(Serialize, Deserialize)]
 struct HandData {
     hand: String,
-    weight: f32,
-    equity: f32,
-    ev: f32,
+    weight: f64,
+    equity: f64,
+    ev: f64,
     strategy: Option<HandStrategy>, // Optionnel car pas toujours disponible
 }
 
@@ -68,9 +69,31 @@ pub fn explore_and_save_ranges(
             .map_err(|e| format!("Échec de création du répertoire {}: {}", output_dir, e))?;
     }
 
+    // Initialiser le GameState
+    let mut state = GameState::new();
+
+    // Créer la racine
+    let root_spot = Spot {
+        spot_type: SpotType::Root,
+        index: 0,
+        player: "flop".to_string(),
+        selected_index: -1,
+        actions: Vec::new(),
+        cards: Vec::new(),
+        pot: game.tree_config().starting_pot as f64,
+        stack: game.tree_config().effective_stack as f64,
+        equity_oop: 0.0,
+        prev_player: None,
+    };
+
+    state.spots.push(root_spot);
+
+    // Sélectionner le premier spot pour initialiser le jeu
+    let results = select_spot(game, &mut state, 1, true, false)?;
+
     // Sauvegarder les données du nœud racine
     let root_path_id = format!("{}_ROOT", street_name);
-    save_node_data(game, &root_path_id, output_dir)?;
+    save_node_data(game, &root_path_id, output_dir, &results)?;
 
     // Commencer l'exploration récursive
     let mut flop_actions = Vec::new();
@@ -81,11 +104,13 @@ pub fn explore_and_save_ranges(
         3 => "F",
         4 => "T",
         5 => "R",
-        _ => "F", // par défaut flop
+        _ => "F",
     };
 
+    // Lancer l'exploration récursive
     explore_actions_recursive(
         game,
+        &mut state,
         &mut flop_actions,
         &mut turn_actions,
         &mut river_actions,
@@ -98,6 +123,7 @@ pub fn explore_and_save_ranges(
 
 fn explore_actions_recursive(
     game: &mut PostFlopGame,
+    state: &mut GameState,
     flop_actions: &mut Vec<String>,
     turn_actions: &mut Vec<String>,
     river_actions: &mut Vec<String>,
@@ -111,42 +137,62 @@ fn explore_actions_recursive(
         return Ok(());
     }
 
-    // Obtenir les actions disponibles
-    let actions = game.available_actions();
-    if actions.is_empty() {
+    // Obtenir le spot actuel et ses actions disponibles
+    let spot_index = state.selected_spot_index as usize;
+    if spot_index >= state.spots.len() {
+        return Err(format!("Index de spot invalide: {}", spot_index));
+    }
+
+    // Cloner les données nécessaires du spot au lieu de garder une référence
+    let action_count = state.spots[spot_index].actions.len();
+    if action_count == 0 {
         return Ok(());
     }
 
-    // Sauvegarder l'histoire actuelle pour pouvoir y revenir
+    // Cloner également les actions pour éviter l'emprunt
+    let actions: Vec<_> = state.spots[spot_index]
+        .actions
+        .iter()
+        .map(|action| (action.name.clone(), action.amount.clone()))
+        .collect();
+
+    // Sauvegarder l'histoire actuelle et l'état pour pouvoir y revenir
     let history = game.cloned_history();
+    let original_state = state.clone();
 
     // Explorer chaque action
-    for (action_idx, action) in actions.iter().enumerate() {
-        let action_str = format!("{:?}", action);
-        let action_formatted = format_action_string(&action_str);
+    for action_idx in 0..action_count {
+        // Utiliser les données clonées au lieu des références
+        let (action_name, action_amount) = &actions[action_idx];
+
+        let action_formatted = if action_amount != "0" {
+            format!("{}{}", action_name, action_amount)
+        } else {
+            action_name.clone()
+        };
 
         // Ajouter l'action au vecteur approprié selon la street
         match current_street {
             "F" => flop_actions.push(action_formatted.clone()),
             "T" => turn_actions.push(action_formatted.clone()),
             "R" => river_actions.push(action_formatted.clone()),
-            _ => flop_actions.push(action_formatted.clone()), // Par défaut flop
+            _ => flop_actions.push(action_formatted.clone()),
         };
 
-        // Jouer l'action
-        game.play(action_idx);
+        // Jouer l'action et récupérer les résultats
+        let results = play(game, state, action_idx)?;
 
         // Générer le path_id pour cette séquence d'actions
         let path_id = format_path_string(flop_actions, turn_actions, river_actions);
 
         // Sauvegarder les données du nœud actuel
-        save_node_data(game, &path_id, output_dir)?;
+        save_node_data(game, &path_id, output_dir, &results)?;
 
-        // Continuer l'exploration récursive si nous ne sommes pas à un nœud terminal ou chance
+        // Continuer l'exploration récursive - maintenant sans problème d'emprunt
         if !game.is_terminal_node() && !game.is_chance_node() && depth + 1 < max_depth {
-            // Si nous sommes toujours sur un nœud de joueur, explorer plus profondément
             explore_actions_recursive(
                 game,
+                state,
                 flop_actions,
                 turn_actions,
                 river_actions,
@@ -159,6 +205,7 @@ fn explore_actions_recursive(
 
         // Revenir à l'état précédent
         game.apply_history(&history);
+        *state = original_state.clone();
 
         // Retirer l'action du vecteur
         match current_street {
@@ -223,77 +270,24 @@ pub fn format_action_string(action: &str) -> String {
     }
 }
 
-pub fn extract_updated_ranges(game: &mut PostFlopGame) -> Result<(String, String), String> {
-    // Assurez-vous que les poids normalisés sont à jour
-    game.cache_normalized_weights();
+pub fn format_range_string(hands_with_weights: &[(String, f64)]) -> String {
+    let mut range = String::new();
 
-    // Extraire les mains et les poids pour chaque joueur
-    let oop_cards = game.private_cards(0);
-    let ip_cards = game.private_cards(1);
-    let oop_weights = game.normalized_weights(0);
-    let ip_weights = game.normalized_weights(1);
-
-    // Calculer les sommes totales des poids positifs
-    let oop_total: f32 = oop_weights.iter().filter(|&&w| w > 0.0).sum();
-    let ip_total: f32 = ip_weights.iter().filter(|&&w| w > 0.0).sum();
-
-    // Initialiser les chaînes de résultat
-    let mut oop_range = String::new(); // Cette ligne manquait!
-    let mut ip_range = String::new(); // Cette ligne manquait!
-
-    // Conversion pour OOP (villain)
-    let mut oop_hands: Vec<(String, f32)> = Vec::new();
-    for (idx, &(card1, card2)) in oop_cards.iter().enumerate() {
-        if oop_weights[idx] > 0.0 {
-            // Normaliser le poids en pourcentage du total
-            let normalized_weight = if oop_total > 0.0 {
-                (oop_weights[idx] / oop_total) * 100.0
-            } else {
-                0.0
-            };
-
-            let hand_str = format_hand_cards((card1, card2));
-            oop_hands.push((hand_str, normalized_weight));
+    for (i, (hand, weight)) in hands_with_weights.iter().enumerate() {
+        if i > 0 {
+            range.push(',');
         }
+        range.push_str(&format!("{}:{:.4}", hand, weight));
     }
 
-    // Même logique pour IP
-    let mut ip_hands: Vec<(String, f32)> = Vec::new();
-    for (idx, &(card1, card2)) in ip_cards.iter().enumerate() {
-        if ip_weights[idx] > 0.0 {
-            let normalized_weight = if ip_total > 0.0 {
-                (ip_weights[idx] / ip_total) * 100.0
-            } else {
-                0.0
-            };
-
-            let hand_str = format_hand_cards((card1, card2));
-            ip_hands.push((hand_str, normalized_weight));
-        }
-    }
-
-    // Convertir les vecteurs en strings de range
-    for (hand, weight) in oop_hands {
-        if !oop_range.is_empty() {
-            oop_range.push(',');
-        }
-        oop_range.push_str(&format!("{}:{:.2}", hand, weight));
-    }
-
-    for (hand, weight) in ip_hands {
-        if !ip_range.is_empty() {
-            ip_range.push(',');
-        }
-        ip_range.push_str(&format!("{}:{:.2}", hand, weight));
-    }
-
-    Ok((oop_range, ip_range))
+    range
 }
 
 pub fn save_node_data(
     game: &mut PostFlopGame,
     path_id: &str,
     output_dir: &str,
+    results: &SpecificResultData,
 ) -> Result<bool, String> {
     let filename = path_id
         .replace(":", "_")
@@ -320,9 +314,6 @@ pub fn save_node_data(
     let pot_oop = pot_base + total_bet_amount[0] as f64;
     let pot_ip = pot_base + total_bet_amount[1] as f64;
 
-    // Extraire les ranges à jour
-    let (oop_range, ip_range) = extract_updated_ranges(game)?;
-
     // Créer les données des joueurs
     let range_data = RangeData {
         path_id: path_id.to_string(),
@@ -331,8 +322,8 @@ pub fn save_node_data(
         pot_oop,
         pot_ip,
         current_player: game.current_player(),
-        oop_player: build_player_data(game, 0, &oop_range)?,
-        ip_player: build_player_data(game, 1, &ip_range)?,
+        oop_player: build_player_data(game, 0, results)?,
+        ip_player: build_player_data(game, 1, results)?,
     };
 
     // Sérialiser en JSON
@@ -360,15 +351,25 @@ pub fn save_node_data(
 fn build_player_data(
     game: &mut PostFlopGame,
     player: usize,
-    range_string: &str,
+    results: &SpecificResultData,
 ) -> Result<PlayerData, String> {
-    let equity = game.equity(player);
-    let ev = game.expected_values(player);
-    let weights = game.normalized_weights(player);
-    let hands = game.private_cards(player);
+    let equity = &results.equity[player];
+    let ev = &results.ev[player];
+    let weights = &results.weights[player];
+    let hands = if player == 0 {
+        &results.oop_cards
+    } else {
+        &results.ip_cards
+    };
 
-    // Utiliser holes_to_strings comme dans display_top_hands
-    let hand_strings = match holes_to_strings(hands) {
+    // Convertir les mains en chaînes
+    let hand_strings = match holes_to_strings(
+        hands
+            .iter()
+            .map(|&(c1, c2)| (c1 as u8, c2 as u8))
+            .collect::<Vec<_>>()
+            .as_slice(),
+    ) {
         Ok(strings) => strings,
         Err(_) => return Err("Erreur lors de la conversion des mains en chaînes".to_string()),
     };
@@ -390,6 +391,7 @@ fn build_player_data(
         action_evs = game.expected_values_detail(player);
     }
 
+    let mut hands_with_weights = Vec::new();
     let mut hand_data = Vec::new();
     let range_size = hands.len();
 
@@ -401,6 +403,7 @@ fn build_player_data(
 
         // Utiliser les noms de mains provenant de holes_to_strings
         let hand_name = &hand_strings[i];
+        hands_with_weights.push((hand_name.clone(), weights[i]));
 
         let mut hand_strategy = None;
 
@@ -440,6 +443,8 @@ fn build_player_data(
             strategy: hand_strategy,
         });
     }
+
+    let range_string = format_range_string(&hands_with_weights);
 
     Ok(PlayerData {
         hands_count: hand_data.len(), // Nombre de mains avec poids > 0
