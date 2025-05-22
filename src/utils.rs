@@ -208,209 +208,6 @@ pub fn weighted_average(slice: &[f32], weights: &[f32]) -> f64 {
     sum / weight_sum
 }
 
-pub fn print_hand_details(game: &mut PostFlopGame, max_hands: usize, results: &[f64]) {
-    // S'assurer que nous sommes dans un nœud valide
-    if game.is_terminal_node() || game.is_chance_node() {
-        println!("Ce nœud ne contient pas de stratégie (terminal ou chance)");
-        return;
-    }
-
-    game.cache_normalized_weights();
-
-    // Récupérer le joueur actuel
-    let player = game.current_player();
-    let player_str = if player == 0 { "OOP" } else { "IP" };
-    println!("\n=== DÉTAILS DU NŒUD ({}) ===", player_str);
-
-    // Récupérer les données brutes selon la structure exacte
-    let player_type = if player == 0 { "oop" } else { "ip" };
-    let num_actions = game.available_actions().len();
-
-    // Définir les tailles des ranges
-    let oop_range_size = game.private_cards(0).len();
-    let ip_range_size = game.private_cards(1).len();
-    let current_range_size = if player == 0 {
-        oop_range_size
-    } else {
-        ip_range_size
-    };
-
-    // --- Initialiser les offsets comme dans le code existant ---
-    let mut offset = 0;
-
-    // Récupérer les en-têtes
-    let pot_oop = results[offset];
-    offset += 1;
-    let pot_ip = results[offset];
-    offset += 1;
-    let is_empty_flag = results[offset] as usize;
-    offset += 1;
-
-    println!("Pot OOP: {:.2} bb", { pot_oop });
-    println!("Pot IP: {:.2} bb", { pot_ip });
-
-    // --- Calculer les offsets précisément ---
-
-    // Skip weights (raw)
-    let weights_offset = offset;
-    offset += oop_range_size + ip_range_size;
-
-    // Si les ranges ne sont pas vides
-    if is_empty_flag == 0 {
-        // Skip normalized weights
-        let norm_weights_offset = offset;
-        offset += oop_range_size + ip_range_size;
-
-        // Skip to equity of current player
-        let equity_offset = offset;
-        if player == 1 {
-            offset += oop_range_size; // Skip OOP equities
-        }
-        let player_equity_offset = offset;
-        offset += current_range_size + (if player == 0 { ip_range_size } else { 0 });
-
-        // Skip to EV of current player
-        let ev_offset = offset;
-        if player == 1 {
-            offset += oop_range_size; // Skip OOP EVs
-        }
-        let player_ev_offset = offset;
-        offset += current_range_size + (if player == 0 { ip_range_size } else { 0 });
-
-        // Skip EQRs
-        offset += oop_range_size + ip_range_size;
-
-        // Strategy offset
-        let strategy_offset = offset;
-
-        // Récupérer les actions disponibles
-        let actions = game.available_actions();
-
-        // EVs per action offset
-        let action_ev_offset = strategy_offset + (actions.len() * current_range_size);
-
-        // Afficher la stratégie globale
-        println!("\n=== STRATÉGIE GLOBALE ===");
-
-        // Calculer la stratégie globale pour chaque action
-        for (i, action) in actions.iter().enumerate() {
-            let action_str = format!("{:?}", action)
-                .to_uppercase()
-                .replace("(", " ")
-                .replace(")", "");
-
-            // Calculer la fréquence moyenne pour cette action
-            let mut total_freq = 0.0;
-            let mut total_weight = 0.0;
-            let weights = game.normalized_weights(player);
-
-            for hand_idx in 0..current_range_size {
-                let strat_idx = hand_idx + i * current_range_size;
-                if strategy_offset + strat_idx < results.len() {
-                    let strat_value = results[strategy_offset + strat_idx];
-                    total_freq += strat_value * weights[hand_idx] as f64;
-                    total_weight += weights[hand_idx] as f64;
-                }
-            }
-
-            let avg_freq = if total_weight > 0.0 {
-                (total_freq / total_weight) * 100.0
-            } else {
-                0.0
-            };
-
-            println!("  {} : {:.2}%", action_str, avg_freq);
-        }
-
-        // Récupérer les noms des mains
-        if let Ok(hand_strings) = holes_to_strings(game.private_cards(player)) {
-            // Déterminer combien de mains à afficher
-            let hands_to_show = std::cmp::min(max_hands, hand_strings.len());
-
-            // Afficher les détails pour chaque main
-            println!("\n=== DÉTAILS PAR MAIN ===");
-
-            for hand_idx in 0..hands_to_show {
-                let hand = &hand_strings[hand_idx];
-
-                // Vérifier que les indices sont valides
-                if player_equity_offset + hand_idx >= results.len()
-                    || player_ev_offset + hand_idx >= results.len()
-                {
-                    println!("Erreur: Indices hors limites pour la main {}", hand);
-                    continue;
-                }
-
-                let equity = results[player_equity_offset + hand_idx] * 100.0;
-                let ev = results[player_ev_offset + hand_idx];
-
-                println!("\n{} {{", hand);
-                println!("  eq: {:.2}%", equity);
-                println!("  ev: {:.2} bb", ev);
-                println!("  actions: [");
-
-                for (action_idx, action) in actions.iter().enumerate() {
-                    let action_str = format!("{:?}", action)
-                        .to_uppercase()
-                        .replace("(", " ")
-                        .replace(")", "");
-
-                    // Calculer les indices avec précaution
-                    let strategy_idx = strategy_offset + hand_idx + action_idx * current_range_size;
-                    let action_ev_idx =
-                        action_ev_offset + hand_idx + action_idx * current_range_size;
-
-                    // Vérifier que les indices sont valides
-                    if strategy_idx >= results.len() {
-                        println!("    {{ /* Donnée de stratégie non disponible */ }},");
-                        continue;
-                    }
-
-                    let frequency = results[strategy_idx] * 100.0;
-
-                    // L'EV de cette action pour cette main (si disponible)
-                    let action_ev = if action_ev_idx < results.len() {
-                        results[action_ev_idx]
-                    } else {
-                        // Si l'indice est invalide, utiliser 0.0
-                        0.0
-                    };
-
-                    println!("    {{");
-                    println!("      action: \"{}\",", action_str);
-                    println!("      frequency: {:.2}%,", frequency);
-                    println!("      ev: {:.2} bb", action_ev);
-
-                    // Ajouter une virgule si ce n'est pas la dernière action
-                    if action_idx < actions.len() - 1 {
-                        println!("    }},");
-                    } else {
-                        println!("    }}");
-                    }
-                }
-
-                println!("  ]");
-                println!("}}");
-            }
-
-            // Afficher un message si nous n'affichons pas toutes les mains
-            if hands_to_show < hand_strings.len() {
-                println!(
-                    "\n... et {} mains supplémentaires",
-                    hand_strings.len() - hands_to_show
-                );
-            }
-        } else {
-            println!("Erreur: Impossible d'obtenir les noms des mains");
-        }
-    } else {
-        println!(
-            "\nAucune main valide dans la range actuelle (is_empty_flag = {})",
-            is_empty_flag
-        );
-    }
-}
-
 pub fn get_specific_result(
     game: &mut PostFlopGame,
     current_player: &str,
@@ -660,16 +457,6 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
 
     let results = play(game, &mut state, bet_idx)?;
     display_top_hands(game, 10, "APRÈS OOP BET", &results)?;
-
-    // match extract_updated_ranges(game) {
-    //     Ok((oop_range, ip_range)) => {
-    //         println!("OOP Range: {}", oop_range);
-    //         println!("IP Range: {}", ip_range);
-    //     }
-    //     Err(e) => println!("Error extracting ranges: {}", e),
-    // }
-
-    // save_node_data(game, "FLOP_OOP_BET", "solver_results")?;
 
     // ÉTAPE 2: IP CALL SUR LE FLOP
     println!("\n=== ÉTAPE 2: IP CALL SUR LE FLOP ===");
@@ -942,7 +729,7 @@ pub fn explore_game_tree(game: &mut PostFlopGame) -> Result<(), String> {
         );
 
         // Afficher les informations du spot actuel
-        print_current_state(&state, game);
+        print_current_state(&state);
 
         // Options utilisateur
         println!("\nEntrez un nombre pour choisir une action");
@@ -1075,7 +862,7 @@ pub fn explore_game_tree(game: &mut PostFlopGame) -> Result<(), String> {
 }
 
 /// Fonction auxiliaire pour afficher l'état actuel du jeu
-fn print_current_state(state: &GameState, game: &PostFlopGame) {
+fn print_current_state(state: &GameState) {
     let current_spot_index = state.selected_spot_index as usize;
 
     if let Some(spot) = state.spots.get(current_spot_index) {
@@ -1133,24 +920,13 @@ fn print_current_state(state: &GameState, game: &PostFlopGame) {
 }
 
 pub fn actions_after(game: &mut PostFlopGame, append: &[usize]) -> String {
-    // println!("actions_after() - test 1");
     if append.is_empty() {
         return get_current_actions_string(game);
     }
 
     let history = game.cloned_history();
-
-    // println!("actions_after() - test 2");
-    // for &action in append {
-    //     println!("actions_after() action : {}", action);
-    //     game.play(action);
-    // }
-
     for &action in append {
-        // println!("actions_after() action: {}", action);
-
         if game.is_chance_node() {
-            // Trouver une carte valide à jouer
             let possible_cards = game.possible_cards();
 
             if possible_cards == 0 {
@@ -1166,19 +942,14 @@ pub fn actions_after(game: &mut PostFlopGame, append: &[usize]) -> String {
                 return format!("error: invalid card {}", action);
             };
 
-            // println!("Playing card {} instead of action {}", card_to_play, action);
             game.play(card_to_play);
         } else {
             game.play(action);
         }
     }
 
-    // println!("actions_after() - test 3");
     let result = get_current_actions_string(game);
-
-    // println!("actions_after() - test 4");
     game.apply_history(&history);
-
     result
 }
 
@@ -1368,34 +1139,6 @@ pub fn explore_recursive(
         // 1. Nœud terminal - afficher le résultat complet et revenir
         SpotType::Terminal => {
             *terminals_reached += 1;
-
-            // Afficher le chemin complet uniquement pour les nœuds terminaux
-            // println!("\n=== NŒUD TERMINAL ATTEINT (#{})=== ", *terminals_reached);
-            // println!("Chemin complet depuis la racine:");
-            // if path.is_empty() {
-            //     println!("  Racine (aucune action)");
-            // } else {
-            //     println!("  RACINE");
-            //     for (idx, action) in path.iter().enumerate() {
-            //         let prefix = if idx == path.len() - 1 {
-            //             "  └─ "
-            //         } else {
-            //             "  ├─ "
-            //         };
-            //         println!("  {}({}){}", prefix, idx + 1, action);
-            //     }
-            // }
-
-            // println!(
-            //     "Board final: {}",
-            //     game.current_board()
-            //         .iter()
-            //         .map(|&c| card_to_string_simple(c))
-            //         .collect::<Vec<_>>()
-            //         .join(" ")
-            // );
-            // println!("Pot final: {:.2} bb", current_spot.pot);
-            // println!("Équité OOP: {:.2}%", current_spot.equity_oop * 100.0);
             return Ok(());
         }
 
@@ -1674,208 +1417,7 @@ pub fn save_spot_results(
         .flush()
         .map_err(|e| format!("Error flushing data: {}", e))?;
 
-    // Get file size to report
-    let metadata =
-        metadata(&full_path).map_err(|e| format!("Failed to get file metadata: {}", e))?;
-
-    // println!(
-    //     "Saved results for '{}' ({:.2} KB)",
-    //     path_id,
-    //     metadata.len() as f64 / 1024.0
-    // );
-
     Ok(true) // File was saved
-}
-
-/// Saves the result of get_specific_result for flop actions to a file
-pub fn save_flop_results(
-    game: &mut PostFlopGame,
-    flop_actions: Option<&[String]>, // Add this parameter to accept flop actions
-) -> Result<(), String> {
-    // Only save if we're on the flop (board length = 3)
-    if game.current_board().len() == 3 && !game.is_terminal_node() && !game.is_chance_node() {
-        // Use the provided flop actions if available, otherwise use an empty vector
-        let actions = flop_actions.unwrap_or(&[]).to_vec();
-
-        // This creates a formatted path like "F:check" or "F:bet50-call" with real actions
-        let path_id = crate::file_output::format_path_string(
-            &actions,
-            &[], // Empty turn actions
-            &[], // Empty river actions
-        );
-
-        // Save the specific result data using the formatted path
-        if let Err(e) = save_hand_data_as_text(game, &path_id, "solver_results") {
-            println!("Error saving specific result data: {}", e);
-            return Err(e);
-        }
-    }
-
-    Ok(())
-}
-
-pub fn save_hand_data_as_text(
-    game: &mut PostFlopGame,
-    path_id: &str,
-    output_dir: &str,
-) -> Result<bool, String> {
-    let filename = path_id
-        .replace(":", "_")
-        .replace(" ", "_")
-        .replace(",", "_")
-        .replace("-", "_");
-
-    // Créer le chemin complet incluant le répertoire
-    let full_path = format!("{}/{}.txt", output_dir, filename);
-
-    // Créer le répertoire s'il n'existe pas
-    if !Path::new(output_dir).exists() {
-        std::fs::create_dir_all(output_dir)
-            .map_err(|e| format!("Échec de création du répertoire {}: {}", output_dir, e))?;
-    }
-
-    game.cache_normalized_weights();
-
-    // Ouvrir le fichier pour l'écriture
-    let file = File::create(&full_path)
-        .map_err(|e| format!("Échec de création du fichier {}: {}", full_path, e))?;
-    let mut writer = BufWriter::new(file);
-
-    // Écrire l'en-tête
-    writeln!(writer, "# HAND DATA FORMAT 1.0").map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-    // Écrire les informations du board
-    let board = game.current_board();
-    writeln!(writer, "board_size: {}", board.len())
-        .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-    let board_str = board
-        .iter()
-        .map(|&c| card_to_string_simple(c))
-        .collect::<Vec<_>>()
-        .join(" ");
-    writeln!(writer, "board: {}", board_str).map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-    // Écrire les informations de pot
-    let total_bet_amount = game.total_bet_amount();
-    let pot_base = game.tree_config().starting_pot + (total_bet_amount[0].min(total_bet_amount[1]));
-    let pot_oop = pot_base + total_bet_amount[0];
-    let pot_ip = pot_base + total_bet_amount[1];
-
-    writeln!(writer, "pot_oop: {}", pot_oop).map_err(|e| format!("Erreur d'écriture: {}", e))?;
-    writeln!(writer, "pot_ip: {}", pot_ip).map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-    // Écrire le joueur courant
-    let current_player = game.current_player();
-    writeln!(writer, "current_player: {}", current_player)
-        .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-    // Pour chaque joueur
-    for player in 0..2 {
-        let player_name = if player == 0 { "OOP" } else { "IP" };
-        writeln!(writer, "\n# PLAYER: {}", player_name)
-            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-        // Obtenir les valeurs utilisées par display_top_hands
-        let equity = game.equity(player);
-        let ev = game.expected_values(player);
-        let weights = game.normalized_weights(player);
-        let hands = game.private_cards(player);
-
-        // Convertir les noms des mains
-        let hand_strings = match holes_to_strings(hands) {
-            Ok(strings) => strings,
-            Err(_) => return Err("Erreur lors de la conversion des mains en chaînes".to_string()),
-        };
-
-        // Écrire le nombre de mains
-        let num_hands = hands.len();
-        writeln!(writer, "hands_count: {}", num_hands)
-            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-        // Écrire un en-tête pour les données
-        writeln!(writer, "hand,card1,card2,weight,equity,ev")
-            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-        // Pour chaque main, écrire toutes les données
-        for i in 0..num_hands {
-            let (card1, card2) = hands[i];
-            let hand_name = &hand_strings[i];
-
-            writeln!(
-                writer,
-                "{},{},{},{:.6},{:.6},{:.6}",
-                hand_name, card1, card2, weights[i], equity[i], ev[i]
-            )
-            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-        }
-    }
-
-    // Écrire les données de stratégie si ce n'est pas un nœud terminal ou chance
-    if !game.is_terminal_node() && !game.is_chance_node() {
-        writeln!(writer, "\n# STRATEGY").map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-        let player = game.current_player();
-        let strategy = game.strategy();
-        let action_evs = game.expected_values_detail(player);
-        let actions = game.available_actions();
-        let range_size = game.private_cards(player).len();
-
-        writeln!(writer, "num_actions: {}", actions.len())
-            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-        // Écrire les noms des actions
-        let action_names: Vec<String> = actions.iter().map(|a| format!("{:?}", a)).collect();
-        writeln!(writer, "actions: {}", action_names.join(","))
-            .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-        // Écrire les données de stratégie
-        writeln!(writer, "strategy_data:").map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-        for hand_idx in 0..range_size {
-            let mut line = Vec::new();
-            for action_idx in 0..actions.len() {
-                let strategy_idx = action_idx * range_size + hand_idx;
-                if strategy_idx < strategy.len() {
-                    line.push(format!("{:.6}", strategy[strategy_idx]));
-                }
-            }
-            writeln!(writer, "{}", line.join(","))
-                .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-        }
-
-        // Écrire les EV des actions
-        writeln!(writer, "action_ev_data:").map_err(|e| format!("Erreur d'écriture: {}", e))?;
-
-        for hand_idx in 0..range_size {
-            let mut line = Vec::new();
-            for action_idx in 0..actions.len() {
-                let ev_idx = action_idx * range_size + hand_idx;
-                if ev_idx < action_evs.len() {
-                    line.push(format!("{:.6}", action_evs[ev_idx]));
-                }
-            }
-            writeln!(writer, "{}", line.join(","))
-                .map_err(|e| format!("Erreur d'écriture: {}", e))?;
-        }
-    }
-
-    // Terminer l'écriture
-    writer
-        .flush()
-        .map_err(|e| format!("Erreur de flush: {}", e))?;
-
-    // Obtenir la taille du fichier pour le rapport
-    let metadata =
-        metadata(&full_path).map_err(|e| format!("Échec d'obtention des métadonnées: {}", e))?;
-
-    println!(
-        "Données sauvegardées pour '{}' ({:.2} KB)",
-        path_id,
-        metadata.len() as f64 / 1024.0
-    );
-
-    Ok(true)
 }
 
 pub fn display_top_hands(
@@ -2085,71 +1627,4 @@ pub fn format_hand_cards(card_pair: (u8, u8)) -> String {
         rank_to_char((card_pair.1 % 13) as usize),
         suit_to_char((card_pair.1 / 13) as usize)
     )
-}
-
-pub fn extract_updated_ranges(game: &mut PostFlopGame) -> Result<(String, String), String> {
-    game.cache_normalized_weights();
-
-    // Extraire les mains et les poids
-    let oop_cards = game.private_cards(0);
-    let ip_cards = game.private_cards(1);
-    let oop_weights = game.normalized_weights(0);
-    let ip_weights = game.normalized_weights(1);
-
-    // Calculer les sommes totales des poids pour normalisation
-    let oop_total: f32 = oop_weights.iter().sum();
-    let ip_total: f32 = ip_weights.iter().sum();
-
-    // Convertir en format range compatible avec l'entrée du solver
-    let mut oop_range = String::new();
-    let mut ip_range = String::new();
-
-    // Conversion pour OOP avec normalisation
-    let mut oop_hands: Vec<(String, f32)> = Vec::new();
-    for (idx, &(card1, card2)) in oop_cards.iter().enumerate() {
-        if oop_weights[idx] > 0.001 {
-            // Normaliser le poids (pourcentage du poids total)
-            let normalized_weight = if oop_total > 0.0 {
-                oop_weights[idx] / oop_total * 100.0 // Convertir en pourcentage
-            } else {
-                0.0
-            };
-
-            let hand_str = format_hand_cards((card1, card2));
-            oop_hands.push((hand_str, normalized_weight));
-        }
-    }
-
-    // Conversion pour IP avec normalisation
-    let mut ip_hands: Vec<(String, f32)> = Vec::new();
-    for (idx, &(card1, card2)) in ip_cards.iter().enumerate() {
-        if ip_weights[idx] > 0.001 {
-            // Normaliser le poids
-            let normalized_weight = if ip_total > 0.0 {
-                ip_weights[idx] / ip_total * 100.0 // Convertir en pourcentage
-            } else {
-                0.0
-            };
-
-            let hand_str = format_hand_cards((card1, card2));
-            ip_hands.push((hand_str, normalized_weight));
-        }
-    }
-
-    // Convertir les vecteurs en strings de range
-    for (hand, weight) in oop_hands {
-        if !oop_range.is_empty() {
-            oop_range.push(',');
-        }
-        oop_range.push_str(&format!("{}:{:.2}", hand, weight));
-    }
-
-    for (hand, weight) in ip_hands {
-        if !ip_range.is_empty() {
-            ip_range.push(',');
-        }
-        ip_range.push_str(&format!("{}:{:.2}", hand, weight));
-    }
-
-    Ok((oop_range, ip_range))
 }

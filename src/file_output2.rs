@@ -1,12 +1,9 @@
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::{self, BufReader, BufWriter, Write};
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 
 use crate::{
-    card_to_string_simple, format_hand_cards, format_path_string, holes_to_strings, play,
-    select_spot, GameState, PostFlopGame, SpecificResultData, Spot, SpotType,
+    card_to_string_simple, format_path_string, holes_to_strings, play, select_spot, GameState,
+    PostFlopGame, SpecificResultData, Spot, SpotType,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -52,31 +49,38 @@ pub fn explore_and_save_ranges(
 ) -> Result<(), String> {
     let board_size = game.current_board().len();
     let street_name = match board_size {
-        3 => "FLOP",
-        4 => "TURN",
-        5 => "RIVER",
-        _ => "UNKNOWN",
+        3 => "flop",
+        4 => "turn",
+        5 => "river",
+        _ => "unknown",
     };
+    let current_street = match game.current_board().len() {
+        3 => "F",
+        4 => "T",
+        5 => "R",
+        _ => "F",
+    };
+
+    let street_dir = format!("{}/{}", output_dir, street_name);
 
     println!(
         "Début de l'exploration des ranges sur {} (profondeur max: {})",
-        street_name, max_depth
+        street_name.to_uppercase(),
+        max_depth
     );
+    println!("Les fichiers seront sauvegardés dans: {}", street_dir);
 
     // Créer le répertoire de sortie s'il n'existe pas
-    if !Path::new(output_dir).exists() {
-        std::fs::create_dir_all(output_dir)
-            .map_err(|e| format!("Échec de création du répertoire {}: {}", output_dir, e))?;
+    if !Path::new(&street_dir).exists() {
+        std::fs::create_dir_all(&street_dir)
+            .map_err(|e| format!("Échec de création du répertoire {}: {}", street_dir, e))?;
     }
 
-    // Initialiser le GameState
     let mut state = GameState::new();
-
-    // Créer la racine
     let root_spot = Spot {
         spot_type: SpotType::Root,
         index: 0,
-        player: "flop".to_string(),
+        player: format!("{}", street_name),
         selected_index: -1,
         actions: Vec::new(),
         cards: Vec::new(),
@@ -88,45 +92,27 @@ pub fn explore_and_save_ranges(
 
     state.spots.push(root_spot);
 
-    // Sélectionner le premier spot pour initialiser le jeu
     let results = select_spot(game, &mut state, 1, true, false)?;
+    let root_path_id = format!("{}_Root", current_street);
+    save_node_data(game, &root_path_id, &street_dir, &results)?;
 
-    // Sauvegarder les données du nœud racine
-    let root_path_id = format!("{}_ROOT", street_name);
-    save_node_data(game, &root_path_id, output_dir, &results)?;
-
-    // Commencer l'exploration récursive
-    let mut flop_actions = Vec::new();
-    let mut turn_actions = Vec::new();
-    let mut river_actions = Vec::new();
-
-    let current_street = match game.current_board().len() {
-        3 => "F",
-        4 => "T",
-        5 => "R",
-        _ => "F",
-    };
-
-    // Lancer l'exploration récursive
+    let mut actions = Vec::new();
     explore_actions_recursive(
         game,
         &mut state,
-        &mut flop_actions,
-        &mut turn_actions,
-        &mut river_actions,
+        &mut actions,
         current_street,
-        output_dir,
+        &street_dir,
         0,
         max_depth,
     )
+    // Ok(())
 }
 
 fn explore_actions_recursive(
     game: &mut PostFlopGame,
     state: &mut GameState,
-    flop_actions: &mut Vec<String>,
-    turn_actions: &mut Vec<String>,
-    river_actions: &mut Vec<String>,
+    actions: &mut Vec<String>, // Un seul vecteur d'actions
     current_street: &str,
     output_dir: &str,
     depth: usize,
@@ -143,27 +129,22 @@ fn explore_actions_recursive(
         return Err(format!("Index de spot invalide: {}", spot_index));
     }
 
-    // Cloner les données nécessaires du spot au lieu de garder une référence
     let action_count = state.spots[spot_index].actions.len();
     if action_count == 0 {
         return Ok(());
     }
 
-    // Cloner également les actions pour éviter l'emprunt
-    let actions: Vec<_> = state.spots[spot_index]
+    let action_info: Vec<_> = state.spots[spot_index]
         .actions
         .iter()
         .map(|action| (action.name.clone(), action.amount.clone()))
         .collect();
 
-    // Sauvegarder l'histoire actuelle et l'état pour pouvoir y revenir
     let history = game.cloned_history();
     let original_state = state.clone();
 
-    // Explorer chaque action
     for action_idx in 0..action_count {
-        // Utiliser les données clonées au lieu des références
-        let (action_name, action_amount) = &actions[action_idx];
+        let (action_name, action_amount) = &action_info[action_idx];
 
         let action_formatted = if action_amount != "0" {
             format!("{}{}", action_name, action_amount)
@@ -171,31 +152,19 @@ fn explore_actions_recursive(
             action_name.clone()
         };
 
-        // Ajouter l'action au vecteur approprié selon la street
-        match current_street {
-            "F" => flop_actions.push(action_formatted.clone()),
-            "T" => turn_actions.push(action_formatted.clone()),
-            "R" => river_actions.push(action_formatted.clone()),
-            _ => flop_actions.push(action_formatted.clone()),
-        };
-
-        // Jouer l'action et récupérer les résultats
+        actions.push(action_formatted);
         let results = play(game, state, action_idx)?;
 
-        // Générer le path_id pour cette séquence d'actions
-        let path_id = format_path_string(flop_actions, turn_actions, river_actions);
+        if action_name != "Fold" {
+            let path_id = format_path_string(actions, current_street);
+            save_node_data(game, &path_id, output_dir, &results)?;
+        }
 
-        // Sauvegarder les données du nœud actuel
-        save_node_data(game, &path_id, output_dir, &results)?;
-
-        // Continuer l'exploration récursive - maintenant sans problème d'emprunt
         if !game.is_terminal_node() && !game.is_chance_node() && depth + 1 < max_depth {
             explore_actions_recursive(
                 game,
                 state,
-                flop_actions,
-                turn_actions,
-                river_actions,
+                actions,
                 current_street,
                 output_dir,
                 depth + 1,
@@ -207,13 +176,8 @@ fn explore_actions_recursive(
         game.apply_history(&history);
         *state = original_state.clone();
 
-        // Retirer l'action du vecteur
-        match current_street {
-            "F" => flop_actions.pop(),
-            "T" => turn_actions.pop(),
-            "R" => river_actions.pop(),
-            _ => flop_actions.pop(),
-        };
+        // Retirer la dernière action
+        actions.pop();
     }
 
     Ok(())
@@ -289,11 +253,16 @@ pub fn save_node_data(
     output_dir: &str,
     results: &SpecificResultData,
 ) -> Result<bool, String> {
-    let filename = path_id
+    let mut filename = path_id
         .replace(":", "_")
         .replace(" ", "_")
         .replace(",", "_")
         .replace("-", "_");
+
+    filename = filename
+        .chars()
+        .filter(|c| !c.is_digit(10)) // Supprime tous les chiffres (base 10)
+        .collect::<String>();
 
     let full_path = format!("{}/{}.json", output_dir, filename);
 

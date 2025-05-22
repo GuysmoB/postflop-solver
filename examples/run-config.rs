@@ -1,9 +1,8 @@
 use postflop_solver::card_to_string_simple;
 use postflop_solver::*;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
 use std::fs::File;
-use std::io::{self, BufReader, BufWriter, Write};
+use std::io::{self, BufReader, Write};
 use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -32,6 +31,7 @@ struct SolverConfig {
     use_compression: bool,
 }
 
+//cargo run --release --example run-config -- examples/config_file.json
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().collect();
 
@@ -152,7 +152,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Exploitability: {:.2}", exploitability);
 
     game.back_to_root();
-    explore_and_save_ranges(&mut game, "solver_results", 3)?;
+    explore_and_save_ranges(&mut game, "solver_results", 10)?;
     // run_bet_call_turn_scenario(&mut game)?;
     // explore_game_tree(&mut game);
     Ok(())

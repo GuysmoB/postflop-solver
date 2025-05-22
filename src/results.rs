@@ -1,4 +1,3 @@
-use crate::holes_to_strings;
 use crate::utils::*;
 use crate::weighted_average;
 use crate::Card;
@@ -305,9 +304,9 @@ pub fn select_spot(
     }
 
     // Save flop action results to file with the real action history
-    if let Err(e) = save_flop_results(game, Some(&flop_actions)) {
-        println!("Warning: Failed to save flop results: {}", e);
-    }
+    // if let Err(e) = save_flop_results(game, Some(&flop_actions)) {
+    //     println!("Warning: Failed to save flop results: {}", e);
+    // }
 
     let mut append_array: Vec<i32> = Vec::new();
     if selected_chance_index_tmp != -1 {

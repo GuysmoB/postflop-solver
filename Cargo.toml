@@ -23,3 +23,6 @@ flate2 = "1.0"
 default = ["bincode", "rayon"]
 custom-alloc = []
 rayon = ["dep:rayon", "zstd?/zstdmt"]
+
+[lints.rust]
+dead_code = "allow"

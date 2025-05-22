@@ -1,12 +1,8 @@
 use serde::{Deserialize, Serialize};
-use serde_json::json;
-use std::fs::File;
-use std::io::Write;
-use std::{collections::HashMap, io::BufWriter};
+use std::collections::HashMap;
 
 use crate::{
-    card_to_string_simple, deal, play, rank_to_char, round_to_decimal_places, save_spot_results,
-    select_spot, suit_to_char, Card, GameState, PostFlopGame, Spot, SpotType,
+    card_to_string_simple, deal, play, select_spot, Card, GameState, PostFlopGame, Spot, SpotType,
 };
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
@@ -77,12 +73,12 @@ fn build_node_recursive(
         let mut node = TreeNode {
             node_type: "chance_node".to_string(),
             player: chance_spot.player.to_uppercase(),
-            path: format_path_string(flop_actions, turn_actions, river_actions),
+            path: "".to_string(), //format_path_string(flop_actions, turn_actions, river_actions, current_street),
             ..Default::default()
         };
 
-        let path_id = format_path_string(flop_actions, turn_actions, river_actions);
-        // save_spot_results(game, &path_id, "solver_data");
+        let path_id = "".to_string(); //format_path_string(flop_actions, turn_actions, river_actions, current_street);
+                                      // save_spot_results(game, &path_id, "solver_data");
 
         let available_cards: Vec<usize> = chance_spot
             .cards
@@ -178,7 +174,7 @@ fn build_node_recursive(
         SpotType::Terminal => Ok(TreeNode {
             node_type: "terminal_node".to_string(),
             player: "TERMINAL".to_string(),
-            path: format_path_string(flop_actions, turn_actions, river_actions),
+            path: "".to_string(), //format_path_string(flop_actions, turn_actions, river_actions, current_street),
             ..Default::default()
         }),
 
@@ -188,7 +184,7 @@ fn build_node_recursive(
             let mut node = TreeNode {
                 node_type: "action_node".to_string(),
                 player: current_spot.player.to_uppercase(),
-                path: format_path_string(flop_actions, turn_actions, river_actions),
+                path: "".to_string(), // format_path_string(flop_actions, turn_actions, river_actions, current_street),
                 ..Default::default()
             };
 
@@ -199,8 +195,9 @@ fn build_node_recursive(
                 river_actions.clear();
             }
 
-            let path_id = format_path_string(flop_actions, turn_actions, river_actions);
-            // save_spot_results(game, &path_id, "solver_data");
+            let path_id = "".to_string(); //format_path_string(flop_actions, turn_actions, river_actions, current_street);
+                                          // format_path_string(flop_actions, turn_actions, river_actions, current_street);
+                                          // save_spot_results(game, &path_id, "solver_data");
 
             // Ajouter les actions disponibles
             let mut action_names = Vec::new();
@@ -346,52 +343,12 @@ fn build_exploration_tree(game: &mut PostFlopGame) -> Result<TreeNode, String> {
     )
 }
 
-/// Fonction utilitaire pour formater correctement le path_string
-pub fn format_path_string(
-    flop_actions: &[String],
-    turn_actions: &[String],
-    river_actions: &[String],
-) -> String {
-    let mut parts = Vec::new();
-
-    if flop_actions.is_empty() {
-        parts.push("F:".to_string());
-    } else {
-        parts.push(format!("F:{}", flop_actions.join("-")));
+pub fn format_path_string(actions: &[String], current_street: &str) -> String {
+    if actions.is_empty() {
+        return format!("{}:", current_street);
     }
 
-    // Ajouter les actions du turn s'il y en a
-    // Le premier élément est la carte turn, les autres sont les actions
-    if !turn_actions.is_empty() {
-        if turn_actions.len() > 1 {
-            // Premier élément est la carte
-            let turn_card = &turn_actions[0];
-            // Les éléments suivants sont les actions
-            let actions = &turn_actions[1..];
-            parts.push(format!("T:{}-{}", turn_card, actions.join("-")));
-        } else {
-            // S'il n'y a que la carte sans action
-            parts.push(format!("T:{}", turn_actions[0]));
-        }
-    }
-
-    // Ajouter les actions du river s'il y en a
-    // Le premier élément est la carte river, les autres sont les actions
-    if !river_actions.is_empty() {
-        if river_actions.len() > 1 {
-            // Premier élément est la carte
-            let river_card = &river_actions[0];
-            // Les éléments suivants sont les actions
-            let actions = &river_actions[1..];
-            parts.push(format!("R:{}-{}", river_card, actions.join("-")));
-        } else {
-            // S'il n'y a que la carte sans action
-            parts.push(format!("R:{}", river_actions[0]));
-        }
-    }
-
-    // Joindre toutes les parties avec des virgules
-    parts.join(", ")
+    format!("{}:{}", current_street, actions.join("-"))
 }
 
 /// Génère les stratégies optimales pour un nœud de jeu
