@@ -2,8 +2,9 @@ use postflop_solver::card_to_string_simple;
 use postflop_solver::*;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
-use std::io::{self, BufReader, Write};
+use std::io::BufReader;
 use std::path::Path;
+use std::time::{Duration, Instant};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SolverConfig {
@@ -17,10 +18,18 @@ struct SolverConfig {
     effective_stack: i32,
     rake_rate: f64,
     rake_cap: f64,
-    oop_bet_sizes: String,
-    oop_raise_sizes: String,
-    ip_bet_sizes: String,
-    ip_raise_sizes: String,
+    flop_oop_bet_sizes: String,
+    flop_oop_raise_sizes: String,
+    flop_ip_bet_sizes: String,
+    flop_ip_raise_sizes: String,
+    turn_oop_bet_sizes: String,
+    turn_oop_raise_sizes: String,
+    turn_ip_bet_sizes: String,
+    turn_ip_raise_sizes: String,
+    river_oop_bet_sizes: String,
+    river_oop_raise_sizes: String,
+    river_ip_bet_sizes: String,
+    river_ip_raise_sizes: String,
     turn_donk_sizes: Option<String>,
     river_donk_sizes: Option<String>,
     add_allin_threshold: f64,
@@ -29,6 +38,8 @@ struct SolverConfig {
     max_iterations: u32,
     target_exploitability: f32,
     use_compression: bool,
+    max_runtime_seconds: Option<u64>,
+    saved_folder: Option<String>,
 }
 
 //cargo run --release --example run-config -- examples/config_file.json
@@ -63,15 +74,41 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         river,
     };
 
-    let oop_bet_sizes = BetSizeOptions::try_from((
-        config.oop_bet_sizes.as_str(),
-        config.oop_raise_sizes.as_str(),
+    let flop_oop_bet_sizes = BetSizeOptions::try_from((
+        config.flop_oop_bet_sizes.as_str(),
+        config.flop_oop_raise_sizes.as_str(),
     ))
     .unwrap();
 
-    let ip_bet_sizes =
-        BetSizeOptions::try_from((config.ip_bet_sizes.as_str(), config.ip_raise_sizes.as_str()))
-            .unwrap();
+    let flop_ip_bet_sizes = BetSizeOptions::try_from((
+        config.flop_ip_bet_sizes.as_str(),
+        config.flop_ip_raise_sizes.as_str(),
+    ))
+    .unwrap();
+
+    let turn_oop_bet_sizes = BetSizeOptions::try_from((
+        config.turn_oop_bet_sizes.as_str(),
+        config.turn_oop_raise_sizes.as_str(),
+    ))
+    .unwrap();
+
+    let turn_ip_bet_sizes = BetSizeOptions::try_from((
+        config.turn_ip_bet_sizes.as_str(),
+        config.turn_ip_raise_sizes.as_str(),
+    ))
+    .unwrap();
+
+    let river_oop_bet_sizes = BetSizeOptions::try_from((
+        config.river_oop_bet_sizes.as_str(),
+        config.river_oop_raise_sizes.as_str(),
+    ))
+    .unwrap();
+
+    let river_ip_bet_sizes = BetSizeOptions::try_from((
+        config.river_ip_bet_sizes.as_str(),
+        config.river_ip_raise_sizes.as_str(),
+    ))
+    .unwrap();
 
     let turn_donk_sizes = config
         .turn_donk_sizes
@@ -96,9 +133,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         effective_stack: config.effective_stack,
         rake_rate: config.rake_rate,
         rake_cap: config.rake_cap,
-        flop_bet_sizes: [oop_bet_sizes.clone(), ip_bet_sizes.clone()],
-        turn_bet_sizes: [oop_bet_sizes.clone(), ip_bet_sizes.clone()],
-        river_bet_sizes: [oop_bet_sizes, ip_bet_sizes],
+        flop_bet_sizes: [flop_oop_bet_sizes, flop_ip_bet_sizes],
+        turn_bet_sizes: [turn_oop_bet_sizes, turn_ip_bet_sizes],
+        river_bet_sizes: [river_oop_bet_sizes, river_ip_bet_sizes],
         turn_donk_sizes,
         river_donk_sizes,
         add_allin_threshold: config.add_allin_threshold,
@@ -111,19 +148,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     game.allocate_memory(config.use_compression);
 
     let max_iterations = config.max_iterations;
-    let target_exploitability = config.target_exploitability;
-    let print_progress = true;
+    let target_exploitability = config.target_exploitability * 100.0;
     let mut exploitability = compute_exploitability(&game);
+    let start_time = Instant::now();
+    let timeout = config
+        .max_runtime_seconds
+        .map(|secs| Duration::from_secs(secs));
 
-    if print_progress {
-        print!("iteration: 0 / {max_iterations} ");
-        print!("(exploitability = {exploitability:.4e})");
-        use std::io::{self, Write};
-        io::stdout().flush().unwrap();
-    }
+    // log_game_state(&game, &config);
 
     for current_iteration in 0..max_iterations {
+        if let Some(max_duration) = timeout {
+            if start_time.elapsed() >= max_duration {
+                println!(
+                    "Solver stopped due to time limit ({} seconds), iteration: {}, exploitability: {:.2}%",
+                    max_duration.as_secs(), current_iteration, exploitability
+                );
+                break;
+            }
+        }
+
         if exploitability <= target_exploitability {
+            println!(
+                "Solver stopped due to target exploitability reached ({:.2}%), iteration: {}, time: {:.2} seconds",
+                exploitability, current_iteration, start_time.elapsed().as_secs_f64()
+            );
             break;
         }
 
@@ -133,26 +182,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             exploitability = compute_exploitability(&game);
         }
 
-        if print_progress {
-            print!(
-                "\riteration: {} / {} ",
-                current_iteration + 1,
-                max_iterations
+        if current_iteration + 1 == max_iterations {
+            println!(
+                "Solver stopped due to max iterations reached: {}, exploitability: {:.2}%, time: {:.2} seconds",
+                max_iterations, exploitability, start_time.elapsed().as_secs_f64()
             );
-            print!("(exploitability = {exploitability:.4e})");
-            io::stdout().flush().unwrap();
         }
     }
 
-    if print_progress {
-        println!();
-    }
+    // println!(
+    //     "Solver finished after {:.2} seconds (exploitability: {:.2}%)",
+    //     start_time.elapsed().as_secs_f64(),
+    //     exploitability
+    // );
 
     finalize(&mut game);
-    println!("Exploitability: {:.2}", exploitability);
-
     game.back_to_root();
-    explore_and_save_ranges(&mut game, "solver_results", 10)?;
+
+    let output_folder = match &config.saved_folder {
+        Some(folder) => format!("results/{}", folder),
+        None => "results".to_string(),
+    };
+
+    explore_and_save_ranges(&mut game, output_folder.as_str(), 10)?;
     // run_bet_call_turn_scenario(&mut game)?;
     // explore_game_tree(&mut game);
     Ok(())
@@ -170,7 +222,7 @@ fn load_config(filename: &str) -> Result<SolverConfig, Box<dyn std::error::Error
     Ok(config)
 }
 
-fn log_game_state(game: &PostFlopGame) {
+fn log_game_state(game: &PostFlopGame, config: &SolverConfig) {
     println!("\n===== POSTFLOP GAME INITIAL STATE =====");
 
     // Card configuration
@@ -206,14 +258,25 @@ fn log_game_state(game: &PostFlopGame) {
     println!("Initial state: {:?}", tree_config.initial_state);
     println!("Starting pot: {}", tree_config.starting_pot);
     println!("Effective stack: {}", tree_config.effective_stack);
-    println!("Rake rate: {}", tree_config.rake_rate);
+    println!("Rake rate: {}", tree_config.rake_rate * 100.0);
     println!("Rake cap: {}", tree_config.rake_cap);
-    println!("Add allin threshold: {}", tree_config.add_allin_threshold);
     println!(
-        "Force allin threshold: {}",
-        tree_config.force_allin_threshold
+        "Add allin threshold: {}%",
+        tree_config.add_allin_threshold * 100.0
     );
-    println!("Merging threshold: {}", tree_config.merging_threshold);
+    println!(
+        "Force allin threshold: {}%",
+        tree_config.force_allin_threshold * 100.0
+    );
+    println!(
+        "Merging threshold: {}%",
+        tree_config.merging_threshold * 100.0
+    );
+    println!(
+        "Target exploitability: {}%",
+        config.target_exploitability * 100.0
+    );
+    println!("Max iterations: {}", config.max_iterations);
 
     // Bet size information
     println!("\n--- Bet Size Configuration ---");

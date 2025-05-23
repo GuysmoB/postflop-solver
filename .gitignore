@@ -3,3 +3,4 @@ Cargo.lock
 results.json
 /solver_data
 /examples/solver_results/
+/examples/results/

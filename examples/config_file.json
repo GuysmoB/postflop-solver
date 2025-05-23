@@ -2,23 +2,38 @@
   "oop_range": "66+,A8s+,A5s-A4s,AJo+,K9s+,KQo,QTs+,JTs,96s+,85s+,75s+,65s,54s",
   "ip_range": "QQ-22,AQs-A2s,ATo+,K5s+,KJo+,Q8s+,J8s+,T7s+,96s+,86s+,75s+,64s+,53s+",
   "flop": "Td5d3h",
-  "turn": null,
+  "turn": "Ad",
   "river": null,
-  "initial_state": "Flop",
+  "initial_state": "Turn",
   "starting_pot": 20,
-  "effective_stack": 200,
+  "effective_stack": 100,
   "rake_rate": 0.0,
   "rake_cap": 0.0,
-  "oop_bet_sizes": "50%",
-  "oop_raise_sizes": "60%",
-  "ip_bet_sizes": "50%",
-  "ip_raise_sizes": "60%",
+  
+  "flop_oop_bet_sizes": "50%, a",
+  "flop_oop_raise_sizes": "2x, a",
+  "flop_ip_bet_sizes": "50%, a",
+  "flop_ip_raise_sizes": "2x, a",
+  
+  "turn_oop_bet_sizes": "50%, a",
+  "turn_oop_raise_sizes": "2x, a",
+  "turn_ip_bet_sizes": "50%, a",
+  "turn_ip_raise_sizes": "2x, a",
+  
+  "river_oop_bet_sizes": "50%, a",
+  "river_oop_raise_sizes": "2x, a",
+  "river_ip_bet_sizes": "50%, a",
+  "river_ip_raise_sizes": "2x, a",
+  
   "turn_donk_sizes": "50%",
   "river_donk_sizes": "50%",
+  
   "add_allin_threshold": 1.5,
   "force_allin_threshold": 0.2,
   "merging_threshold": 0.1,
-  "max_iterations": 10,
-  "target_exploitability": 0.1,
-  "use_compression": false
+  "max_iterations": 100,
+  "target_exploitability": 0.01,
+  "use_compression": false,
+  "max_runtime_seconds": 50,
+  "saved_folder": "Poker spin Titan 5-10"
 }

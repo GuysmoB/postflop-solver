@@ -63,12 +63,12 @@ pub fn explore_and_save_ranges(
 
     let street_dir = format!("{}/{}", output_dir, street_name);
 
-    println!(
-        "Début de l'exploration des ranges sur {} (profondeur max: {})",
-        street_name.to_uppercase(),
-        max_depth
-    );
-    println!("Les fichiers seront sauvegardés dans: {}", street_dir);
+    // println!(
+    //     "Début de l'exploration des ranges sur {} (profondeur max: {})",
+    //     street_name.to_uppercase(),
+    //     max_depth
+    // );
+    // println!("Les fichiers seront sauvegardés dans: {}", street_dir);
 
     // Créer le répertoire de sortie s'il n'existe pas
     if !Path::new(&street_dir).exists() {
@@ -253,6 +253,10 @@ pub fn save_node_data(
     output_dir: &str,
     results: &SpecificResultData,
 ) -> Result<bool, String> {
+    if results.equity.is_empty() || results.ev.is_empty() || results.weights.is_empty() {
+        return Err("Résultats incomplets, impossible de sauvegarder le nœud".to_string());
+    }
+
     let mut filename = path_id
         .replace(":", "_")
         .replace(" ", "_")
@@ -309,10 +313,10 @@ pub fn save_node_data(
     std::fs::write(&full_path, json_data)
         .map_err(|e| format!("Échec d'écriture du fichier {}: {}", full_path, e))?;
 
-    println!(
-        "Données sauvegardées en JSON pour '{}' dans {}",
-        path_id, full_path
-    );
+    // println!(
+    //     "Données sauvegardées en JSON pour '{}' dans {}",
+    //     path_id, full_path
+    // );
 
     Ok(true)
 }
@@ -322,6 +326,27 @@ fn build_player_data(
     player: usize,
     results: &SpecificResultData,
 ) -> Result<PlayerData, String> {
+    if results.equity.is_empty() {
+        return Err("Les données d'équité sont vides".to_string());
+    }
+
+    if results.ev.is_empty() {
+        return Err("Les données d'EV sont vides".to_string());
+    }
+
+    if results.weights.is_empty() {
+        return Err("Les données de poids sont vides".to_string());
+    }
+
+    // Vérifier si l'indice du joueur est valide
+    if player >= results.equity.len() {
+        return Err(format!(
+            "Index de joueur invalide: {} (max: {})",
+            player,
+            results.equity.len() - 1
+        ));
+    }
+
     let equity = &results.equity[player];
     let ev = &results.ev[player];
     let weights = &results.weights[player];
@@ -330,6 +355,25 @@ fn build_player_data(
     } else {
         &results.ip_cards
     };
+
+    // println!(
+    //     "Debug - tailles: hands={}, weights={}, equity={}, ev={}",
+    //     hands.len(),
+    //     weights.len(),
+    //     equity.len(),
+    //     ev.len()
+    // );
+
+    // S'assurer que nous n'itérons pas plus loin que la plus petite taille
+    let min_len = hands
+        .len()
+        .min(weights.len())
+        .min(equity.len())
+        .min(ev.len());
+
+    // if min_len != hands.len() {
+    //     println!("ALERTE: Incohérence dans les tailles des données");
+    // }
 
     // Convertir les mains en chaînes
     let hand_strings = match holes_to_strings(
@@ -363,6 +407,8 @@ fn build_player_data(
     let mut hands_with_weights = Vec::new();
     let mut hand_data = Vec::new();
     let range_size = hands.len();
+
+    // println!("before loop: {}", range_size);
 
     for i in 0..hands.len() {
         // Utiliser seulement les mains avec un poids > 0
@@ -407,11 +453,13 @@ fn build_player_data(
         hand_data.push(HandData {
             hand: hand_name.clone(),
             weight: weights[i],
-            equity: equity[i],
-            ev: ev[i],
+            equity: if i < equity.len() { equity[i] } else { 0.0 }, // SÉCURITÉ
+            ev: if i < ev.len() { ev[i] } else { 0.0 },
             strategy: hand_strategy,
         });
     }
+
+    // println!("after loop: {}", range_size);
 
     let range_string = format_range_string(&hands_with_weights);
 
