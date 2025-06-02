@@ -41,6 +41,7 @@ struct SolverConfig {
     max_runtime_seconds: Option<u64>,
     saved_folder: Option<String>,
     removed_lines: Option<Vec<Vec<String>>>,
+    added_lines: Option<Vec<Vec<String>>>,
 }
 
 //cargo run --release --example run-config -- examples/config_file.json
@@ -146,8 +147,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut action_tree = ActionTree::new(tree_config.clone())?;
 
+    remove_all_lines(&mut action_tree);
+
     if let Some(removed_lines) = &config.removed_lines {
         remove_lines_simple(&mut action_tree, removed_lines);
+    }
+
+    if let Some(added_lines) = &config.added_lines {
+        add_lines_simple(&mut action_tree, added_lines);
     }
 
     let mut game = PostFlopGame::with_config(card_config, action_tree)?;

@@ -1697,3 +1697,66 @@ pub fn remove_lines_simple(action_tree: &mut ActionTree, removed_lines_config: &
         }
     }
 }
+
+// Dans utils.rs
+pub fn add_lines_simple(action_tree: &mut ActionTree, added_lines_config: &[Vec<String>]) {
+    println!("\n=== AJOUT DE LIGNES ===");
+
+    for line_str in added_lines_config {
+        match parse_action_line(line_str) {
+            Ok(action_sequence) => {
+                println!("Ajout de la ligne: {:?}", line_str);
+                if let Err(e) = action_tree.add_line(&action_sequence) {
+                    eprintln!("Failed to add line {:?}: {}", line_str, e);
+                } else {
+                    println!("  ✓ Ligne ajoutée avec succès");
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to parse action sequence {:?}: {}", line_str, e);
+            }
+        }
+    }
+
+    println!("=== FIN DE L'AJOUT ===\n");
+}
+
+// Dans utils.rs
+// Dans utils.rs - Remplacer remove_all_lines par :
+pub fn remove_all_lines(action_tree: &mut ActionTree) -> Result<(), String> {
+    println!("\n=== SUPPRESSION DE TOUTES LES LIGNES ===");
+
+    let mut removed_count = 0;
+    let max_attempts = 1000; // Limite de sécurité
+
+    // Continuer à supprimer jusqu'à ce qu'il n'y ait plus rien à supprimer
+    for attempt in 0..max_attempts {
+        let invalid_terminals = action_tree.invalid_terminals();
+
+        if invalid_terminals.is_empty() {
+            break;
+        }
+
+        // Prendre la première ligne et essayer de la supprimer
+        let line_to_remove = &invalid_terminals[0];
+
+        match action_tree.remove_line(line_to_remove) {
+            Ok(()) => {
+                removed_count += 1;
+                println!("  ✓ Ligne {} supprimée", removed_count);
+            }
+            Err(e) => {
+                println!("  ✗ Erreur: {}", e);
+                break;
+            }
+        }
+    }
+
+    if removed_count == 0 {
+        println!("Aucune ligne à supprimer - l'arbre est déjà minimal");
+    } else {
+        println!("=== {} LIGNES SUPPRIMÉES ===", removed_count);
+    }
+
+    Ok(())
+}

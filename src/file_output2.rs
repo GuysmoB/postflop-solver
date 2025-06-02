@@ -263,10 +263,10 @@ pub fn save_node_data(
         .replace(",", "_")
         .replace("-", "_");
 
-    filename = filename
-        .chars()
-        .filter(|c| !c.is_digit(10)) // Supprime tous les chiffres (base 10)
-        .collect::<String>();
+    // filename = filename
+    //     .chars()
+    //     .filter(|c| !c.is_digit(10)) // Supprime tous les chiffres (base 10)
+    //     .collect::<String>();
 
     let full_path = format!("{}/{}.json", output_dir, filename);
 

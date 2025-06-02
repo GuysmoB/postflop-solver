@@ -9,25 +9,20 @@
   "effective_stack": 100,
   "rake_rate": 0.0,
   "rake_cap": 0.0,
-  
-  "flop_oop_bet_sizes": "50%, a",
-  "flop_oop_raise_sizes": "2x, a",
-  "flop_ip_bet_sizes": "50%, a",
-  "flop_ip_raise_sizes": "2x, a",
-  
+  "flop_oop_bet_sizes": "",
+  "flop_oop_raise_sizes": "",
+  "flop_ip_bet_sizes": "",
+  "flop_ip_raise_sizes": "",
   "turn_oop_bet_sizes": "50%, a",
   "turn_oop_raise_sizes": "2x, a",
   "turn_ip_bet_sizes": "50%, a",
   "turn_ip_raise_sizes": "2x, a",
-  
-  "river_oop_bet_sizes": "50%, a",
-  "river_oop_raise_sizes": "2x, a",
-  "river_ip_bet_sizes": "50%, a",
-  "river_ip_raise_sizes": "2x, a",
-  
   "turn_donk_sizes": "50%",
-  "river_donk_sizes": "50%",
-  
+  "river_oop_bet_sizes": "",
+  "river_oop_raise_sizes": "",
+  "river_ip_bet_sizes": "",
+  "river_ip_raise_sizes": "",
+  "river_donk_sizes": "",
   "add_allin_threshold": 1.5,
   "force_allin_threshold": 0.2,
   "merging_threshold": 0.1,
@@ -36,11 +31,7 @@
   "use_compression": false,
   "max_runtime_seconds": 50,
   "saved_folder": "Poker spin Titan 5-10",
-
-    "removed_lines": [
-    ["Bet10", "Call"],
-    ["Bet10", "AllIn100"],
-["AllIn100"],
-["Check"]
-  ]
+  "removed_lines": [],
+  "added_lines": [
+   ["Bet10"]]
 }
