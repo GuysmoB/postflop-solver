@@ -2,9 +2,9 @@
   "oop_range": "66+,A8s+,A5s-A4s,AJo+,K9s+,KQo,QTs+,JTs,96s+,85s+,75s+,65s,54s",
   "ip_range": "QQ-22,AQs-A2s,ATo+,K5s+,KJo+,Q8s+,J8s+,T7s+,96s+,86s+,75s+,64s+,53s+",
   "flop": "Td5d3h",
-  "turn": "Ad",
+  "turn": null,
   "river": null,
-  "initial_state": "Turn",
+  "initial_state": "Flop",
   "starting_pot": 20,
   "effective_stack": 100,
   "rake_rate": 0.0,
@@ -35,5 +35,12 @@
   "target_exploitability": 0.01,
   "use_compression": false,
   "max_runtime_seconds": 50,
-  "saved_folder": "Poker spin Titan 5-10"
+  "saved_folder": "Poker spin Titan 5-10",
+
+    "removed_lines": [
+    ["Bet10", "Call"],
+    ["Bet10", "AllIn100"],
+["AllIn100"],
+["Check"]
+  ]
 }

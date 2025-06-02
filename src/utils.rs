@@ -1,16 +1,15 @@
-use std::fs::metadata;
 use std::fs::File;
 use std::io::BufWriter;
 use std::io::Write;
 use std::path::Path;
 
-use crate::action_tree::Action as GameAction;
+use crate::action_tree::Action;
 use crate::deal;
 use crate::holes_to_strings;
 use crate::play;
 use crate::results::select_spot;
 use crate::save_exploration_results;
-use crate::save_node_data;
+use crate::ActionTree;
 use crate::Card;
 use crate::GameState;
 use crate::PostFlopGame;
@@ -23,6 +22,14 @@ use rand::Rng;
 pub struct PredefinedCard {
     pub card_index: usize,
     pub card_value: Card,
+}
+
+#[derive(Debug)]
+pub enum ActionPattern {
+    Exact(Action),
+    BetWildcard,
+    RaiseWildcard,
+    AllInWildcard,
 }
 
 #[derive(Clone)]
@@ -962,12 +969,12 @@ pub fn get_current_actions_string(game: &PostFlopGame) -> String {
         game.available_actions()
             .iter()
             .map(|action| match action {
-                GameAction::Fold => "Fold:0".to_string(),
-                GameAction::Check => "Check:0".to_string(),
-                GameAction::Call => "Call:0".to_string(),
-                GameAction::Bet(amount) => format!("Bet:{}", amount),
-                GameAction::Raise(amount) => format!("Raise:{}", amount),
-                GameAction::AllIn(amount) => format!("Allin:{}", amount),
+                Action::Fold => "Fold:0".to_string(),
+                Action::Check => "Check:0".to_string(),
+                Action::Call => "Call:0".to_string(),
+                Action::Bet(amount) => format!("Bet:{}", amount),
+                Action::Raise(amount) => format!("Raise:{}", amount),
+                Action::AllIn(amount) => format!("Allin:{}", amount),
                 _ => unreachable!(),
             })
             .collect::<Vec<_>>()
@@ -1627,4 +1634,66 @@ pub fn format_hand_cards(card_pair: (u8, u8)) -> String {
         rank_to_char((card_pair.1 % 13) as usize),
         suit_to_char((card_pair.1 / 13) as usize)
     )
+}
+
+// Fonction pour parser une action individuelle
+pub fn parse_action(action_str: &str) -> Result<Action, String> {
+    match action_str {
+        "Fold" => Ok(Action::Fold),
+        "Check" => Ok(Action::Check),
+        "Call" => Ok(Action::Call),
+        s if s.starts_with("Bet") => {
+            let amount_str = &s[3..];
+            let amount = amount_str
+                .parse::<i32>()
+                .map_err(|_| format!("Invalid bet amount: {}", amount_str))?;
+            Ok(Action::Bet(amount))
+        }
+        s if s.starts_with("Raise") => {
+            let amount_str = &s[5..];
+            let amount = amount_str
+                .parse::<i32>()
+                .map_err(|_| format!("Invalid raise amount: {}", amount_str))?;
+            Ok(Action::Raise(amount))
+        }
+        s if s.starts_with("AllIn") => {
+            let amount_str = &s[5..];
+            let amount = amount_str
+                .parse::<i32>()
+                .map_err(|_| format!("Invalid all-in amount: {}", amount_str))?;
+            Ok(Action::AllIn(amount))
+        }
+        _ => Err(format!("Unknown action: {}", action_str)),
+    }
+}
+
+// Et modifier parse_action_line pour utiliser Action
+pub fn parse_action_line(line_str: &[String]) -> Result<Vec<Action>, String> {
+    let mut actions = Vec::new();
+
+    for action_str in line_str {
+        let action = parse_action(action_str)?;
+        actions.push(action);
+    }
+
+    Ok(actions)
+}
+
+// Dans utils.rs - Version simple sans génération de montants
+pub fn remove_lines_simple(action_tree: &mut ActionTree, removed_lines_config: &[Vec<String>]) {
+    for line_str in removed_lines_config {
+        match parse_action_line(line_str) {
+            Ok(action_sequence) => {
+                println!("Suppression de la ligne: {:?}", line_str);
+                if let Err(e) = action_tree.remove_line(&action_sequence) {
+                    eprintln!("Failed to remove line {:?}: {}", line_str, e);
+                } else {
+                    println!("  ✓ Supprimé");
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to parse action sequence {:?}: {}", line_str, e);
+            }
+        }
+    }
 }

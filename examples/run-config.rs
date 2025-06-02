@@ -40,6 +40,7 @@ struct SolverConfig {
     use_compression: bool,
     max_runtime_seconds: Option<u64>,
     saved_folder: Option<String>,
+    removed_lines: Option<Vec<Vec<String>>>,
 }
 
 //cargo run --release --example run-config -- examples/config_file.json
@@ -143,7 +144,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         merging_threshold: config.merging_threshold,
     };
 
-    let action_tree = ActionTree::new(tree_config.clone())?;
+    let mut action_tree = ActionTree::new(tree_config.clone())?;
+
+    if let Some(removed_lines) = &config.removed_lines {
+        remove_lines_simple(&mut action_tree, removed_lines);
+    }
+
     let mut game = PostFlopGame::with_config(card_config, action_tree)?;
     game.allocate_memory(config.use_compression);
 
@@ -156,7 +162,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(|secs| Duration::from_secs(secs));
 
     // log_game_state(&game, &config);
-
     for current_iteration in 0..max_iterations {
         if let Some(max_duration) = timeout {
             if start_time.elapsed() >= max_duration {

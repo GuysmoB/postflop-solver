@@ -23,7 +23,7 @@ pub struct SpotSelectionResult {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Action {
+pub struct SpotAction {
     pub index: usize,
     pub name: String,
     pub amount: String,
@@ -44,7 +44,7 @@ pub struct Spot {
     pub index: usize,
     pub player: String,
     pub selected_index: i32,
-    pub actions: Vec<Action>,
+    pub actions: Vec<SpotAction>,
     pub cards: Vec<SpotCard>,
     pub prev_player: Option<String>, // Nouveau champ
     pub pot: f64,
@@ -725,7 +725,7 @@ fn splice_spots_chance(
         };
 
         // Note: Dans le frontend, une couleur est calculée ici avec actionColor
-        player_actions.push(Action {
+        player_actions.push(SpotAction {
             index: i,
             name,
             amount,
@@ -783,7 +783,7 @@ fn splice_spots_player(
     };
 
     let actions: Vec<&str> = actions_str.split('/').collect();
-    let player_actions: Vec<Action> = actions
+    let player_actions: Vec<SpotAction> = actions
         .iter()
         .enumerate()
         .map(|(i, action)| {
@@ -795,7 +795,7 @@ fn splice_spots_player(
                 "0".to_string()
             };
 
-            Action {
+            SpotAction {
                 index: i,
                 name,
                 amount,
