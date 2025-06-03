@@ -9,10 +9,10 @@
   "effective_stack": 100,
   "rake_rate": 0.0,
   "rake_cap": 0.0,
-  "flop_oop_bet_sizes": "",
-  "flop_oop_raise_sizes": "",
-  "flop_ip_bet_sizes": "",
-  "flop_ip_raise_sizes": "",
+  "flop_oop_bet_sizes": "50%, a",
+  "flop_oop_raise_sizes": "2x, a",
+  "flop_ip_bet_sizes": "50%, a",
+  "flop_ip_raise_sizes": "2x, a",
   "turn_oop_bet_sizes": "50%, a",
   "turn_oop_raise_sizes": "2x, a",
   "turn_ip_bet_sizes": "50%, a",
@@ -32,6 +32,5 @@
   "max_runtime_seconds": 50,
   "saved_folder": "Poker spin Titan 5-10",
   "removed_lines": [],
-  "added_lines": [
-   ["Bet10"]]
+  "added_lines": []
 }

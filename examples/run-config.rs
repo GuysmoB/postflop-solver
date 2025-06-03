@@ -147,8 +147,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut action_tree = ActionTree::new(tree_config.clone())?;
 
-    remove_all_lines(&mut action_tree);
-
     if let Some(removed_lines) = &config.removed_lines {
         remove_lines_simple(&mut action_tree, removed_lines);
     }

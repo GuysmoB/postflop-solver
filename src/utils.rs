@@ -1700,8 +1700,6 @@ pub fn remove_lines_simple(action_tree: &mut ActionTree, removed_lines_config: &
 
 // Dans utils.rs
 pub fn add_lines_simple(action_tree: &mut ActionTree, added_lines_config: &[Vec<String>]) {
-    println!("\n=== AJOUT DE LIGNES ===");
-
     for line_str in added_lines_config {
         match parse_action_line(line_str) {
             Ok(action_sequence) => {
@@ -1717,8 +1715,6 @@ pub fn add_lines_simple(action_tree: &mut ActionTree, added_lines_config: &[Vec<
             }
         }
     }
-
-    println!("=== FIN DE L'AJOUT ===\n");
 }
 
 // Dans utils.rs
