@@ -551,6 +551,7 @@ pub fn run_bet_call_turn_scenario(game: &mut PostFlopGame) -> Result<(), String>
     );
 
     play(game, &mut state, turn_bet_idx)?;
+    display_top_hands(game, 10, "APRÈS OOP BET SUR LA TURN", &results)?;
 
     // ÉTAPE 5: IP CALL SUR LA TURN
     println!("\n=== ÉTAPE 5: IP CALL SUR LA TURN ===");
